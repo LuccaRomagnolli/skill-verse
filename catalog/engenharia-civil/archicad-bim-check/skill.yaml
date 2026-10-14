@@ -1,0 +1,9 @@
+titulo: Auditoria BIM no ArchiCAD
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Audita o modelo aberto no ArchiCAD 29 contra regras de entrega (classificação, numeração de ambientes, propriedades IFC, layers), marca os elementos com problema, cria issues e exporta BCF para compatibilização.
+mcps: [archicad]
+exemplos:
+  - "O modelo está pronto para exportar IFC para o calculista?"
+  - "Rode a auditoria de entrega e me diga o que falta corrigir"
+  - "Marque no ArchiCAD as paredes sem classificação e gere um BCF para a equipe"

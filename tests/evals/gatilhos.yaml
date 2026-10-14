@@ -1,0 +1,52 @@
+# Casos de gatilho por skill: pedidos que DEVEM acionar a skill e pedidos parecidos que NÃO devem.
+# Use com a skill skill-creator (otimização de description) ou com `claude plugin eval` quando montar a suíte.
+concreto-armado-nbr6118:
+  deve:
+    - "Quanto de aço vai numa viga 15x40 com momento de 60 kN.m?"
+    - "Essa laje de 10 cm aguenta um vão de 4,5 m?"
+    - "Dimensiona o pilar P3 pra mim, 1200 kN, 3 m de pé-direito"
+    - "qual bitola de estribo usar nessa viga"
+  nao_deve:
+    - "Qual o traço de concreto para fck 25?"
+    - "Me explica a diferença entre CA-50 e CA-60 para uma prova"
+cargas-combinacoes:
+  deve:
+    - "Qual sobrecarga uso numa sala de escritório?"
+    - "Calcula o vento num galpão de 8 m de altura em Goiânia"
+    - "Monta as combinações ELU com peso próprio, uso e vento"
+  nao_deve:
+    - "Quanto pesa um saco de cimento?"
+memorial-de-calculo:
+  deve:
+    - "Gera o memorial de cálculo dessas peças"
+    - "Preciso documentar o dimensionamento pra prefeitura"
+  nao_deve:
+    - "Escreve o memorial descritivo de arquitetura da casa"
+quantitativos-sinapi:
+  deve:
+    - "Quantos m³ de concreto tem essa estrutura?"
+    - "Orça a estrutura com o SINAPI de agosto, BDI 22%"
+    - "Qual o código SINAPI de alvenaria de bloco cerâmico 14 cm?"
+  nao_deve:
+    - "Qual o preço do cimento hoje na minha cidade?"
+autocad-assistente:
+  deve:
+    - "Desenha no AutoCAD a seção da viga V2"
+    - "Me gera um DXF com os pilares"
+    - "Cria os layers do projeto estrutural"
+  nao_deve:
+    - "Qual atalho do AutoCAD pra fazer offset?"
+archicad-bim-check:
+  deve:
+    - "O modelo do ArchiCAD tá pronto pra mandar o IFC pro calculista?"
+    - "Quais paredes estão sem classificação?"
+    - "Gera um BCF com as pendências do modelo"
+  nao_deve:
+    - "Como faço uma escada no ArchiCAD?"
+relatorio-tecnico:
+  deve:
+    - "Monta um laudo de vistoria com essas fotos"
+    - "Preciso de um parecer técnico sobre abrir essa parede"
+    - "Faz o relatório de inspeção predial do condomínio"
+  nao_deve:
+    - "Resume esse artigo científico"

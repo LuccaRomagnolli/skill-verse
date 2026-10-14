@@ -1,0 +1,9 @@
+titulo: Relatórios e laudos técnicos
+categoria: _comum
+version: 1.0.0
+resumo: Redige relatórios técnicos, laudos de vistoria, pareceres e relatórios de inspeção predial na estrutura das normas, com fotos numeradas, e entrega em Word e PDF.
+mcps: []
+exemplos:
+  - "Monte um laudo de vistoria das fissuras com estas 6 fotos"
+  - "Escreva um parecer técnico sobre a viabilidade de abrir um vão nesta parede"
+  - "Faça o relatório de inspeção predial do condomínio com as anomalias que listei"

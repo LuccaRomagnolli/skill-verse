@@ -1,0 +1,45 @@
+id: engenharia-civil
+nome: Pack Engenharia Civil
+version: 1.0.0
+publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
+descricao: >-
+  Cálculo de concreto armado pela NBR 6118, cargas, vento e combinações, memorial de cálculo,
+  quantitativos com orçamento SINAPI, laudos técnicos e conexão com AutoCAD e ArchiCAD.
+skills:
+  - engenharia-civil/concreto-armado-nbr6118
+  - engenharia-civil/cargas-combinacoes
+  - engenharia-civil/memorial-de-calculo
+  - engenharia-civil/quantitativos-sinapi
+  - engenharia-civil/autocad-assistente
+  - engenharia-civil/archicad-bim-check
+  - _comum/relatorio-tecnico
+mcps:
+  - nome: autocad
+    opcional: true
+  - nome: archicad
+    opcional: true
+fluxos:
+  - titulo: Do lançamento ao memorial (pavimento de concreto armado)
+    passos:
+      - "Descreva o pavimento: \"Tenho 4 lajes, 6 vigas e 6 pilares; as lajes são…\" — o agente organiza o lançamento."
+      - "Peça as cargas: \"Quais cargas uso em apartamento com porcelanato e forro de gesso?\" (cargas-combinacoes)."
+      - "Calcule as lajes uma a uma e anote as reações nas vigas (concreto-armado-nbr6118)."
+      - "Calcule as vigas com essas reações e depois os pilares com a carga acumulada."
+      - "Peça: \"Gere o memorial com tudo que calculamos\" (memorial-de-calculo) — sai em Word e PDF."
+  - titulo: Do cálculo ao desenho
+    passos:
+      - "Com uma viga ou pilar calculado, peça: \"Desenhe a seção da V1 no AutoCAD\" (autocad-assistente)."
+      - "Sem AutoCAD aberto, peça o DXF: \"Gere o DXF das seções de todos os pilares\"."
+  - titulo: Orçamento rápido da estrutura
+    passos:
+      - "Baixe a planilha SINAPI do seu estado no site da Caixa."
+      - "Peça: \"Levante os quantitativos da estrutura e orce com o SINAPI de <mês>, BDI 25%\" (quantitativos-sinapi)."
+  - titulo: Modelo BIM pronto para entrega
+    passos:
+      - "Abra o projeto no ArchiCAD 29 e salve."
+      - "Peça: \"Audite o modelo para exportar IFC\" (archicad-bim-check) e corrija o que for apontado."
+      - "Exporte as pendências em BCF para a equipe de projeto."
+  - titulo: Laudo de vistoria com fotos
+    passos:
+      - "Junte as fotos numa pasta e suas anotações de campo."
+      - "Peça: \"Monte um laudo de vistoria com estas fotos e anotações\" (relatorio-tecnico)."

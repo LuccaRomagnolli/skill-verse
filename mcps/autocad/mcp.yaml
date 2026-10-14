@@ -1,0 +1,43 @@
+# MCP de terceiros — NÃO embutimos o código; o instalador baixa a versão fixada do upstream.
+nome: autocad
+titulo: AutoCAD LT (2024+)
+descricao: >-
+  Controla o AutoCAD LT pelo chat: desenhar entidades, layers, blocos, cotas, P&ID.
+  Sem AutoCAD (ou no macOS/Linux) roda em modo "headless" e gera arquivos DXF.
+licenca: MIT
+upstream: https://github.com/puran-water/autocad-mcp
+versao_fixada: 95476a33a1c246308326eb4709d6379ef2efdbc1
+requisitos:
+  so: [windows, macos, linux]
+  software: "AutoCAD LT 2024+ no Windows (opcional — sem ele, gera DXF headless)"
+  ferramentas: [uv]
+# Onde procurar o software instalado (glob). Se não achar, ainda instala em modo headless.
+deteccao:
+  windows: ["C:/Program Files/Autodesk/AutoCAD LT 20*", "C:/Program Files/Autodesk/AutoCAD 20*"]
+  macos: ["/Applications/Autodesk/AutoCAD*"]
+util_sem_software: true
+preparo:
+  - baixar_zip: https://github.com/puran-water/autocad-mcp/archive/95476a33a1c246308326eb4709d6379ef2efdbc1.zip
+    destino: "{MCP_DIR}/autocad-mcp"
+  - comando: ["uv", "sync", "--directory", "{MCP_DIR}/autocad-mcp"]
+servidor:
+  command: uv
+  args: ["run", "--directory", "{MCP_DIR}/autocad-mcp", "python", "-m", "autocad_mcp"]
+  env:
+    AUTOCAD_MCP_BACKEND: auto
+  por_so:
+    macos: {env: {AUTOCAD_MCP_BACKEND: ezdxf}}
+    linux: {env: {AUTOCAD_MCP_BACKEND: ezdxf}}
+teste:
+  tool_esperada: system
+pos_instalacao:
+  windows:
+    - "Abra o AutoCAD LT e digite APPLOAD."
+    - "Carregue o arquivo {MCP_DIR}/autocad-mcp/lisp-code/mcp_dispatch.lsp (adicione ao Startup Suite para carregar sempre)."
+    - "A mensagem '=== MCP Dispatch ... loaded ===' confirma que está pronto."
+  macos:
+    - "No macOS o AutoCAD não aceita AutoLISP: o MCP funciona em modo headless, gerando arquivos .dxf que você abre no AutoCAD/DWG viewer."
+  linux:
+    - "Modo headless: gera arquivos .dxf."
+avisos:
+  - "offset, fillet e chamfer só funcionam com o AutoCAD aberto (Windows)."

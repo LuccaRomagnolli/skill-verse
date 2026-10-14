@@ -1,0 +1,35 @@
+# MCP de terceiros — NÃO embutimos o código; o instalador usa o pacote PyPI na versão fixada.
+nome: archicad
+titulo: ArchiCAD 29
+descricao: >-
+  Conecta ao ArchiCAD 29 aberto: auditoria de entrega (regras de escritório em YAML),
+  consulta e edição de elementos, classificações, issues/BCF e prontidão para IFC.
+licenca: MIT
+upstream: https://github.com/alesdev88/Archicad-MCP
+versao_fixada: 0.7.1
+requisitos:
+  so: [macos, windows]
+  software: "ArchiCAD 29 aberto com um projeto. Add-on Tapir recomendado."
+  ferramentas: [uv]
+deteccao:
+  macos: ["/Applications/Graphisoft/Archicad 29*", "/Applications/GRAPHISOFT/Archicad 29*"]
+  windows: ["C:/Program Files/Graphisoft/Archicad 29*", "C:/Program Files/GRAPHISOFT/Archicad 29*"]
+util_sem_software: false
+preparo:
+  # regras de entrega em PT-BR que acompanham a skill archicad-bim-check (não sobrescreve arquivos já existentes)
+  - copiar_do_pack: plugin/skills/archicad-bim-check/assets/regras
+    destino: "{SKILLVERSE_HOME}/archicad-regras"
+servidor:
+  command: uvx
+  args: ["--from", "archicad-mcp-server==0.7.1", "archicad-mcp", "--mode", "full",
+         "--rules-dir", "{SKILLVERSE_HOME}/archicad-regras"]
+  env: {}
+teste:
+  tool_esperada: get_project_info
+pos_instalacao:
+  todos:
+    - "Instale o add-on Tapir (https://github.com/ENZYME-APD/tapir-archicad-automation/releases) para criar elementos, issues e checar IFC."
+    - "Deixe o ArchiCAD 29 aberto com o projeto antes de usar as skills de BIM."
+avisos:
+  - "SALVE o projeto antes de auditorias: a leitura de propriedades pode travar o ArchiCAD 29 (falha do próprio ArchiCAD)."
+  - "Mac Intel: a primeira execução compila dependências e pode demorar alguns minutos."

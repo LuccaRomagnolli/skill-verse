@@ -1,0 +1,23 @@
+SKILL-VERSE — {{PACK_NOME}} (versão {{VERSAO}})
+==============================================
+
+Instalação em 3 passos
+----------------------
+
+1. Descompacte este arquivo .zip em qualquer pasta (Downloads serve).
+
+2. Abra essa pasta no seu agente:
+   - Claude Code (terminal):  cd "caminho/da/pasta"  e depois  claude
+   - Claude Code (app/VS Code): File > Open Folder > escolha esta pasta
+   - Codex:  cd "caminho/da/pasta"  e depois  codex
+
+3. Digite:   instale este pack
+
+O agente vai perguntar onde instalar e quais softwares você usa, instalar tudo,
+testar as conexões e gerar o seu MANUAL personalizado (em ~/SkillVerse/{{PACK_ID}}/).
+
+Requisitos: Python 3.10 ou mais novo (python.org) e Claude Code ou Codex instalados.
+
+Depois de instalado, pode apagar esta pasta: o pack fica guardado em ~/SkillVerse.
+
+Problemas? Abra o arquivo INSTALAR.md — ele tem o passo a passo manual.

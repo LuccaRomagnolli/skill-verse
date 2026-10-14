@@ -1,0 +1,97 @@
+# Regras de entrega Skill-Verse (modelo base para escritórios brasileiros).
+# Carregadas pelo MCP do ArchiCAD a partir de ~/SkillVerse/archicad-regras/ (--rules-dir).
+# Adapte nomes de sistema de classificação, layers e propriedades ao template do escritório.
+# Tags: entrega (prancha/aprovação), ifc (exportação/compatibilização), padrao (padrão interno).
+
+# ---------------------------------------------------------------- ambientes
+- id: zonas-numeradas
+  type: zone-number-required
+  severity: error
+  tags: [entrega]
+
+# ---------------------------------------------------------------- classificação (necessária para IFC e quantitativos)
+- id: paredes-classificadas
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Wall }
+  severity: warning
+  tags: [entrega, ifc]
+
+- id: lajes-classificadas
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Slab }
+  severity: warning
+  tags: [entrega, ifc]
+
+- id: pilares-classificados
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Column }
+  severity: warning
+  tags: [entrega, ifc]
+
+- id: vigas-classificadas
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Beam }
+  severity: warning
+  tags: [entrega, ifc]
+
+- id: portas-classificadas
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Door }
+  severity: warning
+  tags: [entrega, ifc]
+
+- id: janelas-classificadas
+  type: classification-required
+  system: "ARCHICAD Classification"
+  applies_to: { element_type: Window }
+  severity: warning
+  tags: [entrega, ifc]
+
+# ---------------------------------------------------------------- IFC (compatibilização com estrutura e instalações)
+- id: ifc-paredes-externas
+  type: ifc-property-required
+  property: "Pset_WallCommon.IsExternal"
+  applies_to: { element_type: Wall }
+  severity: warning
+  tags: [ifc]
+
+- id: ifc-paredes-estruturais
+  type: ifc-property-required
+  property: "Pset_WallCommon.LoadBearing"
+  applies_to: { element_type: Wall }
+  severity: warning
+  tags: [ifc]
+
+- id: ifc-pilares-estruturais
+  type: ifc-property-required
+  property: "Pset_ColumnCommon.LoadBearing"
+  applies_to: { element_type: Column }
+  severity: warning
+  tags: [ifc]
+
+- id: ifc-vigas-estruturais
+  type: ifc-property-required
+  property: "Pset_BeamCommon.LoadBearing"
+  applies_to: { element_type: Beam }
+  severity: warning
+  tags: [ifc]
+
+- id: ifc-lajes-estruturais
+  type: ifc-property-required
+  property: "Pset_SlabCommon.LoadBearing"
+  applies_to: { element_type: Slab }
+  severity: warning
+  tags: [ifc]
+
+# ---------------------------------------------------------------- padrão interno de layers (só aviso; rode com ruleset "padrao")
+# Troque o padrão pela convenção do escritório (e use severity: error se for obrigatório).
+- id: layers-padrao-escritorio
+  type: layer-compliance
+  pattern: "^(ARQ|EST|INST|HID|ELE|PCI|AR|Archicad|ARCHICAD|Layout)"
+  severity: warning
+  tags: [padrao]

@@ -1,0 +1,9 @@
+titulo: Quantitativos e orçamento SINAPI
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Levanta concreto, fôrmas, aço e alvenaria por elemento e monta orçamento com composições SINAPI da planilha oficial da Caixa, com BDI e exportação para Excel.
+mcps: []
+exemplos:
+  - "Levante o volume de concreto, fôrma e aço da estrutura que calculamos"
+  - "Ache no SINAPI a composição de concreto usinado fck 25 lançado com bomba"
+  - "Monte o orçamento da estrutura com BDI de 25% usando a planilha SINAPI-DF de setembro"

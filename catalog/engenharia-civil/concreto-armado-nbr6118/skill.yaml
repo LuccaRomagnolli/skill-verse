@@ -1,0 +1,10 @@
+titulo: Concreto armado (NBR 6118)
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Dimensiona e verifica vigas, lajes maciças e pilares de concreto armado com memória de cálculo passo a passo, por scripts testados.
+mcps: []
+exemplos:
+  - "Dimensione uma viga biapoiada de 5 m, 15×45 cm, C25, com g = 12 kN/m e q = 6 kN/m"
+  - "Calcule a laje de 4×5 m com h = 10 cm, engastada em duas bordas, carga de uso 1,5 kN/m²"
+  - "Verifique um pilar 20×50 cm com Nk = 1100 kN, pé-direito 2,80 m, C30"
+  - "Pré-dimensione os pilares de canto deste prédio de 4 pavimentos"
