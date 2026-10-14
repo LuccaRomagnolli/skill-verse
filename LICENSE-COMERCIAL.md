@@ -17,4 +17,6 @@ Licenças para equipes e empresas: entre em contato.
 
 **Componentes de terceiros**: as conexões com AutoCAD (autocad-mcp) e ArchiCAD (archicad-mcp-server) são softwares livres sob licença MIT, baixados de suas fontes oficiais durante a instalação. AutoCAD e ArchiCAD são marcas de seus respectivos titulares. Este produto não é afiliado à Autodesk, à Graphisoft, à Anthropic ou à OpenAI.
 
+**Documentos públicos**: a conexão de normas públicas baixa NRs, normas do DNIT e cadernos do SINAPI diretamente dos sites oficiais para o seu computador. Esses documentos pertencem aos respectivos órgãos e não fazem parte do pack. Normas ABNT não são fornecidas.
+
 Atualizações da mesma versão principal (1.x) estão incluídas.

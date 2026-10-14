@@ -31,6 +31,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -133,14 +134,30 @@ class Log:
         self.avisos.append(msg)
 
 
-def run(cmd: list[str], log: Log, check: bool = True, timeout: int = 600) -> subprocess.CompletedProcess | None:
+def run(cmd: list[str], log: Log, check: bool = True, timeout: int = 600,
+        env: dict | None = None) -> subprocess.CompletedProcess | None:
     log.passo("$ " + " ".join(cmd))
     if log.simular:
         return None
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout,
+                       env={**os.environ, **env} if env else None)
     if check and p.returncode != 0:
         raise RuntimeError(f"comando falhou ({p.returncode}): {' '.join(cmd)}\n{p.stderr.strip() or p.stdout.strip()}")
     return p
+
+
+def baixar_url(url: str, timeout: int = 120) -> bytes:
+    """urllib; se o Python não tiver certificados (python.org no macOS), usa o curl do sistema."""
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as r:
+            return r.read()
+    except urllib.error.URLError as e:
+        if "CERTIFICATE_VERIFY_FAILED" not in str(e) or not shutil.which("curl"):
+            raise
+        p = subprocess.run(["curl", "-fsSL", "--max-time", str(timeout), url], capture_output=True)
+        if p.returncode != 0:
+            raise RuntimeError(f"curl falhou ({p.returncode}): {p.stderr.decode(errors='replace')[-300:]}") from e
+        return p.stdout
 
 
 def subst(value, ctx: dict[str, str]):
@@ -155,8 +172,14 @@ def subst(value, ctx: dict[str, str]):
     return value
 
 
+_PACK_DIR: Path | None = None  # raiz do pack instalado (para MCPs próprios que vêm dentro do pack)
+
+
 def ctx() -> dict[str, str]:
-    return {"MCP_DIR": mcp_dir().as_posix(), "SKILLVERSE_HOME": sv_home().as_posix()}
+    c = {"MCP_DIR": mcp_dir().as_posix(), "SKILLVERSE_HOME": sv_home().as_posix()}
+    if _PACK_DIR:
+        c["PACK_DIR"] = _PACK_DIR.as_posix()
+    return c
 
 
 def copy_tree(src: Path, dst: Path) -> None:
@@ -189,6 +212,8 @@ def detect(pack: dict) -> dict:
             "caminhos": found,
             "suporta_este_so": osk in m["requisitos"]["so"],
             "util_sem_software": bool(m.get("util_sem_software")),
+            "recomendado": bool(m.get("recomendado")),
+            "descricao": m.get("descricao", ""),
             "opcional": m.get("opcional", True),
         }
     claude = find_claude()
@@ -281,8 +306,7 @@ def prepare_mcp(m: dict, log: Log, pack_root: Path) -> None:
             log.passo(f"baixar {step['baixar_zip']} → {dest}")
             if log.simular:
                 continue
-            with urllib.request.urlopen(step["baixar_zip"], timeout=120) as r:
-                data = r.read()
+            data = baixar_url(step["baixar_zip"])
             with tempfile.TemporaryDirectory() as tmp:
                 with zipfile.ZipFile(io.BytesIO(data)) as z:
                     z.extractall(tmp)
@@ -295,7 +319,7 @@ def prepare_mcp(m: dict, log: Log, pack_root: Path) -> None:
         elif "comando" in step:
             cmd = list(step["comando"])
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            run(cmd, log, timeout=1200)
+            run(cmd, log, timeout=1800, env=step.get("env"))
 
 
 def toml_str(s: str) -> str:
@@ -444,6 +468,8 @@ def cmd_instalar(args) -> int:
     if not log.simular and root.resolve() != dest.resolve():
         copy_tree(root, dest)
     installed_root = dest if not log.simular else root
+    global _PACK_DIR
+    _PACK_DIR = installed_root
 
     registro = {"version": pack["version"], "instalado_em": _dt.datetime.now().isoformat(timespec="seconds"),
                 "pasta": str(dest), "plataformas": {}, "mcps": {}}
@@ -462,6 +488,8 @@ def cmd_instalar(args) -> int:
             prepare_mcp(m, log, installed_root)
             srv = resolve_server(m)
             reg = {"servidor": srv, "plataformas": []}
+            if m.get("dados"):
+                reg["dados"] = subst(m["dados"], ctx())
             if "claude" in plataformas and register_claude_mcp(n, srv, log):
                 reg["plataformas"].append("claude")
             if "codex" in plataformas and register_codex_mcp(n, srv, log):
@@ -680,6 +708,10 @@ def cmd_desinstalar(args) -> int:
             run([claude, "mcp", "remove", nome, "--scope", "user"], log, check=False)
         if "codex" in r["plataformas"]:
             unregister_codex_mcp(nome, log)
+        if r.get("dados") and Path(r["dados"]).is_dir():
+            log.passo(f"remover {r['dados']}")
+            if not log.simular:
+                shutil.rmtree(r["dados"], ignore_errors=True)
         d = mcp_dir()
         for leftover in d.glob(f"{nome}*") if d.is_dir() else []:
             log.passo(f"remover {leftover}")

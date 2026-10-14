@@ -24,6 +24,7 @@ Três hábitos que dão resultado melhor:
 | "python3 não encontrado" | Instale o Python 3.10+ em python.org (no Windows, marque "Add to PATH"). |
 | AutoCAD não responde | Abra o AutoCAD LT e carregue o `mcp_dispatch.lsp` (APPLOAD). No Mac, o modo é headless: gera DXF. |
 | ArchiCAD não responde | Abra o ArchiCAD 29 com o projeto. Instale o add-on Tapir para IFC, issues e BCF. |
+| Busca de normas sem resultado | Peça "baixe os documentos do DNIT/SINAPI sobre <assunto>" ou "atualize o catálogo de normas". Normas ABNT não estão no índice. |
 | Resultado estranho | Peça "mostre as hipóteses e a memória" e confira os dados de entrada. |
 | Atualizar o pack | Baixe a versão nova na área de membros, abra a pasta e diga "atualize o pack". |
 | Remover o pack | Abra a pasta do pack ({{PASTA}}) e diga "desinstale o pack". |

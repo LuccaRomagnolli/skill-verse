@@ -1,0 +1,10 @@
+titulo: Consulta a normas e boas práticas
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Consulta NRs, normas e manuais do DNIT e cadernos técnicos do SINAPI num índice local, cita item e página, e transforma a exigência em checklist de projeto ou de obra.
+mcps: [normas-publicas]
+exemplos:
+  - "O que a NR-18 exige para guarda-corpo na periferia da laje?"
+  - "Monte o checklist de segurança do canteiro desta obra de 4 pavimentos"
+  - "Qual o critério de medição do SINAPI para alvenaria de vedação?"
+  - "Quais ensaios o DNIT exige para sub-base de solo-cimento?"

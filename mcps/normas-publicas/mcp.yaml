@@ -1,0 +1,40 @@
+# MCP PRÓPRIO do Skill-Verse (código em servidor/, copiado para o pack pelo build).
+# Os documentos NÃO vão no .zip: são baixados das fontes oficiais na máquina do usuário.
+nome: normas-publicas
+titulo: Normas e manuais públicos (NRs, DNIT, SINAPI)
+descricao: >-
+  Índice local consultado pelo agente com documentos técnicos públicos: Normas Regulamentadoras
+  (segurança do trabalho e canteiro de obras) e seus manuais oficiais, normas e manuais do DNIT e
+  cadernos técnicos do SINAPI. Baixa direto das fontes oficiais. Não inclui normas ABNT.
+licenca: "Código proprietário Skill-Verse; documentos públicos (atos oficiais / reprodução livre com citação)"
+upstream: interno
+versao_fixada: 1.0.0
+requisitos:
+  so: [windows, macos, linux]
+  software: "nenhum — precisa de internet na instalação (~25 MB no conjunto padrão)"
+  ferramentas: [uv]
+util_sem_software: true
+recomendado: true
+dados: "{SKILLVERSE_HOME}/normas-publicas"
+preparo:
+  - comando: ["uv", "run", "-q", "--no-project", "--with", "pypdf>=4", "--with", "certifi", "python",
+              "{PACK_DIR}/mcps/normas-publicas/normas.py", "catalogo"]
+    env: {NORMAS_DIR: "{SKILLVERSE_HOME}/normas-publicas"}
+  - comando: ["uv", "run", "-q", "--no-project", "--with", "pypdf>=4", "--with", "certifi", "python",
+              "{PACK_DIR}/mcps/normas-publicas/normas.py", "baixar", "--padrao"]
+    env: {NORMAS_DIR: "{SKILLVERSE_HOME}/normas-publicas"}
+servidor:
+  command: uv
+  args: ["run", "-q", "--no-project", "--with", "mcp[cli]>=1.2,<2", "--with", "pypdf>=4", "--with", "certifi", "python",
+         "{PACK_DIR}/mcps/normas-publicas/server.py"]
+  env:
+    NORMAS_DIR: "{SKILLVERSE_HOME}/normas-publicas"
+teste:
+  tool_esperada: buscar_normas
+pos_instalacao:
+  todos:
+    - "Já estão no índice as NRs da construção civil (NR-1, 6, 8, 10, 11, 12, 17, 18, 23, 24, 33, 35) e seus manuais oficiais. Normas do DNIT e cadernos do SINAPI são baixados quando o agente precisar."
+    - "As NRs mudam várias vezes por ano: peça 'atualize o catálogo de normas' de tempos em tempos."
+    - "Normas ABNT (NBR) não são incluídas por direitos autorais. Use a sua cópia licenciada."
+avisos:
+  - "O texto das NRs no índice não substitui o publicado no Diário Oficial da União."

@@ -4,7 +4,7 @@ Banco de skills (formato aberto Agent Skills) organizado por categoria. Packs po
 
 ## Mapa
 - `catalog/<categoria>/<skill>/` — **fonte única** de cada skill. `_comum/` = skills usadas por mais de um pack.
-- `mcps/<nome>/mcp.yaml` — como instalar/registrar um MCP de terceiros (origem upstream fixada, licença, requisitos).
+- `mcps/<nome>/mcp.yaml` — como instalar/registrar um MCP. Terceiros: origem upstream fixada, licença, requisitos. Próprio (`upstream: interno`): código em `mcps/<nome>/servidor/`, copiado para o zip e referenciado por `{PACK_DIR}/mcps/<nome>/`.
 - `packs/<pack>/pack.yaml` — o que entra em cada pack + `manual.template.md`.
 - `installer/` — skill `instalar-pack` + `install.py` (stdlib pura). Vai dentro de todo pack.
 - `tools/validate.py` — lint do catálogo. `tools/build.py <pack>` — gera `dist/*.zip`.
@@ -19,6 +19,7 @@ Banco de skills (formato aberto Agent Skills) organizado por categoria. Packs po
 6. Scripts referenciados no SKILL.md com caminho relativo à pasta da skill (`scripts/x.py`); o agente resolve a partir da pasta da skill.
 7. Nada de dados pessoais, chaves ou caminhos absolutos da máquina do autor.
 8. Português do Brasil, normas ABNT citadas por número e ano.
+9. **Direito autoral**: nunca copie, raspe ou embuta texto de normas ABNT (NBR) — elas são vendidas pela ABNT. Em `references/`, só sínteses próprias com o número do item. Texto literal só de fontes públicas (NRs, DNIT, SINAPI), via MCP `normas-publicas`, baixado na máquina do usuário — nunca dentro do .zip.
 
 ## Comandos
 ```bash

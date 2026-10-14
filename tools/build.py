@@ -88,6 +88,12 @@ def build(pack_id: str, keep: bool) -> Path:
         "plugins": [{"name": pack["id"], "source": "./plugin", "description": pack["descricao"]}],
     }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
+    # MCPs próprios (código em mcps/<nome>/servidor/)
+    for m in pack["mcps"]:
+        srv_dir = MCPS / m["nome"] / "servidor"
+        if srv_dir.is_dir():
+            shutil.copytree(srv_dir, stage / "mcps" / m["nome"], ignore=IGNORE)
+
     # Instalador
     shutil.copytree(INSTALLER / "instalar-pack", stage / "instalador", ignore=IGNORE)
 

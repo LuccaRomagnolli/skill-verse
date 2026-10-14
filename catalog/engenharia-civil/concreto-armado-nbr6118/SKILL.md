@@ -44,6 +44,8 @@ Convenções que confundem:
 
 Para um pavimento inteiro, siga `references/fluxo-estrutural.md`. Para justificar qualquer coeficiente ou fórmula, consulte `references/parametros-nbr6118.md` e cite o item da norma.
 
+**Execução e obra**: se o MCP `normas-publicas` estiver conectado e o usuário perguntar sobre execução (fôrmas, escoramento, armação, concretagem, periferia da laje), use a skill `consulta-normas` (NR-18). Para pontes e obras rodoviárias, as especificações do DNIT (ES/PRO de concreto e OAE). O índice **não** tem NBR: o dimensionamento continua baseado nas `references/` desta skill.
+
 Para o memorial: rode com `--formato json` e salve em `resultados/<elemento>.json`; a skill `memorial-de-calculo` monta o documento.
 
 ## Limites e responsabilidade

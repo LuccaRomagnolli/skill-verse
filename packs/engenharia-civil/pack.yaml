@@ -1,10 +1,10 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.0.0
+version: 1.1.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Cálculo de concreto armado pela NBR 6118, cargas, vento e combinações, memorial de cálculo,
-  quantitativos com orçamento SINAPI, laudos técnicos e conexão com AutoCAD e ArchiCAD.
+  quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e conexão com AutoCAD e ArchiCAD.
 skills:
   - engenharia-civil/concreto-armado-nbr6118
   - engenharia-civil/cargas-combinacoes
@@ -12,8 +12,11 @@ skills:
   - engenharia-civil/quantitativos-sinapi
   - engenharia-civil/autocad-assistente
   - engenharia-civil/archicad-bim-check
+  - engenharia-civil/consulta-normas
   - _comum/relatorio-tecnico
 mcps:
+  - nome: normas-publicas
+    opcional: true
   - nome: autocad
     opcional: true
   - nome: archicad
@@ -39,6 +42,11 @@ fluxos:
       - "Abra o projeto no ArchiCAD 29 e salve."
       - "Peça: \"Audite o modelo para exportar IFC\" (archicad-bim-check) e corrija o que for apontado."
       - "Exporte as pendências em BCF para a equipe de projeto."
+  - titulo: Canteiro e segurança conforme as NRs
+    passos:
+      - "Peça: \"Monte o checklist da NR-18 para o canteiro desta obra de 4 pavimentos com 30 trabalhadores\" (consulta-normas)."
+      - "Cada exigência vem com o item e a página da NR; peça o texto literal quando precisar fundamentar."
+      - "Com o AutoCAD conectado: \"Desenhe o layout do canteiro atendendo a esse checklist\"."
   - titulo: Laudo de vistoria com fotos
     passos:
       - "Junte as fotos numa pasta e suas anotações de campo."

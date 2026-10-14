@@ -45,7 +45,9 @@ def test_estrutura_do_zip(pacote):
               ".claude-plugin/marketplace.json", "plugin/.claude-plugin/plugin.json", "instalador/SKILL.md"):
         assert (pacote / f).is_file(), f
     pack = json.loads((pacote / "pack.json").read_text(encoding="utf-8"))
-    assert len(pack["skills"]) == 7
+    assert len(pack["skills"]) == 8
+    assert (pacote / "mcps/normas-publicas/server.py").is_file()   # código do MCP próprio vai no zip
+    assert not list(pacote.rglob("*.db")) and not list(pacote.rglob("pdf/*.pdf"))  # documentos não vão
     mk = json.loads((pacote / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
     assert mk["plugins"][0]["name"] == json.loads((pacote / "plugin/.claude-plugin/plugin.json").read_text())["name"]
     assert not list(pacote.rglob("skill.yaml")), "metadados internos não devem ir no zip"
@@ -113,3 +115,19 @@ def test_simulacao_nao_altera_nada(pacote, home):
 def test_md_to_html_tabela_e_listas():
     h = install.md_to_html("# T\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n- x\n- y\n", "t")
     assert "<th>a</th>" in h and "<td>2</td>" in h and "<li>y</li>" in h
+
+
+def test_download_cai_para_curl_sem_certificados(monkeypatch):
+    import urllib.error
+
+    def falha(*a, **k):
+        raise urllib.error.URLError("[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed")
+    chamadas = []
+
+    class P:
+        returncode, stdout, stderr = 0, b"PK-conteudo", b""
+    monkeypatch.setattr(install.urllib.request, "urlopen", falha)
+    monkeypatch.setattr(install.shutil, "which", lambda n: "/usr/bin/curl" if n == "curl" else None)
+    monkeypatch.setattr(install.subprocess, "run", lambda cmd, **k: chamadas.append(cmd) or P())
+    assert install.baixar_url("https://exemplo/x.zip") == b"PK-conteudo"
+    assert chamadas[0][0] == "curl"

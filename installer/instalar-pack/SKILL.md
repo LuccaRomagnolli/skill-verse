@@ -19,7 +19,7 @@ Se o Python não existir ou for < 3.10, oriente a instalação (python.org) e pa
 
 ## 2. Perguntas (uma mensagem só)
 1. **Onde instalar**: só aqui (a plataforma atual) ou também na outra (`claude`, `codex`, `ambas`). Padrão: a atual.
-2. **Quais softwares conectar**: liste cada item de `softwares` com o status detectado. Recomende conectar os detectados; para os não detectados, só se `util_sem_software` for true (explique o que funciona sem o software). Não ofereça os que `suporta_este_so` é false.
+2. **Quais softwares conectar**: liste cada item de `softwares` com o status detectado. Recomende conectar os detectados e os marcados com `recomendado: true` (ex.: índice de normas públicas, que não depende de software, só de internet; use a `descricao` para explicar). Para os não detectados, ofereça só se `util_sem_software` for true (explique o que funciona sem o software). Não ofereça os que `suporta_este_so` é false.
 3. Pergunte **como ele trabalha** (ex.: tipo de projeto, escritório/autônomo, normas que mais usa) — uma linha basta. Isso vai personalizar o manual.
 
 ## 3. Pré-requisito dos softwares (só se escolheu algum)

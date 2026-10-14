@@ -166,6 +166,18 @@ def check_mcps(rep: Report) -> set[str]:
         srv = data.get("servidor") or {}
         if "command" not in srv:
             rep.err(f, "servidor.command obrigatório")
+        if data.get("upstream") == "interno":
+            srv_dir = d / "servidor"
+            if not srv_dir.is_dir():
+                rep.err(f, "MCP interno precisa da pasta servidor/ com o código")
+            for py in srv_dir.rglob("*.py") if srv_dir.is_dir() else []:
+                try:
+                    compile(py.read_text(encoding="utf-8"), str(py), "exec")
+                except SyntaxError as e:
+                    rep.err(py, f"não compila: {e}")
+            usa_pack = "{PACK_DIR}" in str(data.get("servidor")) + str(data.get("preparo"))
+            if not usa_pack:
+                rep.err(f, "MCP interno deve referenciar o código via {PACK_DIR}/mcps/<nome>/")
         if str(data.get("licenca", "")).upper() in ("", "DESCONHECIDA", "?"):
             rep.err(f, "licença do upstream não verificada — não pode ser vendido")
         found.add(d.name)

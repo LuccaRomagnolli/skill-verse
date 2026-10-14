@@ -35,6 +35,9 @@ Depois de executar as operações: `view` → `zoom_extents` (se disponível) e 
 - **Inspecionar desenho existente**: `drawing` → `info`; `entity` → `list` `{layer}`.
 - Antes de apagar ou mover muitas entidades, **descreva o que vai fazer e peça confirmação**. Em `file_ipc` existe `drawing` → `undo`.
 
+## Layout de canteiro
+Para desenhar canteiro de obras (áreas de vivência, acessos, central de armação/fôrmas, baias, proteção de periferia), levante antes as exigências com a skill `consulta-normas` (NR-18, NR-24, NR-10) e anote o item da norma em cada elemento do desenho (layer `EST-TEXTO`).
+
 ## Limites e responsabilidade
 - Gera desenhos de apoio (seções, layers, elementos simples). Não substitui o detalhamento completo (armação longitudinal com comprimentos, ancoragens, dobras, tabela de aço) nem a revisão do projetista.
 - `system` → `execute_lisp` executa código arbitrário no AutoCAD: só use com pedido explícito do usuário e mostre o código antes.

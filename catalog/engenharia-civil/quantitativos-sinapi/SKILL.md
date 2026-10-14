@@ -27,10 +27,11 @@ Scripts em `scripts/` (stdlib). Rode a partir da pasta desta skill.
    ```bash
    python3 scripts/sinapi.py orcar --arquivo SINAPI.xlsx --itens itens.json --bdi 25 --saida orcamento.csv
    ```
-5. Entregue a tabela, o total e o CSV (abre no Excel com `;`). Anote UF, mês de referência, desoneração e BDI no cabeçalho do orçamento.
+5. **Critério de medição**: com o MCP `normas-publicas` conectado, confirme no caderno técnico da composição: `buscar_catalogo` (fonte `sinapi`, ex.: "alvenaria") → `baixar_documentos` → `buscar_normas` ("critério de medição vãos"). Cite o caderno e a página no orçamento.
+6. Entregue a tabela, o total e o CSV (abre no Excel com `;`). Anote UF, mês de referência, desoneração e BDI no cabeçalho do orçamento.
 
 ## Limites e responsabilidade
 - O quantitativo é geométrico e depende dos dados de entrada: não substitui o levantamento sobre o projeto executivo.
-- Critérios de medição variam por composição. O Caderno Técnico do SINAPI prevalece sobre os padrões do script.
+- Critérios de medição variam por composição. O Caderno Técnico do SINAPI prevalece sobre os padrões do script (consulte-o pelo MCP `normas-publicas` quando disponível).
 - Preços e BDI de obra pública seguem regras próprias (Decreto 7.983/2013 e orientações do TCU). Avise quando o usuário estiver orçando obra pública.
 - O orçamento é estimativa técnica de responsabilidade do profissional que o assina.

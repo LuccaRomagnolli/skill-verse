@@ -6,14 +6,14 @@ Banco de skills para agentes de IA (Claude Code e Codex), organizado por categor
 
 | Pack | Versão | Skills | Conexões |
 |---|---|---|---|
-| Engenharia Civil | 1.0.0 | concreto armado (NBR 6118), cargas/vento/combinações, memorial de cálculo, quantitativos + SINAPI, assistente AutoCAD, auditoria BIM ArchiCAD, relatórios técnicos | AutoCAD LT, ArchiCAD 29 |
+| Engenharia Civil | 1.1.0 | concreto armado (NBR 6118), cargas/vento/combinações, memorial de cálculo, quantitativos + SINAPI, assistente AutoCAD, auditoria BIM ArchiCAD, relatórios técnicos, consulta a normas públicas | normas-publicas (próprio), AutoCAD LT, ArchiCAD 29 |
 | Professores | — | (próximo) | — |
 
 ## Estrutura
 ```
 catalog/<categoria>/<skill>/   fonte única de cada skill (SKILL.md + skill.yaml + scripts/ + references/ + assets/)
 catalog/_comum/                skills usadas por mais de um pack
-mcps/<nome>/mcp.yaml           como baixar/registrar cada MCP de terceiros (versão fixada, licença, requisitos)
+mcps/<nome>/mcp.yaml           como baixar/registrar cada MCP (terceiros: versão fixada; próprio: upstream interno + servidor/)
 packs/<pack>/                  pack.yaml (composição), manual.template.md, CHANGELOG.md
 installer/instalar-pack/       skill + install.py (stdlib) que vão dentro de todo pack
 installer/bundle/              COMECE-AQUI, INSTALAR, CLAUDE.md/AGENTS.md do zip

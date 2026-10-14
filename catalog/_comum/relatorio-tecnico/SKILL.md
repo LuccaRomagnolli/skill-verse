@@ -20,6 +20,8 @@ description: Redige e formata documentos técnicos de engenharia — relatório 
    Saídas: `.docx` (edição final no Word/Google Docs, fotos embutidas) e `.html` (abrir no navegador → Imprimir → PDF A4).
 5. **Revisão**: liste os `[preencher]` pendentes e as afirmações que dependem de confirmação do responsável.
 
+Quando o documento tratar de segurança do trabalho, canteiro, trabalho em altura, espaço confinado ou de critérios de obras rodoviárias, e o MCP `normas-publicas` estiver conectado, fundamente as constatações com a skill `consulta-normas`: cite o item literal da NR/DNIT e a página. Isso dá força técnica ao laudo.
+
 Se o laudo for de estrutura de concreto e o usuário quiser verificar uma peça, use a skill `concreto-armado-nbr6118` e cite o resultado no documento.
 
 ## Limites e responsabilidade
