@@ -19,6 +19,10 @@
 ## Ductilidade
 x/d ≤ 0,45 (fck ≤ 50) e ≤ 0,35 (50 < fck ≤ 90) — item 14.6.4.3. Acima disso o script usa armadura dupla.
 
+## Classe de agressividade e concreto mínimo
+- CAA pelo ambiente (Tab. 6.1): rural/submersa I · urbano II · marinho/industrial III · industrial agressivo/respingos de maré IV. Os scripts leem a classe da ficha do projeto (`projeto-contexto.json`) quando `--caa` não é informado.
+- Concreto armado mínimo (Tab. 7.1): CAA I ≥ C20 · II ≥ C25 · III ≥ C30 · IV ≥ C40 (a/c ≤ 0,65 · 0,60 · 0,55 · 0,45). Os scripts alertam quando o fck fica abaixo.
+
 ## Cobrimento nominal (Tabela 7.2, Δc = 10 mm), mm
 | CAA | Laje | Viga/Pilar |
 |---|---|---|

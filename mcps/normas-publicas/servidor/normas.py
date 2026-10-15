@@ -15,6 +15,7 @@ Dados em $NORMAS_DIR (padrão ~/SkillVerse/normas-publicas): normas.db (SQLite +
   python3 normas.py catalogo-buscar "concreto"             busca nos títulos do catálogo
   python3 normas.py ler nr-18 --pagina 12
   python3 normas.py item nr-18 18.13.4
+  python3 normas.py importar-url https://.../codigo-de-obras.pdf --titulo "Código de Obras de X" --esfera municipal
   python3 normas.py importar arquivo.pdf --titulo "NBR 9050:2020 (gratuita)"   documento obtido pelo usuário
   python3 normas.py status
 
@@ -69,6 +70,8 @@ FONTES = {
     "dnit": "DNIT/IPR — reprodução permitida desde que citado o DNIT como fonte e mantido o texto.",
     "sinapi": "SINAPI — CAIXA/IBGE, publicações técnicas de livre acesso.",
     "usuario": "Documento fornecido pelo usuário (uso pessoal).",
+    "local": "Legislação/norma pública local (município, estado, Corpo de Bombeiros, concessionária) obtida no "
+             "endereço indicado em 'url'. Confira a vigência na fonte oficial.",
 }
 
 
@@ -389,6 +392,81 @@ def importar(arquivo: Path, titulo: str, codigo: str = "") -> dict:
     return indexar(con, doc_id, destino, hashlib.sha1(dados).hexdigest())
 
 
+# ------------------------------------------------------------------ documentos públicos locais (via URL)
+
+# Sites que hospedam cópias não autorizadas de normas técnicas: nunca baixar deles.
+HOSTS_BLOQUEADOS = ("scribd.", "passeidireto.", "studocu.", "docero.", "pdfcoffee.", "dokumen.", "idoc.", "kupdf.",
+                    "vdocuments.", "documents.pub", "doku.pub", "pt.slideshare.", "slideshare.", "academia.edu",
+                    "docplayer.", "1library.", "pdfslide.", "fdocumentos.", "docslide.", "baixardoc.", "dokumen.pub")
+# Marcas de exemplar vendido pela ABNT (texto protegido por direito autoral)
+MARCAS_ABNT = (r"exemplar\s+para\s+uso\s+exclusivo", r"©\s*ABNT\s*\d{4}",
+               r"todos\s+os\s+direitos\s+reservados.{0,300}ABNT", r"ABNT.{0,300}todos\s+os\s+direitos\s+reservados")
+
+
+def _html_para_paginas(conteudo: str, tamanho: int = 3500) -> list[str]:
+    conteudo = re.sub(r"(?is)<(script|style|nav|header|footer)[^>]*>.*?</\1>", " ", conteudo)
+    conteudo = re.sub(r"(?i)<br\s*/?>|</p>|</li>|</h\d>|</tr>", "\n", conteudo)
+    texto = html.unescape(re.sub(r"<[^>]+>", " ", conteudo))
+    texto = "\n".join(re.sub(r"[ \t]+", " ", ln).strip() for ln in texto.splitlines())
+    texto = re.sub(r"\n{3,}", "\n\n", texto).strip()
+    paginas, atual = [], ""
+    for par in texto.split("\n"):
+        if len(atual) + len(par) > tamanho and atual:
+            paginas.append(atual)
+            atual = ""
+        atual += par + "\n"
+    return paginas + ([atual] if atual.strip() else [])
+
+
+def eh_texto_abnt_protegido(paginas: list[str]) -> bool:
+    amostra = "\n".join(paginas[:4])
+    return any(re.search(m, amostra, re.I | re.S) for m in MARCAS_ABNT)
+
+
+def importar_url(url: str, titulo: str, esfera: str = "municipal", log=print) -> dict:
+    """Baixa e indexa um documento PÚBLICO (lei municipal, IT de bombeiros, norma de concessionária).
+
+    Recusa sites de cópias não autorizadas e qualquer documento com marcas de exemplar ABNT.
+    """
+    partes = urllib.parse.urlsplit(url)
+    if partes.scheme not in ("https", "http"):
+        return {"erro": "URL inválida"}
+    host = partes.netloc.lower()
+    if any(b in host for b in HOSTS_BLOQUEADOS):
+        return {"erro": f"{host} hospeda cópias não autorizadas de documentos — use a fonte oficial"}
+    h = Http()
+    try:
+        dados = h.binario(url)
+    except Exception as e:  # noqa: BLE001
+        return {"erro": f"{type(e).__name__}: {e}"}
+    doc_id = "local-" + slug(titulo)
+    con = db()
+    pdf = dados.startswith(b"%PDF")
+    destino = data_dir() / "pdf" / f"{doc_id}.{'pdf' if pdf else 'html'}"
+    destino.write_bytes(dados)
+    if pdf:
+        paginas = _extrair(destino)
+    else:
+        paginas = _html_para_paginas(dados.decode("utf-8", "replace"))
+    if eh_texto_abnt_protegido(paginas):
+        destino.unlink(missing_ok=True)
+        return {"erro": "O documento parece ser um exemplar de norma ABNT protegido por direito autoral. "
+                        "Não foi indexado. Use a cópia licenciada do usuário ou sínteses próprias."}
+    sha1 = hashlib.sha1(dados).hexdigest()
+    with con:
+        con.execute("""INSERT OR REPLACE INTO docs(id,fonte,grupo,codigo,titulo,url,data_ref,atualizado_em)
+                       VALUES(?,?,?,?,?,?,?,?)""", (doc_id, "local", f"local-{esfera}", esfera, titulo, url,
+                                                    dt.date.today().isoformat(), agora()))
+        con.execute("DELETE FROM pag WHERE doc_id=?", (doc_id,))
+        con.executemany("INSERT INTO pag(doc_id,pagina,texto) VALUES(?,?,?)",
+                        [(doc_id, i + 1, t) for i, t in enumerate(paginas) if t.strip()])
+        sem_texto = sum(len(t.strip()) for t in paginas) < 50 * max(1, len(paginas))
+        con.execute("UPDATE docs SET baixado=1, paginas=?, sem_texto=?, caminho=?, sha1=? WHERE id=?",
+                    (len(paginas), int(sem_texto), str(destino), sha1, doc_id))
+    log(f"  • {doc_id}: {len(paginas)} pág.")
+    return {"id": doc_id, "paginas": len(paginas), "sem_texto": sem_texto, "fonte": "local"}
+
+
 # ------------------------------------------------------------------ consulta
 
 STOPWORDS = set("""a o e é as os ao aos à às de da do das dos em no na nos nas num numa para pra por pelo pela pelos
@@ -519,6 +597,10 @@ def main(argv=None) -> int:
     p = sub.add_parser("item")
     p.add_argument("id")
     p.add_argument("item")
+    p = sub.add_parser("importar-url")
+    p.add_argument("url")
+    p.add_argument("--titulo", required=True)
+    p.add_argument("--esfera", default="municipal")
     p = sub.add_parser("importar")
     p.add_argument("arquivo")
     p.add_argument("--titulo", required=True)
@@ -550,6 +632,10 @@ def main(argv=None) -> int:
         show(ler(a.id, a.pagina, a.n))
     elif a.cmd == "item":
         show(localizar_item(a.id, a.item))
+    elif a.cmd == "importar-url":
+        r = importar_url(a.url, a.titulo, a.esfera)
+        show(r)
+        return 0 if "erro" not in r else 2
     elif a.cmd == "importar":
         show(importar(Path(a.arquivo), a.titulo, a.codigo))
     elif a.cmd == "status":

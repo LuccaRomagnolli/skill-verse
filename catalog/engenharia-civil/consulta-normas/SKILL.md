@@ -10,6 +10,7 @@ O MCP `normas-publicas` mantém um índice local (SQLite) com documentos **públ
 **Normas ABNT não estão no índice** (protegidas por direito autoral). Nunca invente nem "reconstrua" texto de NBR. Para NBR, use as sínteses em `references/` das skills de cálculo, com o número do item, e diga que o texto oficial está na norma.
 
 ## Fluxo de consulta
+0. **Ficha do projeto**: se existir `projeto-contexto.json` (skill `contexto-do-projeto`), use uso, pavimentos, área e município para filtrar o que se aplica (ex.: exigências da NR-18 que dependem do porte da obra; documentos `fonte='local'` daquele município). Fontes encontradas aqui que valem para o projeto devem ser registradas na ficha com `contexto.py fonte`.
 1. **Assunto → fonte**: use `references/mapa-de-fontes.md` para saber onde procurar.
 2. **Buscar no texto**: `buscar_normas` com termos técnicos (substantivos, sem frases). Ex.: `"guarda-corpo travessão rodapé"`, `"escavação talude 1,25"`, `"critério medição alvenaria vãos"`.
 3. **Sem resultado bom?** `buscar_normas` já sugere documentos do catálogo ainda não baixados → `baixar_documentos` com os ids pertinentes (no máximo 10; diga ao usuário o que vai baixar) → repita a busca.
@@ -23,6 +24,9 @@ Quando o usuário estiver **projetando ou planejando** (não só perguntando), c
 - **Orçamento**: o critério de medição vem do caderno técnico SINAPI da composição. Use junto com a skill `quantitativos-sinapi`.
 - **Rodovias/pavimentos**: ES (execução e controle) + EM (material) + ME (ensaios), com a frequência de ensaios para o plano de controle tecnológico.
 - Sempre diferencie **obrigação normativa** (tem item) de **boa prática** (recomendação de manual/guia ou experiência). Escreva "boa prática" quando não houver item que obrigue.
+
+## Normas locais (município/estado)
+Código de obras, plano diretor, ITs do Corpo de Bombeiros e normas de concessionárias são pesquisados na internet pela skill `contexto-do-projeto`, a partir do município da obra. Documentos públicos encontrados entram no índice com `importar_documento_publico(url, titulo, esfera)` e passam a ser consultados aqui com `buscar_normas(fonte='local')`. O servidor recusa sites de cópias e exemplares de NBR.
 
 ## Manutenção do índice
 - `status`: o que está indexado e quando o catálogo foi atualizado. Se faz mais de 3 meses, sugira `atualizar_catalogo` (NRs mudam várias vezes por ano; versões novas são reindexadas).

@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (COBRIMENTO, Aco, Concreto, Memoria, camadas_retangulo,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, Aco, Concreto, Memoria, camadas_retangulo,  # noqa: E402
                      fmt, momento_resistente)
 
 POSICAO = {"intermediario": 1.3, "extremidade": 1.5, "canto": 1.8}
@@ -143,9 +143,10 @@ def main(argv=None) -> int:
                         "mesmo sinal do topo = curvatura simples")
     ap.add_argument("--fck", type=float, required=True)
     ap.add_argument("--aco", default="CA-50", choices=["CA-50", "CA-60"])
-    ap.add_argument("--caa", default="II", choices=["I", "II", "III", "IV"])
+    ap.add_argument("--caa", choices=["I", "II", "III", "IV"], help="classe de agressividade (padrão: ficha do projeto ou II)")
     ap.add_argument("--barras-face", type=int, default=2, help="barras por face (≥ 2)")
     ap.add_argument("--faces", type=int, choices=[2, 4], default=4, help="armadura em 2 ou nas 4 faces")
+    ap.add_argument("--contexto", default="projeto-contexto.json", help="ficha do projeto (skill contexto-do-projeto)")
     ap.add_argument("--formato", choices=["md", "json"], default="md")
     a = ap.parse_args(argv)
 
@@ -175,11 +176,14 @@ def main(argv=None) -> int:
     gn = gamma_n(bmin)
     Nd = a.Nd if a.Nd is not None else 1.4 * a.Nk
     Nd *= gn
+    a.caa, origem_caa = caa_do_projeto(a.caa, a.contexto)
     c = COBRIMENTO[a.caa]["pilar"]
     d2 = (c + 5 + 8) / 10  # c + φt + φl/2 (cm)
     Ac = a.bx * a.by
     nu = Nd * 1e3 / (Ac * 100 * conc.fcd)
     mem = Memoria(f"Pilar {fmt(a.bx,0)}×{fmt(a.by,0)} cm — C{fmt(a.fck,0)}, {a.aco}, CAA {a.caa}")
+    mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}; cobrimento {c} mm (Tab. 7.2)")
+    checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Esforço normal", f"Nd = γn·γf·Nk = {fmt(gn,2)}·{fmt(Nd/gn)} = {fmt(Nd)} kN; ν = Nd/(Ac·fcd) = {fmt(nu,3)}")
     try:
         dx = direcao("x", a.bx, a.lex, Nd, a.Mx_topo * gn, a.Mx_base * gn, nu, mem)

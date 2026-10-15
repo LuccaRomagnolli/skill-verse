@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (COBRIMENTO, ES, Aco, Concreto, Memoria, barras_por_metro,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, ES, Aco, Concreto, Memoria, barras_por_metro,  # noqa: E402
                      flexao_simples, fmt, rho_min)
 from placa import resolver_refinado  # noqa: E402
 
@@ -75,12 +75,14 @@ def main(argv=None) -> int:
     ap.add_argument("--psi2", type=float, default=0.3, help="ψ2 da carga variável (0,3 residencial; 0,4 comercial)")
     ap.add_argument("--fck", type=float, required=True)
     ap.add_argument("--aco", default="CA-50", choices=["CA-50", "CA-60"])
-    ap.add_argument("--caa", default="II", choices=["I", "II", "III", "IV"])
+    ap.add_argument("--caa", choices=["I", "II", "III", "IV"], help="classe de agressividade (padrão: ficha do projeto ou II)")
     ap.add_argument("--nu", type=float, default=0.2)
+    ap.add_argument("--contexto", default="projeto-contexto.json", help="ficha do projeto (skill contexto-do-projeto)")
     ap.add_argument("--formato", choices=["md", "json"], default="md")
     a = ap.parse_args(argv)
 
     conc, aco = Concreto(a.fck), Aco(a.aco)
+    a.caa, origem_caa = caa_do_projeto(a.caa, a.contexto)
     c = COBRIMENTO[a.caa]["laje"]
     pp = 25 * a.h / 100
     p = pp + a.g + a.q
@@ -93,6 +95,8 @@ def main(argv=None) -> int:
     mem = Memoria(f"{titulo} — h = {fmt(a.h,0)} cm, C{fmt(a.fck,0)}")
     mem.add("Cargas", f"pp = 25·{fmt(a.h/100)} = {fmt(pp)}; p = {fmt(p)} kN/m²; pd = 1,4·p = {fmt(pd)} kN/m²; "
                       f"p,qp = g + ψ2·q = {fmt(pqp)} kN/m²")
+    mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
+    checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Cobrimento (Tab. 7.2)", f"c = {c} mm")
     res: dict = {"entrada": vars(a), "cargas": {"pp": pp, "p": p, "pd": pd, "pqp": pqp}}
     d1 = a.h - c / 10 - 0.5  # 1ª camada, φ ≈ 10 mm

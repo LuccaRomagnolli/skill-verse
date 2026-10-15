@@ -29,11 +29,13 @@ NORMA_VENTO = "ABNT NBR 6123:1988 — Forças devidas ao vento em edificações"
 
 # ------------------------------------------------------------------ montagem do conteúdo (blocos)
 
-def blocos(projeto: dict, resultados: list[tuple[str, dict]]) -> list[tuple]:
+def blocos(projeto: dict, resultados: list[tuple[str, dict]], contexto: dict | None = None) -> list[tuple]:
     """Lista de blocos: ('h', nível, texto) | ('p', texto) | ('table', cabeçalho, linhas) | ('ul', itens)."""
     p = projeto
     B: list[tuple] = [("title", p.get("titulo", "Memorial de Cálculo Estrutural"))]
-    ident = [("Obra", p.get("obra", "")), ("Endereço", p.get("endereco", "")), ("Proprietário", p.get("proprietario", "")),
+    ctx = contexto or {}
+    local = f"{ctx['municipio']}/{ctx['uf']}" if ctx.get("municipio") else ""
+    ident = [("Obra", p.get("obra", "")), ("Endereço", p.get("endereco", "")), ("Município/UF", p.get("municipio", local)), ("Proprietário", p.get("proprietario", "")),
              ("Responsável técnico", p.get("responsavel", "")), ("Registro profissional", p.get("registro", "")),
              ("ART/RRT", p.get("art", "")), ("Data", p.get("data") or dt.date.today().strftime("%d/%m/%Y")),
              ("Revisão", p.get("revisao", "0"))]
@@ -45,7 +47,14 @@ def blocos(projeto: dict, resultados: list[tuple[str, dict]]) -> list[tuple]:
         normas.append(NORMA_VENTO)
     normas += p.get("normas_extras", [])
     B += [("h", 1, "3. Normas técnicas"), ("ul", normas)]
-    mat = p.get("materiais") or {}
+    fontes = [f for f in ctx.get("fontes", []) if f.get("esfera") != "abnt"]
+    if fontes:
+        B.append(("p", f"Legislação e normas locais consultadas ({local}):"))
+        B.append(("ul", [f"{f['titulo']}" + (f" — {f['url']}" if f.get("url") else "") + f" (acesso em {f['acessado_em']}"
+                         + ("" if f.get("vigente") == "sim" else "; vigência a confirmar") + ")" for f in fontes]))
+    mat = dict(p.get("materiais") or {})
+    if ctx.get("caa") and not any("agressividade" in k.lower() for k in mat):
+        mat["Classe de agressividade ambiental"] = f"{ctx['caa']['classe']} ({ctx['caa']['agressividade']}, ambiente {ctx['caa']['ambiente']})"
     linhas_mat = [[k, str(v)] for k, v in mat.items()]
     B += [("h", 1, "4. Materiais e durabilidade")]
     B += [("table", ["Parâmetro", "Valor"], linhas_mat)] if linhas_mat else [("p", "Conforme indicado em cada elemento.")]
@@ -237,6 +246,7 @@ def main(argv=None) -> int:
     ap.add_argument("--projeto", required=True)
     ap.add_argument("--resultados", required=True)
     ap.add_argument("--saida", default="memorial")
+    ap.add_argument("--contexto", help="projeto-contexto.json da skill contexto-do-projeto (município, CAA, legislação local)")
     a = ap.parse_args(argv)
     projeto = json.loads(Path(a.projeto).read_text(encoding="utf-8"))
     pasta = Path(a.resultados)
@@ -244,7 +254,10 @@ def main(argv=None) -> int:
     if not arquivos:
         sys.exit(f"nenhum .json em {pasta}")
     resultados = [(f.stem, json.loads(f.read_text(encoding="utf-8"))) for f in arquivos]
-    B = blocos(projeto, resultados)
+    contexto = json.loads(Path(a.contexto).read_text(encoding="utf-8")) if a.contexto else None
+    if not contexto and Path("projeto-contexto.json").is_file():
+        contexto = json.loads(Path("projeto-contexto.json").read_text(encoding="utf-8"))
+    B = blocos(projeto, resultados, contexto)
     out = Path(a.saida)
     out.mkdir(parents=True, exist_ok=True)
     titulo = projeto.get("titulo", "Memorial de Cálculo Estrutural")

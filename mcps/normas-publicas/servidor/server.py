@@ -21,7 +21,10 @@ INSTRUCOES = """Índice local de documentos técnicos PÚBLICOS brasileiros:
   (PRO) e manuais de obras rodoviárias, pavimentação, drenagem e obras de arte.
 - SINAPI/Caixa: cadernos técnicos de composições (critérios de medição, especificações, produtividade)
   e metodologia.
-Normas ABNT (NBR) NÃO estão aqui: são protegidas por direito autoral. Nunca invente texto de NBR.
+- Documentos públicos locais que o agente importou (fonte 'local'): código de obras, plano diretor,
+  ITs do Corpo de Bombeiros, normas de concessionárias.
+Normas ABNT (NBR) NÃO estão aqui: são protegidas por direito autoral. Nunca invente texto de NBR e nunca
+use cópias de NBR encontradas na internet.
 
 Como usar: 1) buscar_normas pelo assunto; 2) se vier vazio, buscar_catalogo e baixar_documentos;
 3) ler_pagina / localizar_item para o texto exato. Sempre cite documento, item e página, e avise que o
@@ -77,6 +80,18 @@ def ler_pagina(doc_id: str, pagina: int, quantidade: int = 1) -> dict:
 def localizar_item(doc_id: str, item: str) -> dict:
     """Texto de um item numerado (ex.: doc_id 'nr-18', item '18.13.1') até o item seguinte."""
     return normas.localizar_item(doc_id, item)
+
+
+@mcp.tool()
+def importar_documento_publico(url: str, titulo: str, esfera: str = "municipal") -> dict:
+    """Baixa e indexa um documento PÚBLICO encontrado na web: código de obras, plano diretor, lei de uso do solo,
+    Instrução Técnica do Corpo de Bombeiros, norma de concessionária (PDF ou página HTML).
+
+    esfera: 'municipal', 'estadual', 'federal' ou 'concessionaria'. Prefira sempre o site oficial (.gov.br,
+    .leg.br, prefeitura, câmara, diário oficial, Corpo de Bombeiros). Sites de cópias e exemplares de NBR
+    vendidos pela ABNT são recusados. Depois use buscar_normas(fonte='local').
+    """
+    return normas.importar_url(url, titulo, esfera, log=lambda m: None)
 
 
 @mcp.tool()

@@ -598,10 +598,20 @@ def render_manual(pack: dict, root: Path, reg: dict, extra: str = "") -> str:
         "MCPS": "\n".join(mcps_md) or "_Nenhum software conectado nesta instalação._",
         "FLUXOS": "\n".join(fluxos_md),
         "PARA_VOCE": extra.strip() + "\n" if extra.strip() else "",
+        "PERFIL": perfil_txt(),
     }
     for k, v in repl.items():
         tpl = tpl.replace("{{" + k + "}}", v)
     return tpl
+
+
+def perfil_txt() -> str:
+    f = sv_home() / "perfil.json"
+    if not f.is_file():
+        return "Município padrão: não informado (o agente pergunta no início de cada projeto)."
+    p = json.loads(f.read_text(encoding="utf-8"))
+    return (f"Município padrão dos seus projetos: **{p.get('municipio')}/{p.get('uf')}**. Em cada projeto novo o agente "
+            "confirma o município da obra e pesquisa as normas locais.")
 
 
 def md_to_html(md: str, title: str) -> str:
@@ -746,6 +756,27 @@ def cmd_atualizar(args) -> int:
     return cmd_instalar(args)
 
 
+UFS = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
+       "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"}
+
+
+def cmd_perfil(args) -> int:
+    """Município/UF onde o usuário mais atua — padrão para as fichas de projeto (skill contexto-do-projeto)."""
+    f = sv_home() / "perfil.json"
+    perfil = json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}
+    if args.municipio or args.uf:
+        uf = (args.uf or perfil.get("uf") or "").upper()
+        if uf not in UFS:
+            sys.exit(f"UF inválida: {uf!r}")
+        perfil.update({"municipio": args.municipio or perfil.get("municipio"), "uf": uf})
+        if args.atuacao:
+            perfil["atuacao"] = args.atuacao
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps(perfil, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(json.dumps(perfil, ensure_ascii=False))
+    return 0
+
+
 def cmd_instalar_uv(args) -> int:
     if shutil.which("uv"):
         print("uv já instalado:", shutil.which("uv"))
@@ -783,11 +814,16 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("desinstalar")
     p.add_argument("--simular", action="store_true")
     sub.add_parser("instalar-uv")
+    p = sub.add_parser("perfil")
+    p.add_argument("--municipio")
+    p.add_argument("--uf")
+    p.add_argument("--atuacao", help="uma linha sobre como o usuário trabalha")
 
     args = ap.parse_args(argv)
     return {
         "detectar": cmd_detectar, "instalar": cmd_instalar, "verificar": cmd_verificar, "manual": cmd_manual,
         "desinstalar": cmd_desinstalar, "atualizar": cmd_atualizar, "instalar-uv": cmd_instalar_uv,
+        "perfil": cmd_perfil,
     }[args.cmd](args)
 
 

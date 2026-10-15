@@ -1,11 +1,12 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.1.0
+version: 1.2.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Cálculo de concreto armado pela NBR 6118, cargas, vento e combinações, memorial de cálculo,
   quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e conexão com AutoCAD e ArchiCAD.
 skills:
+  - engenharia-civil/contexto-do-projeto
   - engenharia-civil/concreto-armado-nbr6118
   - engenharia-civil/cargas-combinacoes
   - engenharia-civil/memorial-de-calculo
@@ -22,6 +23,12 @@ mcps:
   - nome: archicad
     opcional: true
 fluxos:
+  - titulo: Começar um projeto pelo município
+    passos:
+      - "Abra o Claude Code/Codex na pasta do projeto e diga: \"Vamos começar um projeto de <uso> em <cidade>/<UF>\" (contexto-do-projeto)."
+      - "Responda às perguntas da ficha: uso, pavimentos, área, ambiente e, se souber, o endereço do lote."
+      - "O agente pesquisa em fontes oficiais o código de obras, o zoneamento, os Bombeiros e as concessionárias, e registra cada fonte com link e data."
+      - "Revise a tabela de exigências que mudam o projeto e as pendências a confirmar com a prefeitura."
   - titulo: Do lançamento ao memorial (pavimento de concreto armado)
     passos:
       - "Descreva o pavimento: \"Tenho 4 lajes, 6 vigas e 6 pilares; as lajes são…\" — o agente organiza o lançamento."

@@ -22,6 +22,8 @@ description: Redige e formata documentos técnicos de engenharia — relatório 
 
 Quando o documento tratar de segurança do trabalho, canteiro, trabalho em altura, espaço confinado ou de critérios de obras rodoviárias, e o MCP `normas-publicas` estiver conectado, fundamente as constatações com a skill `consulta-normas`: cite o item literal da NR/DNIT e a página. Isso dá força técnica ao laudo.
 
+Se existir `projeto-contexto.json` (skill `contexto-do-projeto`), use o município/UF e a legislação local registrada na identificação e na fundamentação do documento.
+
 Se o laudo for de estrutura de concreto e o usuário quiser verificar uma peça, use a skill `concreto-armado-nbr6118` e cite o resultado no documento.
 
 ## Limites e responsabilidade

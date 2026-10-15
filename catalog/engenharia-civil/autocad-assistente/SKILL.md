@@ -23,7 +23,7 @@ O script `scripts/detalhe_secao.py` calcula a geometria (cobrimento, estribo, po
 python3 scripts/detalhe_secao.py --b 15 --h 45 --c 3 --inf 3x12.5 --sup 2x8 --estribo 5 --s 13 --nome V1 --ops V1.json --dxf V1.dxf
 python3 scripts/detalhe_secao.py --b 20 --h 50 --c 3 --pilar 3 --phi 20 --estribo 5 --s 20 --nome P1 --origem 40 0 --ops P1.json
 ```
-Use os dados da skill `concreto-armado-nbr6118` (barras e estribos sugeridos, cobrimento da CAA). Várias seções no mesmo desenho: desloque cada uma com `--origem x y` (ex.: 40 cm entre seções).
+Use os dados da skill `concreto-armado-nbr6118` (barras e estribos sugeridos). Rodando na pasta do projeto, o script pega o **cobrimento pela classe de agressividade da ficha** (`projeto-contexto.json`, skill `contexto-do-projeto`). `--c` sobrescreve. Várias seções no mesmo desenho: desloque cada uma com `--origem x y` (ex.: 40 cm entre seções).
 
 Depois de executar as operações: `view` → `zoom_extents` (se disponível) e `view` → `get_screenshot` para mostrar o resultado ao usuário. Salve com `drawing` → `save` (AutoCAD) ou `save_as_dxf`.
 
@@ -34,6 +34,9 @@ Depois de executar as operações: `view` → `zoom_extents` (se disponível) e 
 - **Textos**: `annotation` → `create_text` `{x,y,text,height,layer}`. Para ⌀, no AutoCAD use `%%c`.
 - **Inspecionar desenho existente**: `drawing` → `info`; `entity` → `list` `{layer}`.
 - Antes de apagar ou mover muitas entidades, **descreva o que vai fazer e peça confirmação**. Em `file_ipc` existe `drawing` → `undo`.
+
+## Pranchas para aprovação
+Prefeituras costumam ter padrão próprio de apresentação (formato, carimbo, quadro de áreas, escalas). Com a ficha do projeto, procure esse padrão com a skill `contexto-do-projeto` (consulta: `padrão de apresentação de projetos <município>`), registre a fonte e siga-o nos layers, textos e carimbo. Preencha o carimbo com os dados da ficha (obra, município/UF) e do responsável técnico informados pelo usuário.
 
 ## Layout de canteiro
 Para desenhar canteiro de obras (áreas de vivência, acessos, central de armação/fôrmas, baias, proteção de periferia), levante antes as exigências com a skill `consulta-normas` (NR-18, NR-24, NR-10) e anote o item da norma em cada elemento do desenho (layer `EST-TEXTO`).

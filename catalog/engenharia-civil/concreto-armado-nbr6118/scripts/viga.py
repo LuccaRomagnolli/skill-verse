@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (COBRIMENTO, Aco, Concreto, Memoria, cisalhamento_modelo1,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, Aco, Concreto, Memoria, cisalhamento_modelo1,  # noqa: E402
                      escolher_barras, escolher_estribo, flexao_simples, fmt)
 
 
@@ -25,7 +25,7 @@ def main(argv=None) -> int:
     ap.add_argument("--d", type=float, help="altura útil (cm); padrão: h − (c + φt + φl/2) estimado")
     ap.add_argument("--fck", type=float, required=True, help="MPa")
     ap.add_argument("--aco", default="CA-50", choices=["CA-50", "CA-60", "CA-25"])
-    ap.add_argument("--caa", default="II", choices=["I", "II", "III", "IV"], help="classe de agressividade ambiental")
+    ap.add_argument("--caa", choices=["I", "II", "III", "IV"], help="classe de agressividade (padrão: ficha do projeto ou II)")
     ap.add_argument("--agregado", default="granito")
     g = ap.add_argument_group("esforços (informe característicos OU de cálculo OU carregamento)")
     g.add_argument("--Mk", type=float, help="momento característico (kN·m)")
@@ -37,12 +37,16 @@ def main(argv=None) -> int:
     g.add_argument("--vao", type=float, help="vão (m) — com --biapoiada")
     g.add_argument("--g", type=float, default=0.0, help="carga permanente (kN/m), sem peso próprio")
     g.add_argument("--q", type=float, default=0.0, help="carga variável (kN/m)")
+    ap.add_argument("--contexto", default="projeto-contexto.json", help="ficha do projeto (skill contexto-do-projeto)")
     ap.add_argument("--formato", choices=["md", "json"], default="md")
     a = ap.parse_args(argv)
 
     conc, aco = Concreto(a.fck, a.agregado), Aco(a.aco)
+    a.caa, origem_caa = caa_do_projeto(a.caa, a.contexto)
     c = COBRIMENTO[a.caa]["viga"]
     mem = Memoria(f"Viga {fmt(a.b,0)}×{fmt(a.h,0)} cm — C{fmt(a.fck,0)}, {a.aco}, CAA {a.caa}")
+    mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
+    checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Cobrimento nominal (Tab. 7.2)", f"c = {c} mm")
 
     if a.biapoiada:

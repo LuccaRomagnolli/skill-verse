@@ -21,6 +21,10 @@ Se o Python não existir ou for < 3.10, oriente a instalação (python.org) e pa
 1. **Onde instalar**: só aqui (a plataforma atual) ou também na outra (`claude`, `codex`, `ambas`). Padrão: a atual.
 2. **Quais softwares conectar**: liste cada item de `softwares` com o status detectado. Recomende conectar os detectados e os marcados com `recomendado: true` (ex.: índice de normas públicas, que não depende de software, só de internet; use a `descricao` para explicar). Para os não detectados, ofereça só se `util_sem_software` for true (explique o que funciona sem o software). Não ofereça os que `suporta_este_so` é false.
 3. Pergunte **como ele trabalha** (ex.: tipo de projeto, escritório/autônomo, normas que mais usa) — uma linha basta. Isso vai personalizar o manual.
+4. Pergunte **em qual município/UF ele mais atua**. Vira o padrão das fichas de projeto: o agente usa o município para pesquisar código de obras, Corpo de Bombeiros e concessionárias, e sempre confirma o da obra em cada projeto novo. Grave:
+   ```bash
+   python3 scripts/install.py perfil --municipio "<município>" --uf <UF> --atuacao "<resposta da pergunta 3>"
+   ```
 
 ## 3. Pré-requisito dos softwares (só se escolheu algum)
 Se `uv` for null, explique que é um gerenciador de Python necessário para as conexões e peça permissão. Com o "sim":
@@ -47,7 +51,7 @@ python3 scripts/install.py verificar
 A primeira verificação dos MCPs pode levar alguns minutos (baixa dependências). Se um MCP falhar porque o software não está aberto, isso é normal: diga que funciona quando ele abrir o programa.
 
 ## 6. Manual personalizado
-Escreva um arquivo temporário `para-voce.md` começando com `## Para você`, com 3–5 sugestões de uso ligadas ao que o usuário contou no passo 2.3. Use os exemplos das skills, adaptados ao trabalho dele, e cite as skills pelo nome. Depois:
+Escreva um arquivo temporário `para-voce.md` começando com `## Para você`, com 3–5 sugestões de uso ligadas ao que o usuário contou nos passos 2.3 e 2.4. Use os exemplos das skills, adaptados ao trabalho dele, e cite as skills pelo nome. Depois:
 ```bash
 python3 scripts/install.py manual --extra para-voce.md
 ```

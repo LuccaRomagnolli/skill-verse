@@ -5,8 +5,10 @@ as unidades indicadas nos docstrings (cm, kN, kN·m, cm²).
 """
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass, field
+from pathlib import Path
 
 GAMMA_C = 1.4
 GAMMA_S = 1.15
@@ -27,6 +29,28 @@ COBRIMENTO = {"I": {"laje": 20, "viga": 25, "pilar": 25},
               "II": {"laje": 25, "viga": 30, "pilar": 30},
               "III": {"laje": 35, "viga": 40, "pilar": 40},
               "IV": {"laje": 45, "viga": 50, "pilar": 50}}
+
+
+# Classe mínima de concreto armado por CAA — NBR 6118 Tabela 7.1
+FCK_MIN_CAA = {"I": 20, "II": 25, "III": 30, "IV": 40}
+
+
+def caa_do_projeto(caa: str | None, contexto: str | None = "projeto-contexto.json") -> tuple[str, str]:
+    """CAA informada > ficha do projeto (skill contexto-do-projeto) > padrão II (urbano)."""
+    if caa:
+        return caa, "informada"
+    f = Path(contexto) if contexto else None
+    if f and f.is_file():
+        c = (json.loads(f.read_text(encoding="utf-8")).get("caa") or {})
+        if c.get("classe") in FCK_MIN_CAA:
+            return c["classe"], f"ficha do projeto (ambiente {c.get('ambiente')})"
+    return "II", "padrão — sem ficha do projeto; confirme o ambiente da obra"
+
+
+def checar_durabilidade(fck: float, caa: str, mem: "Memoria") -> None:
+    mem.add("Durabilidade (Tab. 7.1)", f"CAA {caa} exige concreto ≥ C{FCK_MIN_CAA[caa]}")
+    if fck < FCK_MIN_CAA[caa]:
+        mem.alerta(f"fck = {fck:g} MPa abaixo do mínimo C{FCK_MIN_CAA[caa]} para CAA {caa} (NBR 6118, Tab. 7.1).")
 
 
 # ------------------------------------------------------------------ materiais

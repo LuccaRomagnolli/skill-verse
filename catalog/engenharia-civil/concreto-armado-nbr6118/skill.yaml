@@ -1,6 +1,6 @@
 titulo: Concreto armado (NBR 6118)
 categoria: engenharia-civil
-version: 1.1.0
+version: 1.2.0
 resumo: Dimensiona e verifica vigas, lajes maciças e pilares de concreto armado com memória de cálculo passo a passo, por scripts testados.
 mcps: []
 exemplos:

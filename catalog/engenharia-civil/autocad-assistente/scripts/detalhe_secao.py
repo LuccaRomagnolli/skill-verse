@@ -30,6 +30,18 @@ def dec(s: str) -> str:
     return re.sub(r"(\d)\.(\d)", r"\1,\2", s)
 
 
+# Cobrimento nominal de vigas e pilares por CAA (cm) — NBR 6118 Tabela 7.2
+COBRIMENTO_VP = {"I": 2.5, "II": 3.0, "III": 4.0, "IV": 5.0}
+
+
+def cobrimento_da_ficha(contexto: str | None) -> float | None:
+    f = Path(contexto) if contexto else None
+    if f and f.is_file():
+        caa = (json.loads(f.read_text(encoding="utf-8")).get("caa") or {}).get("classe")
+        return COBRIMENTO_VP.get(caa)
+    return None
+
+
 def parse_barras(s: str) -> tuple[int, float]:
     n, phi = s.lower().replace("φ", "").split("x")
     return int(n), float(phi.replace(",", "."))
@@ -183,7 +195,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--b", type=float, required=True, help="largura (cm)")
     ap.add_argument("--h", type=float, required=True, help="altura (cm)")
-    ap.add_argument("--c", type=float, default=3.0, help="cobrimento (cm)")
+    ap.add_argument("--c", type=float, help="cobrimento (cm); padrão: pela CAA da ficha do projeto (NBR 6118 Tab. 7.2) ou 3,0")
+    ap.add_argument("--contexto", default="projeto-contexto.json", help="ficha do projeto (skill contexto-do-projeto)")
     ap.add_argument("--estribo", type=float, default=5.0, help="φ do estribo (mm)")
     ap.add_argument("--s", type=float, help="espaçamento dos estribos (cm), só para o texto")
     ap.add_argument("--inf", help="viga: barras inferiores, ex. 3x12.5")
@@ -197,6 +210,8 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     if not a.pilar and not a.inf:
         ap.error("viga: informe --inf; pilar: informe --pilar")
+    if a.c is None:
+        a.c = cobrimento_da_ficha(a.contexto) or 3.0
     g = geometria(a)
     deslocar(g, *a.origem)
     if a.ops:

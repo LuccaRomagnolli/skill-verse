@@ -6,7 +6,7 @@ Banco de skills para agentes de IA (Claude Code e Codex), organizado por categor
 
 | Pack | Versão | Skills | Conexões |
 |---|---|---|---|
-| Engenharia Civil | 1.1.0 | concreto armado (NBR 6118), cargas/vento/combinações, memorial de cálculo, quantitativos + SINAPI, assistente AutoCAD, auditoria BIM ArchiCAD, relatórios técnicos, consulta a normas públicas | normas-publicas (próprio), AutoCAD LT, ArchiCAD 29 |
+| Engenharia Civil | 1.2.0 | ficha do projeto + normas locais por município, concreto armado (NBR 6118), cargas/vento/combinações, memorial de cálculo, quantitativos + SINAPI, assistente AutoCAD, auditoria BIM ArchiCAD, relatórios técnicos, consulta a normas públicas | normas-publicas (próprio), AutoCAD LT, ArchiCAD 29 |
 | Professores | — | (próximo) | — |
 
 ## Estrutura

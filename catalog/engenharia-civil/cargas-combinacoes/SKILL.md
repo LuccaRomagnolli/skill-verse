@@ -8,7 +8,7 @@ description: Levanta cargas de projeto (peso próprio, revestimentos, alvenarias
 Scripts em `scripts/` (Python 3.10+, stdlib). Rode a partir da pasta desta skill. Os números saem dos scripts; você conduz e explica.
 
 ## 1. Cargas permanentes e de uso
-Use `references/cargas-usuais.md`. Monte uma **tabela de carga por m²** com as camadas (material, espessura, γ, carga) e some. Regras:
+Se existir `projeto-contexto.json` (skill `contexto-do-projeto`), parta do **uso** da ficha para escolher a carga de uso e o tipo de ação nas combinações (`residencial` ou `comercial`) e confirme com o usuário. Use `references/cargas-usuais.md`. Monte uma **tabela de carga por m²** com as camadas (material, espessura, γ, carga) e some. Regras:
 - Valor que não está na referência → **peça ao usuário** o valor da Tabela da NBR 6120:2019 que ele tem. Não chute.
 - Alvenaria sobre laje sem viga embaixo: distribua o peso da parede pela área da laje (laje armada em cruz) ou trate como linha de carga, e diga qual hipótese usou.
 - Entregue: g (permanente adicional, sem peso próprio da laje) e q (uso), prontos para a skill `concreto-armado-nbr6118`.
@@ -18,7 +18,7 @@ Use `references/cargas-usuais.md`. Monte uma **tabela de carga por m²** com as 
 python3 scripts/vento.py --V0 35 --categoria IV --maior-dimensao 25 --altura-total 15 --passo 3 --S3-grupo 2
 python3 scripts/vento.py --V0 35 --categoria IV --classe B --alturas 3 6 9 12 15 --Ca 1.3 --largura 20
 ```
-Antes de rodar, confirme com o usuário: **V0 da cidade** (mapa de isopletas), categoria do terreno, maior dimensão da edificação e grupo de S3. Descrições de cada fator em `references/vento-nbr6123.md`. O Ca vem do ábaco da norma: ajude a ler, mas o valor é do usuário.
+Antes de rodar, confirme com o usuário: **V0 da cidade da obra** (mapa de isopletas; o município está em `projeto-contexto.json` se a ficha da skill `contexto-do-projeto` existir; a classe de rugosidade também pode ser discutida a partir do endereço do lote), categoria do terreno, maior dimensão da edificação e grupo de S3. Descrições de cada fator em `references/vento-nbr6123.md`. O Ca vem do ábaco da norma: ajude a ler, mas o valor é do usuário.
 
 ## 3. Combinações
 Cada ação entra como `nome:tipo:valor[:grupo]`, com o **efeito característico** (esforço numa seção, reação, carga). Ações do mesmo grupo são exclusivas (ex.: vento em direções diferentes).

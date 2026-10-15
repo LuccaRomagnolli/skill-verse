@@ -1,0 +1,9 @@
+titulo: Contexto do projeto e normas locais
+categoria: engenharia-civil
+version: 1.0.1
+resumo: Começa cada projeto pela ficha (município, UF, uso, ambiente) e pesquisa na internet a legislação local, as ITs dos Bombeiros, as normas das concessionárias e a edição vigente das NBR, registrando cada fonte oficial.
+mcps: []
+exemplos:
+  - "Vamos começar um projeto de sobrado em Goiânia: quais normas locais se aplicam?"
+  - "Levante o código de obras, o zoneamento e as exigências dos Bombeiros para um prédio de 6 andares em Curitiba"
+  - "Quais NBR do projeto estão em vigor e qual a edição de cada uma?"

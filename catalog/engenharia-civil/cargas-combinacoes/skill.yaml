@@ -1,6 +1,6 @@
 titulo: Cargas e combinações (NBR 6120 / 6123 / 8681)
 categoria: engenharia-civil
-version: 1.0.0
+version: 1.1.1
 resumo: Levanta cargas permanentes e de uso, calcula vento pela NBR 6123 e gera todas as combinações de ELU e ELS com envoltória.
 mcps: []
 exemplos:

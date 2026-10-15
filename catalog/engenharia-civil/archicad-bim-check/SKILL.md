@@ -24,12 +24,19 @@ O MCP `archicad` conversa com o ArchiCAD 29 **aberto com o projeto**. O add-on T
    - `export_issues_bcf` `{bcf_path}`: exporta tudo em BCF (sobrescreve o arquivo; confirme o caminho).
 6. **Correção automática** (opcional): `set_element_data`/`edit_classifications` alteram o modelo. Só com pedido explícito, num conjunto pequeno de elementos, depois de mostrar exatamente o que vai mudar. Sugira salvar uma cópia antes.
 
+## Conformidade com a legislação local
+Com a ficha do projeto (`projeto-contexto.json`, skill `contexto-do-projeto`), confira o modelo contra exigências **numéricas** do código de obras e do zoneamento do município:
+1. Levante os valores na fonte registrada na ficha (ou no índice `normas-publicas`, `buscar_normas(fonte='local')`): área mínima e dimensão mínima por compartimento, pé-direito, iluminação/ventilação, taxa de ocupação, permeabilidade. Anote o artigo de cada valor.
+2. Verifique com `find_elements` (ex.: zonas cujo nome contém "Dormit" e com área `less` que o mínimo; valores em m e m²). Use `search_definitions` para achar o endereço exato da propriedade de área/altura no template do usuário.
+3. Relate em tabela `Exigência | Artigo | Elementos fora | Ação`. Com confirmação do usuário, crie issues com `create_issue` + `attach_elements_to_issue` e exporte BCF.
+4. Valor que não foi encontrado em fonte oficial **não vira verificação**: entra como pendência na ficha.
+
 ## Perguntas típicas
 - "Quantas portas tem no 2º pavimento?" → `find_elements` com `element_types: [Door]` e comparação `story`.
 - "Quais paredes são estruturais?" → `find_elements` com a propriedade IFC/usuário correspondente (ache o endereço com `search_definitions`).
 - Integração com a estrutura: depois do IFC aprovado, use a skill `concreto-armado-nbr6118` para as peças e a `quantitativos-sinapi` para os volumes.
 
 ## Limites e responsabilidade
-- A auditoria verifica **dados** do modelo (preenchimento, classificação, nomenclatura). Ela não verifica geometria, interferências físicas (clash) nem conformidade com código de obras.
+- A auditoria verifica **dados** do modelo (preenchimento, classificação, nomenclatura) e, quando houver ficha do projeto, os parâmetros numéricos da legislação local que foram levantados em fonte oficial. Não substitui a análise da prefeitura nem verifica interferências físicas (clash).
 - Alterações no modelo são feitas em nome do usuário: sempre com confirmação e com o projeto salvo.
 - Requisitos: ArchiCAD 29 aberto; Tapir recomendado. Outras versões do ArchiCAD não são suportadas por este MCP.

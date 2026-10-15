@@ -17,7 +17,7 @@ Scripts em `scripts/` (stdlib). Rode a partir da pasta desta skill.
 3. Mostre a tabela, explique os critérios (`references/criterios-medicao.md`) e **confira as taxas** (aço kg/m³ e fôrma m²/m³) contra os indicadores da referência.
 
 ## 2. Orçamento SINAPI
-1. Peça ao usuário a planilha SINAPI (UF, mês, desonerado ou não) e o caminho do arquivo. Sem planilha, **não informe preços**: códigos e custos mudam todo mês.
+1. Peça ao usuário a planilha SINAPI (UF, mês, desonerado ou não). A UF da obra está em `projeto-contexto.json` quando a ficha da skill `contexto-do-projeto` existir e o caminho do arquivo. Sem planilha, **não informe preços**: códigos e custos mudam todo mês.
 2. Se o leitor não achar o cabeçalho: `python3 scripts/sinapi.py colunas --arquivo X.xlsx` e, se precisar, `--aba "<nome>"`.
 3. Para cada serviço do quantitativo, busque e **confirme a composição com o usuário** (descrição e unidade compatíveis):
    ```bash

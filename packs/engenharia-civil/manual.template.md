@@ -3,6 +3,8 @@
 Versão {{VERSAO}} · instalado em {{DATA}} · plataforma: {{PLATAFORMAS}}
 
 {{PARA_VOCE}}
+{{PERFIL}}
+
 ## Como usar
 Você não precisa decorar comandos. Abra o Claude Code ou o Codex na pasta do seu projeto e **descreva o que quer em português**. O agente escolhe a skill certa. Se quiser forçar uma skill, use a chamada direta indicada em cada uma.
 
@@ -10,6 +12,7 @@ Três hábitos que dão resultado melhor:
 1. **Dê os dados de uma vez**: dimensões, materiais, cargas e normas que você usa.
 2. **Peça a memória**: os cálculos saem de scripts testados, com passo a passo e o item da norma, e não "de cabeça".
 3. **Trabalhe numa pasta do projeto**: resultados, memorial e desenhos ficam organizados juntos.
+4. **Comece cada projeto pelo município**: diga "vamos começar um projeto em <cidade>". O agente monta a ficha do projeto e pesquisa as regras locais (código de obras, zoneamento, Corpo de Bombeiros, concessionárias) em fontes oficiais.
 
 ## Suas skills
 {{SKILLS}}

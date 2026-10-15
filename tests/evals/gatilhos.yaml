@@ -59,3 +59,12 @@ consulta-normas:
   nao_deve:
     - "Me passa o texto completo da NBR 6118"
     - "Qual o preço do aço CA-50 hoje?"
+contexto-do-projeto:
+  deve:
+    - "Vamos começar um projeto de sobrado em Goiânia"
+    - "Quais os afastamentos e a taxa de ocupação pra um lote em Curitiba?"
+    - "O Corpo de Bombeiros de MG exige o quê pra um prédio de 5 andares?"
+    - "A NBR 15575 que vale é de que ano?"
+  nao_deve:
+    - "Calcula a armadura dessa viga 15x40"
+    - "Qual a população de Goiânia?"

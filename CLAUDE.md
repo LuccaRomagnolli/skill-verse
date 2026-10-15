@@ -20,6 +20,7 @@ Banco de skills (formato aberto Agent Skills) organizado por categoria. Packs po
 7. Nada de dados pessoais, chaves ou caminhos absolutos da máquina do autor.
 8. Português do Brasil, normas ABNT citadas por número e ano.
 9. **Direito autoral**: nunca copie, raspe ou embuta texto de normas ABNT (NBR) — elas são vendidas pela ABNT. Em `references/`, só sínteses próprias com o número do item. Texto literal só de fontes públicas (NRs, DNIT, SINAPI), via MCP `normas-publicas`, baixado na máquina do usuário — nunca dentro do .zip.
+10. **Busca web pelas skills**: instruções de pesquisa sempre priorizam fonte oficial (prefeitura, câmara, diário oficial, Bombeiros, concessionária, CREA/CONFEA) e registram link + data de acesso + vigência (`contexto.py fonte`). De NBR, só metadados (número, edição vigente). Sites de cópias ficam bloqueados em `HOSTS_BLOQUEADOS` (normas.py).
 
 ## Comandos
 ```bash

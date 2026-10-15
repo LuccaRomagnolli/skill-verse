@@ -1,6 +1,6 @@
 titulo: Assistente AutoCAD estrutural
 categoria: engenharia-civil
-version: 1.1.0
+version: 1.2.0
 resumo: Desenha no AutoCAD pelo chat (layers padronizados, detalhes de seção de vigas e pilares a partir do cálculo, cotas e textos) e gera DXF quando não há AutoCAD.
 mcps: [autocad]
 exemplos:

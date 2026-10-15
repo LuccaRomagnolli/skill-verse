@@ -17,6 +17,7 @@ Scripts em `scripts/` (Python 3.10+, só biblioteca padrão). Rode a partir da p
 
 ## Como conduzir
 
+0. **Contexto**: rode os scripts **na pasta do projeto**. Se houver `projeto-contexto.json` (skill `contexto-do-projeto`), os scripts leem dali a classe de agressividade, aplicam o cobrimento (Tab. 7.2) e conferem o concreto mínimo da classe (Tab. 7.1). A origem aparece na memória ("CAA III — ficha do projeto"). Sem ficha, o padrão é CAA II: proponha criar a ficha ou pergunte o ambiente da obra e passe `--caa`.
 1. **Colete os dados mínimos** e pergunte só o que faltar (uma pergunta agrupada):
    - Todos: fck (padrão C25 se for estudo, mas pergunte), aço (CA-50), classe de agressividade (padrão II urbana).
    - Viga: bw, h, esforços (Mk/Vk característicos ou Md/Vd de cálculo) ou vão + cargas se biapoiada.
