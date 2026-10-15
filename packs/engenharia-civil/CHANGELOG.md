@@ -1,5 +1,31 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.3.0 — 2026-10-15
+- Nova skill **revit-assistente** + conexão **revit** (mcp-servers-for-revit v1.0.0, MIT): o agente lê e cria
+  níveis, eixos, pilares, vigas, lajes, cotas, tags e ambientes no Revit 2020–2026; `lancamento.py` converte o
+  cálculo em chamadas com os tipos de seção certos; quantitativos de concreto por nível; IFC; C# com confirmação.
+- Nova skill **solidworks-assistente** + conexão **solidworks** (Solidworks-MCP-Server v0.4.0, MIT): peças e
+  montagens metálicas de obra, `perfis.py` (geometria, área, massa e peso de chapas e perfis), interferência,
+  STEP e macros VBA para folha de desenho, PDF e DXF de corte.
+- Nova skill **tqs-assistente** (sem MCP, via API Python oficial do TQS no Windows): diagnóstico do ambiente com
+  introspecção da API instalada, leitura e conferência dos dados do edifício contra a NBR 6118:2023
+  (Tab. 7.1 e 7.2), variantes numa cópia, processamento global em fila (só com confirmação), leitura do modelo,
+  conversão para o Revit, exportação de desenhos DXF/PDF e conversão tf↔kN.
+- **autocad-assistente** 1.3.0: proficiência geral (mapa completo das operações do MCP, comandos, AutoLISP seguro,
+  padrões de desenho ABNT, plotagem), `prancha.py` (formatos A0–A4, carimbo, escala e alturas de texto) e
+  roteiro de base de arquitetura limpa para TQS/Revit.
+- Instalador: requisitos de ferramenta por conexão (`uv`, `node`), passo `extrair_zip` por versão do software
+  (add-in do Revit em `%APPDATA%`, mesclando sem apagar nada) e remoção só do que o pack instalou.
+
+### Validação pendente no software real (sem máquina Windows nesta versão)
+- [ ] Revit: add-in carrega em 2024/2025/2026; `verificar` com handshake; `lancamento.py` no exemplo (tipos C#,
+      eixos irregulares C#, pilares/vigas/lajes) e marcas; receitas C# de `revit-api-csharp.md` compilam.
+- [ ] SOLIDWORKS: `uv sync` no Windows; chapa de base e perfil I do `perfis.py` com massa < 1% do script;
+      macros VBA de `api-vba.md` (folha 1º diedro, PDF, DXF, lista de peças).
+- [ ] TQS: `tqs_ambiente.py` (32/64 bits) em V23/V24/V25; `tqs_edificio.py ler/conferir/aplicar` no
+      "Mod-Padrão"; `tqs_processar.py --executar`; `tqs_modelo.py listar/para-revit`; `tqs_dwg.py ler/exportar`.
+- [ ] AutoCAD: `prancha.py` em modo IPC (Windows) e headless; `plot_pdf`.
+
 ## 1.2.0 — 2026-10-15
 - Nova skill **contexto-do-projeto**: ficha do projeto (município, UF, uso, porte, ambiente → classe de agressividade)
   e pesquisa web guiada das exigências locais em fontes oficiais (código de obras, zoneamento, aprovação, Corpo de

@@ -33,6 +33,8 @@ python3 scripts/install.py instalar-uv
 ```
 Depois disso o PATH pode exigir reiniciar o terminal/agente; se `uv` ainda não aparecer, peça para reiniciar e retomar daqui.
 
+Algumas conexões (ex.: Revit) usam **Node.js**. Se um software escolhido tiver `node` em `ferramentas_faltando`, explique e peça permissão para instalar o Node.js LTS (Windows: `winget install OpenJS.NodeJS.LTS`; ou o instalador de nodejs.org). Depois peça para reiniciar o terminal/agente e rode `detectar` de novo. Sem o Node, a instalação pula só essa conexão e avisa.
+
 ## 4. Simular e instalar
 Mostre o plano antes:
 ```bash
@@ -58,7 +60,7 @@ python3 scripts/install.py manual --extra para-voce.md
 O script gera `MANUAL.md` e `MANUAL.html` (abre em qualquer navegador e imprime em PDF). Mostre os caminhos e apague o arquivo temporário.
 
 ## 7. Encerramento
-- Liste os **passos manuais** que o script imprimiu (ex.: carregar o arquivo LISP no AutoCAD, instalar o add-on Tapir) como checklist.
+- Liste os **passos manuais** que o script imprimiu (ex.: carregar o arquivo LISP no AutoCAD, instalar o add-on Tapir, ligar o serviço MCP no Revit) como checklist.
 - Diga para **reiniciar o Claude Code/Codex** para as skills aparecerem.
 - Sugira um primeiro pedido de teste tirado do manual.
 
@@ -68,5 +70,5 @@ O script gera `MANUAL.md` e `MANUAL.html` (abre em qualquer navegador e imprime 
 
 ## Regras
 - Nunca edite `~/.claude.json`, `settings.json` ou `~/.codex/config.toml` à mão: use o script (ele marca o que é do pack e respeita o que é do usuário).
-- Nunca rode `--forcar`, `instalar-uv` ou `desinstalar` sem o "sim" explícito do usuário.
+- Nunca rode `--forcar`, `instalar-uv`, a instalação do Node.js ou `desinstalar` sem o "sim" explícito do usuário.
 - Se algo fugir deste roteiro, explique o que aconteceu e pare, em vez de improvisar comandos.

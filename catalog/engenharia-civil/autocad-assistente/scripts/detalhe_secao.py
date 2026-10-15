@@ -114,11 +114,14 @@ def deslocar(g: dict, dx: float, dy: float) -> None:
 
 # ------------------------------------------------------------------ MCP AutoCAD
 
-def para_ops(g: dict) -> list[dict]:
-    ops = [{"tool": "layer", "operation": "create", "data": {"name": n, "color": c}} for n, c in LAYERS]
+def para_ops(g: dict, layers=LAYERS) -> list[dict]:
+    ops = [{"tool": "layer", "operation": "create", "data": {"name": n, "color": c}} for n, c in layers]
     for e in g["entidades"]:
         p = e["p"]
-        if e["t"] == "rect":
+        if e["t"] == "line":
+            ops.append({"tool": "entity", "operation": "create_line", "x1": p[0], "y1": p[1], "x2": p[2], "y2": p[3],
+                        "layer": e["layer"]})
+        elif e["t"] == "rect":
             ops.append({"tool": "entity", "operation": "create_rectangle", "x1": p[0], "y1": p[1], "x2": p[2], "y2": p[3],
                         "layer": e["layer"]})
         elif e["t"] == "circle":  # barra cheia: polígono de 24 lados + hachura SOLID (funciona nos dois backends)
@@ -145,11 +148,12 @@ def dxf_txt(s: str) -> str:
     return s.replace("φ", "%%c").replace("—", "-").replace("×", "x")
 
 
-def para_dxf(gs: list[dict]) -> str:
+def para_dxf(gs: list[dict], layers=LAYERS, insunits: int = 5) -> str:
+    """insunits: 4 = mm, 5 = cm, 6 = m."""
     L = ["0", "SECTION", "2", "HEADER", "9", "$ACADVER", "1", "AC1009", "9", "$DWGCODEPAGE", "3", "ANSI_1252",
-         "9", "$INSUNITS", "70", "5", "0", "ENDSEC",
-         "0", "SECTION", "2", "TABLES", "0", "TABLE", "2", "LAYER", "70", str(len(LAYERS))]
-    for n, c in LAYERS:
+         "9", "$INSUNITS", "70", str(insunits), "0", "ENDSEC",
+         "0", "SECTION", "2", "TABLES", "0", "TABLE", "2", "LAYER", "70", str(len(layers))]
+    for n, c in layers:
         L += ["0", "LAYER", "2", n, "70", "0", "62", str(c), "6", "CONTINUOUS"]
     L += ["0", "ENDTAB", "0", "ENDSEC", "0", "SECTION", "2", "ENTITIES"]
 
@@ -159,7 +163,9 @@ def para_dxf(gs: list[dict]) -> str:
     for g in gs:
         for e in g["entidades"]:
             p, lay = e["p"], e["layer"]
-            if e["t"] == "rect":
+            if e["t"] == "line":
+                L += line(*p, lay)
+            elif e["t"] == "rect":
                 x1, y1, x2, y2 = p
                 L += ["0", "POLYLINE", "8", lay, "66", "1", "70", "1"]
                 for x, y in ((x1, y1), (x2, y1), (x2, y2), (x1, y2)):

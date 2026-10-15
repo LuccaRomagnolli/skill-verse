@@ -45,7 +45,7 @@ def test_estrutura_do_zip(pacote):
               ".claude-plugin/marketplace.json", "plugin/.claude-plugin/plugin.json", "instalador/SKILL.md"):
         assert (pacote / f).is_file(), f
     pack = json.loads((pacote / "pack.json").read_text(encoding="utf-8"))
-    assert len(pack["skills"]) == 9
+    assert len(pack["skills"]) == 12
     assert (pacote / "mcps/normas-publicas/server.py").is_file()   # código do MCP próprio vai no zip
     assert not list(pacote.rglob("*.db")) and not list(pacote.rglob("pdf/*.pdf"))  # documentos não vão
     mk = json.loads((pacote / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
@@ -131,3 +131,69 @@ def test_download_cai_para_curl_sem_certificados(monkeypatch):
     monkeypatch.setattr(install.subprocess, "run", lambda cmd, **k: chamadas.append(cmd) or P())
     assert install.baixar_url("https://exemplo/x.zip") == b"PK-conteudo"
     assert chamadas[0][0] == "curl"
+
+
+def _zip(arquivos: dict[str, bytes]) -> bytes:
+    import io
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for nome, dados in arquivos.items():
+            z.writestr(nome, dados)
+    return buf.getvalue()
+
+
+REVIT = {"nome": "revit", "titulo": "Revit", "requisitos": {"so": ["windows"], "ferramentas": ["node"]},
+         "deteccao": {"windows": ["C:/Program Files/Autodesk/Revit 20*"]},
+         "preparo": [{"extrair_zip": "https://x/addin-Revit{VERSAO}.zip", "destino": "{APPDATA}/Addins/{VERSAO}",
+                      "versao_regex": r"Revit (\d{4})", "versoes": ["2024", "2025", "2026"],
+                      "ignorar": ["duplicado.addin"]}],
+         "servidor": {"command": "npx", "args": ["-y", "pkg@1.0.0"], "env": {},
+                      "por_so": {"windows": {"command": "cmd", "args": ["/c", "npx", "-y", "pkg@1.0.0"]}}}}
+
+
+def test_extrair_zip_por_versao_mescla_e_desinstala_so_o_que_e_do_pack(tmp_path, monkeypatch):
+    monkeypatch.setenv("APPDATA", str(tmp_path / "Roaming"))
+    monkeypatch.setattr(install, "os_key", lambda: "windows")
+    monkeypatch.setattr(install.glob, "glob", lambda pat: ["C:/Program Files/Autodesk/Revit 2025",
+                                                           "C:/Program Files/Autodesk/Revit 2027"])
+    urls = []
+    monkeypatch.setattr(install, "baixar_url", lambda url: urls.append(url) or _zip(
+        {"plugin.addin": b"<x/>", "duplicado.addin": b"<x/>", "plugin/a.dll": b"1", "plugin/sub/b.dll": b"2"}))
+    addins = tmp_path / "Roaming/Addins/2025"
+    addins.mkdir(parents=True)
+    (addins / "outro-addin.addin").write_text("do usuário")
+
+    log = install.Log(simular=False)
+    criados = install.prepare_mcp(REVIT, log, tmp_path)
+    assert urls == ["https://x/addin-Revit2025.zip"]                  # 2027 sem suporte não é baixado
+    assert any("2027" in a for a in log.avisos)
+    assert (addins / "plugin/sub/b.dll").is_file() and not (addins / "duplicado.addin").exists()
+    assert (addins / "outro-addin.addin").read_text() == "do usuário"  # mescla, não apaga
+
+    install.remover_extraidos(criados, log)
+    assert not (addins / "plugin").exists() and not (addins / "plugin.addin").exists()
+    assert (addins / "outro-addin.addin").is_file() and addins.is_dir()
+
+
+def test_extrair_zip_recusa_caminho_fora_do_destino(tmp_path):
+    with pytest.raises(RuntimeError, match="fora do destino"):
+        install.extrair_mesclando(_zip({"../fora.txt": b"x"}), tmp_path / "dest")
+
+
+def test_sem_software_detectado_nao_baixa(tmp_path, monkeypatch):
+    monkeypatch.setattr(install, "os_key", lambda: "windows")
+    monkeypatch.setattr(install.glob, "glob", lambda pat: [])
+    monkeypatch.setattr(install, "baixar_url", lambda url: pytest.fail("não devia baixar"))
+    log = install.Log(simular=False)
+    assert install.prepare_mcp(REVIT, log, tmp_path)["arquivos"] == []
+    assert any("não encontrado" in a for a in log.avisos)
+
+
+def test_servidor_por_so_troca_comando_e_ferramentas(monkeypatch):
+    monkeypatch.setattr(install, "os_key", lambda: "windows")
+    monkeypatch.setattr(install.shutil, "which", lambda n: None)
+    srv = install.resolve_server(REVIT)
+    assert srv["command"] == "cmd" and srv["args"][:2] == ["/c", "npx"]
+    assert install.ferramentas_faltando(REVIT) == ["node"]
+    monkeypatch.setattr(install.shutil, "which", lambda n: "/usr/bin/npx" if n == "npx" else None)
+    assert install.ferramentas_faltando(REVIT) == []

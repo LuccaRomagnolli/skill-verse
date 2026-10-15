@@ -1,0 +1,42 @@
+# MCP de terceiros — NÃO embutimos o código; o instalador usa o pacote npm e o add-in do release fixados.
+nome: revit
+titulo: Autodesk Revit (2020–2026)
+descricao: >-
+  Conecta ao Revit aberto: lê a vista e os elementos, cria níveis, eixos, pilares, vigas, lajes e paredes,
+  cotas, tags e ambientes, levanta quantitativos de materiais e executa código C# da Revit API (com confirmação).
+licenca: MIT
+upstream: https://github.com/mcp-servers-for-revit/mcp-servers-for-revit
+versao_fixada: v1.0.0   # commit 1a52de93d9f4565f94d0d1541186c9cf18f3648f; npm mcp-server-for-revit@1.0.0
+requisitos:
+  so: [windows]
+  software: "Autodesk Revit 2020 a 2026 (Windows), com o serviço MCP ligado na faixa 'Revit MCP Plugin'"
+  ferramentas: [node]
+deteccao:
+  windows: ["C:/Program Files/Autodesk/Revit 20*"]
+util_sem_software: false
+preparo:
+  # add-in C# do Revit: um zip por versão, extraído em %APPDATA%/Autodesk/Revit/Addins/<ano> (mescla, não apaga nada)
+  - extrair_zip: "https://github.com/mcp-servers-for-revit/mcp-servers-for-revit/releases/download/v1.0.0/mcp-servers-for-revit-v1.0.0-Revit{VERSAO}.zip"
+    destino: "{APPDATA}/Autodesk/Revit/Addins/{VERSAO}"
+    versao_regex: "Revit (\\d{4})"
+    versoes: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"]
+    # o release traz dois .addin idênticos (mesmo ClientId); só um pode ficar, senão o Revit acusa duplicidade
+    ignorar: ["revit-mcp.addin"]
+servidor:
+  command: npx
+  args: ["-y", "mcp-server-for-revit@1.0.0"]
+  env: {}
+  por_so:
+    # Claude Code nativo no Windows precisa do wrapper 'cmd /c' para executar o npx
+    windows: {command: cmd, args: ["/c", "npx", "-y", "mcp-server-for-revit@1.0.0"]}
+teste:
+  tool_esperada: get_current_view_info
+pos_instalacao:
+  windows:
+    - "Abra o Revit. Na mensagem de segurança do complemento 'mcp-servers-for-revit', clique em 'Sempre carregar'."
+    - "Na faixa Suplementos → painel 'Revit MCP Plugin', clique em 'Settings', marque todos os comandos e salve."
+    - "Com um projeto aberto, clique em 'Revit MCP Switch' para ligar o serviço (precisa estar ligado sempre que for usar o agente)."
+avisos:
+  - "O serviço do Revit escuta em localhost:8080. Se outro programa usar essa porta, a conexão falha."
+  - "Revit 2027 ou mais novo ainda não tem add-in publicado nesta versão fixada."
+  - "A primeira execução baixa o pacote npm (precisa de internet)."

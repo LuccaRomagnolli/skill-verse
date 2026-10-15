@@ -1,0 +1,33 @@
+# MCP de terceiros — NÃO embutimos o código; o instalador baixa a versão fixada do upstream.
+nome: solidworks
+titulo: SOLIDWORKS (2022+)
+descricao: >-
+  Controla o SOLIDWORKS aberto: esboços, extrusões, cortes, furos, padrões, montagens com posicionamentos,
+  configurações, equações, propriedades de massa, interferência, capturas de tela e exportação STEP/IGES/STL.
+licenca: MIT
+upstream: https://github.com/HarrierPigeon/Solidworks-MCP-Server
+versao_fixada: 60c11fe45b6cfc60c4e2da8ad41fc725a48bf8ea   # tag v0.4.0
+requisitos:
+  so: [windows]
+  software: "SOLIDWORKS 2022 ou mais novo, ativado, aberto no Windows"
+  ferramentas: [uv]
+deteccao:
+  windows: ["C:/Program Files/SOLIDWORKS Corp/SOLIDWORKS*", "C:/Program Files/SolidWorks Corp/SolidWorks*"]
+util_sem_software: false
+preparo:
+  - baixar_zip: https://github.com/HarrierPigeon/Solidworks-MCP-Server/archive/60c11fe45b6cfc60c4e2da8ad41fc725a48bf8ea.zip
+    destino: "{MCP_DIR}/solidworks-mcp"
+  - comando: ["uv", "sync", "--directory", "{MCP_DIR}/solidworks-mcp"]
+servidor:
+  command: uv
+  args: ["run", "--directory", "{MCP_DIR}/solidworks-mcp", "python", "server.py"]
+  env: {}
+teste:
+  tool_esperada: solidworks_get_state
+pos_instalacao:
+  windows:
+    - "Abra o SOLIDWORKS antes de pedir qualquer modelagem; o agente se conecta à sessão aberta."
+    - "Arquivos salvos só com o nome (sem pasta) vão para {MCP_DIR}/solidworks-mcp/workspace. Prefira informar a pasta do projeto."
+avisos:
+  - "Não há desenho 2D (folha de detalhamento) nem exportação DXF pela conexão: a skill gera macro VBA para isso."
+  - "O Hole Wizard pode abrir uma janela de confirmação em algumas versões do SOLIDWORKS."

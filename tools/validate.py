@@ -148,6 +148,8 @@ def check_catalog(rep: Report, known_mcps: set[str]) -> dict[str, Path]:
 
 
 MCP_REQUIRED = ("nome", "titulo", "licenca", "upstream", "versao_fixada", "requisitos", "servidor", "teste")
+FERRAMENTAS = {"uv", "node"}  # as que o instalador sabe procurar (install.py FERRAMENTAS)
+PREPARO = ("copiar_do_pack", "baixar_zip", "extrair_zip", "comando")
 
 
 def check_mcps(rep: Report) -> set[str]:
@@ -180,6 +182,17 @@ def check_mcps(rep: Report) -> set[str]:
                 rep.err(f, "MCP interno deve referenciar o código via {PACK_DIR}/mcps/<nome>/")
         if str(data.get("licenca", "")).upper() in ("", "DESCONHECIDA", "?"):
             rep.err(f, "licença do upstream não verificada — não pode ser vendido")
+        for t in (data.get("requisitos") or {}).get("ferramentas") or []:
+            if t not in FERRAMENTAS:
+                rep.err(f, f"ferramenta '{t}' desconhecida pelo instalador (use {', '.join(sorted(FERRAMENTAS))})")
+        for step in data.get("preparo") or []:
+            tipo = [k for k in PREPARO if k in step]
+            if len(tipo) != 1:
+                rep.err(f, f"passo de preparo inválido {step!r} (use um de {', '.join(PREPARO)})")
+            elif tipo[0] in ("baixar_zip", "extrair_zip", "copiar_do_pack") and "destino" not in step:
+                rep.err(f, f"passo '{tipo[0]}' sem 'destino'")
+            elif tipo[0] == "extrair_zip" and "{VERSAO}" in str(step) and not step.get("versoes"):
+                rep.err(f, "extrair_zip por versão precisa da lista 'versoes' suportadas")
         found.add(d.name)
     return found
 

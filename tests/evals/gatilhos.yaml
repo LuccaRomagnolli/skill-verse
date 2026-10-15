@@ -34,8 +34,41 @@ autocad-assistente:
     - "Desenha no AutoCAD a seção da viga V2"
     - "Me gera um DXF com os pilares"
     - "Cria os layers do projeto estrutural"
-  nao_deve:
+    - "Monta uma prancha A1 em 1:50 com carimbo"
+    - "Limpa essa planta da arquitetura pra eu lançar no TQS"
     - "Qual atalho do AutoCAD pra fazer offset?"
+  nao_deve:
+    - "Qual a diferença entre DWG e IFC num processo BIM?"
+    - "Modela essa viga no Revit"
+revit-assistente:
+  deve:
+    - "Lança esses pilares e vigas no Revit"
+    - "Quantos m³ de concreto tem nesse modelo do Revit?"
+    - "Cria os níveis e eixos do prédio no Revit"
+    - "Pinta as vigas por seção pra eu revisar"
+    - "Exporta o IFC da estrutura pro calculista"
+  nao_deve:
+    - "O que é BIM?"
+    - "Audita o modelo do ArchiCAD pra entrega"
+solidworks-assistente:
+  deve:
+    - "Modela uma chapa de base com 4 furos no SolidWorks"
+    - "Quanto pesa essa peça metálica?"
+    - "Monta a ligação e vê se tem interferência"
+    - "Exporta essa peça em STEP"
+  nao_deve:
+    - "Dimensiona essa viga de aço pela NBR 8800"
+    - "Desenha o detalhe da viga de concreto no AutoCAD"
+tqs-assistente:
+  deve:
+    - "Confere os dados do edifício no TQS"
+    - "Processa o edifício no TQS e gera a tabela de ferros"
+    - "Testa o edifício com fck 30 no TQS"
+    - "Lista os pilares que estão lançados no TQS"
+    - "Qual a diferença entre Modelo IV e Modelo VI no TQS?"
+  nao_deve:
+    - "Calcula a armadura dessa viga 15x40"
+    - "Como faço uma laje no Eberick?"
 archicad-bim-check:
   deve:
     - "O modelo do ArchiCAD tá pronto pra mandar o IFC pro calculista?"

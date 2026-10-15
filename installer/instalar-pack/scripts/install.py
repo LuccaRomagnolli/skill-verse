@@ -176,7 +176,9 @@ _PACK_DIR: Path | None = None  # raiz do pack instalado (para MCPs próprios que
 
 
 def ctx() -> dict[str, str]:
-    c = {"MCP_DIR": mcp_dir().as_posix(), "SKILLVERSE_HOME": sv_home().as_posix()}
+    appdata = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
+    c = {"MCP_DIR": mcp_dir().as_posix(), "SKILLVERSE_HOME": sv_home().as_posix(),
+         "APPDATA": Path(appdata).as_posix()}
     if _PACK_DIR:
         c["PACK_DIR"] = _PACK_DIR.as_posix()
     return c
@@ -200,12 +202,29 @@ def owned_by(path: Path, pack_id: str) -> bool:
 
 # ---------------------------------------------------------------- detectar
 
+# ferramenta declarada em requisitos.ferramentas → executável procurado no PATH
+FERRAMENTAS = {"uv": "uv", "node": "npx"}
+COMO_INSTALAR = {
+    "uv": "rode 'install.py instalar-uv' (com a permissão do usuário)",
+    "node": "instale o Node.js LTS (Windows: 'winget install OpenJS.NodeJS.LTS'; ou nodejs.org) e reabra o terminal",
+}
+
+
+def ferramentas_faltando(m: dict) -> list[str]:
+    return [f for f in (m.get("requisitos") or {}).get("ferramentas") or []
+            if not shutil.which(FERRAMENTAS.get(f, f))]
+
+
+def detected_paths(m: dict) -> list[str]:
+    pats = (m.get("deteccao") or {}).get(os_key(), [])
+    return sorted({p for pat in pats for p in glob.glob(pat)})
+
+
 def detect(pack: dict) -> dict:
     osk = os_key()
     softwares = {}
     for m in pack.get("mcps", []):
-        pats = (m.get("deteccao") or {}).get(osk, [])
-        found = sorted({p for pat in pats for p in glob.glob(pat)})
+        found = detected_paths(m)
         softwares[m["nome"]] = {
             "titulo": m["titulo"],
             "detectado": bool(found),
@@ -215,6 +234,7 @@ def detect(pack: dict) -> dict:
             "recomendado": bool(m.get("recomendado")),
             "descricao": m.get("descricao", ""),
             "opcional": m.get("opcional", True),
+            "ferramentas_faltando": ferramentas_faltando(m),
         }
     claude = find_claude()
     codex = shutil.which("codex")
@@ -229,6 +249,7 @@ def detect(pack: dict) -> dict:
             "codex": {"cli": codex, "pasta": str(codex_home()), "pasta_existe": codex_home().is_dir()},
         },
         "uv": shutil.which("uv"),
+        "node": shutil.which("npx"),
         "softwares": softwares,
         "instalacao_atual": state["packs"].get(pack["id"]),
         "destino": str(sv_home()),
@@ -286,11 +307,47 @@ def resolve_server(m: dict) -> dict:
     extra = (srv.pop("por_so", None) or {}).get(os_key(), {})
     env = dict(srv.get("env") or {})
     env.update(extra.get("env") or {})
-    cmd = shutil.which(srv["command"]) or srv["command"]
-    return {"command": cmd, "args": list(srv.get("args") or []), "env": env}
+    command = extra.get("command", srv["command"])
+    args = extra.get("args", srv.get("args") or [])
+    cmd = shutil.which(command) or command
+    return {"command": cmd, "args": list(args), "env": env}
 
 
-def prepare_mcp(m: dict, log: Log, pack_root: Path) -> None:
+def versoes_detectadas(m: dict, step: dict, log: Log) -> list[str]:
+    """Versões do software instalado (ex.: Revit 2025) que o passo suporta."""
+    rx = re.compile(step.get("versao_regex", r"(\d{4})"))
+    achadas = sorted({mt.group(1) for p in detected_paths(m) if (mt := rx.search(p))})
+    suportadas = [str(v) for v in step.get("versoes") or achadas]
+    fora = [v for v in achadas if v not in suportadas]
+    if fora:
+        log.aviso(f"{m['titulo']}: versão {', '.join(fora)} sem suporte nesta conexão (suportadas: "
+                  f"{suportadas[0]}–{suportadas[-1]})")
+    if not achadas:
+        log.aviso(f"{m['titulo']}: software não encontrado nesta máquina — o complemento não foi instalado. "
+                  "Instale o programa e rode 'atualizar'.")
+    return [v for v in achadas if v in suportadas]
+
+
+def extrair_mesclando(data: bytes, dest: Path, ignorar: list[str] | None = None) -> list[str]:
+    """Extrai o zip DENTRO de dest sem apagar o que já existe lá. Devolve os arquivos gravados."""
+    gravados = []
+    base = dest.resolve()
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        for info in z.infolist():
+            alvo = (dest / info.filename).resolve()
+            if base != alvo and base not in alvo.parents:
+                raise RuntimeError(f"zip com caminho fora do destino: {info.filename}")
+            if info.is_dir() or info.filename in (ignorar or []):
+                continue
+            alvo.parent.mkdir(parents=True, exist_ok=True)
+            alvo.write_bytes(z.read(info))
+            gravados.append(str(alvo))
+    return gravados
+
+
+def prepare_mcp(m: dict, log: Log, pack_root: Path) -> dict:
+    """Executa o preparo. Devolve {'arquivos': [...], 'pastas_base': [...]} do que foi extraído fora do MCP_DIR."""
+    criados: dict[str, list[str]] = {"arquivos": [], "pastas_base": []}
     for step in subst(m.get("preparo") or [], ctx()):
         if "copiar_do_pack" in step:
             src, dest = pack_root / step["copiar_do_pack"], Path(step["destino"])
@@ -316,10 +373,37 @@ def prepare_mcp(m: dict, log: Log, pack_root: Path) -> None:
                 if dest.exists():
                     shutil.rmtree(dest)
                 shutil.move(str(src), str(dest))
+        elif "extrair_zip" in step:
+            # complemento por versão do software (ex.: add-in do Revit em %APPDATA%/Autodesk/Revit/Addins/<ano>)
+            for v in versoes_detectadas(m, step, log):
+                url = step["extrair_zip"].replace("{VERSAO}", v)
+                dest = Path(step["destino"].replace("{VERSAO}", v))
+                log.passo(f"baixar {url} → {dest} (mesclando)")
+                if log.simular:
+                    continue
+                criados["arquivos"] += extrair_mesclando(baixar_url(url), dest, step.get("ignorar"))
+                criados["pastas_base"].append(str(dest.resolve()))
         elif "comando" in step:
             cmd = list(step["comando"])
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
             run(cmd, log, timeout=1800, env=step.get("env"))
+    return criados
+
+
+def remover_extraidos(reg: dict, log: Log) -> None:
+    """Apaga só os arquivos que o pack extraiu e as pastas que ficaram vazias, sem subir além da pasta base."""
+    bases = {Path(b) for b in reg.get("pastas_base", [])}
+    for f in reg.get("arquivos", []):
+        p = Path(f)
+        if p.is_file():
+            log.passo(f"remover {p}")
+            if log.simular:
+                continue
+            p.unlink()
+            d = p.parent
+            while any(b in d.parents for b in bases) and d.is_dir() and not any(d.iterdir()):
+                d.rmdir()
+                d = d.parent
 
 
 def toml_str(s: str) -> str:
@@ -459,7 +543,8 @@ def cmd_instalar(args) -> int:
     for n in escolhidos:
         if n not in mcps_by_name:
             sys.exit(f"MCP '{n}' não faz parte deste pack. Disponíveis: {', '.join(mcps_by_name) or 'nenhum'}")
-    if escolhidos and not shutil.which("uv"):
+    neste_so = [n for n in escolhidos if os_key() in mcps_by_name[n]["requisitos"]["so"]]
+    if any("uv" in ferramentas_faltando(mcps_by_name[n]) for n in neste_so):
         sys.exit("Os MCPs precisam do 'uv'. Rode 'install.py instalar-uv' (com a permissão do usuário) e tente de novo.")
 
     print(f"Instalando {pack['nome']} v{pack['version']} em: {', '.join(plataformas)}")
@@ -484,10 +569,17 @@ def cmd_instalar(args) -> int:
         if os_key() not in m["requisitos"]["so"]:
             log.aviso(f"{m['titulo']} não roda em {os_key()} — pulei")
             continue
+        faltam = ferramentas_faltando(m)
+        if faltam:
+            falhas[n] = "falta " + ", ".join(faltam)
+            log.aviso(f"{m['titulo']}: falta {', '.join(faltam)} — " + "; ".join(COMO_INSTALAR.get(f, f) for f in faltam))
+            continue
         try:
-            prepare_mcp(m, log, installed_root)
+            criados = prepare_mcp(m, log, installed_root)
             srv = resolve_server(m)
             reg = {"servidor": srv, "plataformas": []}
+            if criados["arquivos"]:
+                reg.update(criados)
             if m.get("dados"):
                 reg["dados"] = subst(m["dados"], ctx())
             if "claude" in plataformas and register_claude_mcp(n, srv, log):
@@ -718,6 +810,7 @@ def cmd_desinstalar(args) -> int:
             run([claude, "mcp", "remove", nome, "--scope", "user"], log, check=False)
         if "codex" in r["plataformas"]:
             unregister_codex_mcp(nome, log)
+        remover_extraidos(r, log)
         if r.get("dados") and Path(r["dados"]).is_dir():
             log.passo(f"remover {r['dados']}")
             if not log.simular:

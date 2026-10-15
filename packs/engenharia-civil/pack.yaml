@@ -1,10 +1,11 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.2.0
+version: 1.3.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Cálculo de concreto armado pela NBR 6118, cargas, vento e combinações, memorial de cálculo,
-  quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e conexão com AutoCAD e ArchiCAD.
+  quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e o agente operando AutoCAD,
+  Revit, SOLIDWORKS, ArchiCAD e TQS.
 skills:
   - engenharia-civil/contexto-do-projeto
   - engenharia-civil/concreto-armado-nbr6118
@@ -12,6 +13,9 @@ skills:
   - engenharia-civil/memorial-de-calculo
   - engenharia-civil/quantitativos-sinapi
   - engenharia-civil/autocad-assistente
+  - engenharia-civil/revit-assistente
+  - engenharia-civil/solidworks-assistente
+  - engenharia-civil/tqs-assistente
   - engenharia-civil/archicad-bim-check
   - engenharia-civil/consulta-normas
   - _comum/relatorio-tecnico
@@ -21,6 +25,10 @@ mcps:
   - nome: autocad
     opcional: true
   - nome: archicad
+    opcional: true
+  - nome: revit
+    opcional: true
+  - nome: solidworks
     opcional: true
 fluxos:
   - titulo: Começar um projeto pelo município
@@ -40,6 +48,23 @@ fluxos:
     passos:
       - "Com uma viga ou pilar calculado, peça: \"Desenhe a seção da V1 no AutoCAD\" (autocad-assistente)."
       - "Sem AutoCAD aberto, peça o DXF: \"Gere o DXF das seções de todos os pilares\"."
+  - titulo: Do cálculo ao modelo no Revit
+    passos:
+      - "Abra o Revit com o projeto e ligue o 'Revit MCP Switch' (faixa Suplementos)."
+      - "Peça: \"Lança no Revit os pilares, vigas e lajes que calculamos, nos níveis Térreo e Pav 1\" (revit-assistente)."
+      - "Confirme a criação dos tipos de seção (código C# mostrado pelo agente) e confira o modelo em 3D."
+      - "Peça: \"Quantos m³ de concreto tem por pavimento?\" e orce com o SINAPI (quantitativos-sinapi)."
+  - titulo: Automatizar o TQS
+    passos:
+      - "No computador com o TQS, abra o Claude Code/Codex e diga: \"Confere os dados do edifício <nome> no TQS\" (tqs-assistente)."
+      - "O agente diagnostica o Python/TQS, lê pisos, CAA, fck e cobrimentos e aponta o que não bate com a NBR 6118."
+      - "Peça variantes: \"Cria uma cópia com fck 30 e processa as duas para comparar o aço\". O processamento só roda depois do seu sim."
+      - "Leve o modelo ao Revit pelo IFC do TQS ou peça \"Manda o modelo do TQS para o Revit\"."
+  - titulo: Peça metálica no SOLIDWORKS
+    passos:
+      - "Abra o SOLIDWORKS e peça: \"Modela uma chapa de base 300x300x16 com 4 furos de 22 mm e me diz o peso\" (solidworks-assistente)."
+      - "Confira a captura de tela e a massa (o agente compara com o cálculo do perfil)."
+      - "Peça a macro da folha de desenho e o DXF de corte, ou exporte em STEP para o Revit."
   - titulo: Orçamento rápido da estrutura
     passos:
       - "Baixe a planilha SINAPI do seu estado no site da Caixa."

@@ -1,0 +1,11 @@
+titulo: Assistente SOLIDWORKS
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Modela no SOLIDWORKS pelo chat peças e montagens metálicas de obra (chapas de base, ligações, perfis, insertos, suportes, fôrmas), com peso de aço calculado e conferido, variações por configuração, interferência, STEP e macros para folha de desenho, PDF e DXF de corte.
+mcps: [solidworks]
+exemplos:
+  - "Modela uma chapa de base 300x300x16 com 4 furos de 22 mm para chumbadores e me diz o peso"
+  - "Cria o perfil Ue 150x60x20x2,65 com 6 m e uma configuração de 4,5 m"
+  - "Monta a ligação da viga no pilar e verifica se tem interferência"
+  - "Gera a macro para fazer a folha com as 3 vistas e o DXF de corte dessa chapa"
+  - "Exporta essa peça em STEP para eu colocar no Revit"

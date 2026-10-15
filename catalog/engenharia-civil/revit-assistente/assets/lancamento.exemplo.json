@@ -1,0 +1,30 @@
+{
+  "niveis": [
+    {"nome": "Fundação", "cota_m": -1.0},
+    {"nome": "Térreo", "cota_m": 0.0},
+    {"nome": "Pav 1", "cota_m": 3.06}
+  ],
+  "eixos": {
+    "x": [{"nome": "1", "pos_m": 0.0}, {"nome": "2", "pos_m": 4.0}, {"nome": "3", "pos_m": 8.5}],
+    "y": [{"nome": "A", "pos_m": 0.0}, {"nome": "B", "pos_m": 5.0}]
+  },
+  "pilares": [
+    {"nome": "P1", "x_m": 0.0, "y_m": 0.0, "b_cm": 20, "h_cm": 40, "base": "Fundação", "topo": "Pav 1"},
+    {"nome": "P2", "x_m": 4.0, "y_m": 0.0, "b_cm": 20, "h_cm": 40, "base": "Fundação", "topo": "Pav 1"},
+    {"nome": "P3", "x_m": 8.5, "y_m": 0.0, "b_cm": 20, "h_cm": 50, "base": "Fundação", "topo": "Pav 1"},
+    {"nome": "P4", "x_m": 0.0, "y_m": 5.0, "b_cm": 20, "h_cm": 40, "base": "Fundação", "topo": "Pav 1"},
+    {"nome": "P5", "x_m": 4.0, "y_m": 5.0, "b_cm": 20, "h_cm": 40, "base": "Fundação", "topo": "Pav 1"},
+    {"nome": "P6", "x_m": 8.5, "y_m": 5.0, "b_cm": 20, "h_cm": 50, "base": "Fundação", "topo": "Pav 1"}
+  ],
+  "vigas": [
+    {"nome": "V1", "de": [0.0, 0.0], "ate": [8.5, 0.0], "b_cm": 15, "h_cm": 45, "nivel": "Pav 1"},
+    {"nome": "V2", "de": [0.0, 5.0], "ate": [8.5, 5.0], "b_cm": 15, "h_cm": 45, "nivel": "Pav 1"},
+    {"nome": "V3", "de": [0.0, 0.0], "ate": [0.0, 5.0], "b_cm": 15, "h_cm": 40, "nivel": "Pav 1"},
+    {"nome": "V4", "de": [4.0, 0.0], "ate": [4.0, 5.0], "b_cm": 15, "h_cm": 40, "nivel": "Pav 1"},
+    {"nome": "V5", "de": [8.5, 0.0], "ate": [8.5, 5.0], "b_cm": 15, "h_cm": 40, "nivel": "Pav 1"}
+  ],
+  "lajes": [
+    {"nome": "L1", "contorno": [[0, 0], [4.0, 0], [4.0, 5.0], [0, 5.0]], "h_cm": 10, "nivel": "Pav 1"},
+    {"nome": "L2", "contorno": [[4.0, 0], [8.5, 0], [8.5, 5.0], [4.0, 5.0]], "h_cm": 12, "nivel": "Pav 1"}
+  ]
+}
