@@ -1,6 +1,6 @@
 titulo: Contexto do projeto e normas locais
 categoria: engenharia-civil
-version: 1.1.0
+version: 1.2.0
 resumo: Começa cada projeto pela ficha (município, UF, uso, ambiente) e pesquisa na internet a legislação local, as ITs dos Bombeiros, as normas das concessionárias e a edição vigente das NBR, registrando cada fonte oficial.
 mcps: []
 exemplos:

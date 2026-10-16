@@ -7,6 +7,9 @@
   "registro": "CREA-UF 000000/D",
   "art": "0000000000000",
   "revisao": "0",
+  "avaliacao_tecnica": {
+    "situacao": "pendente"
+  },
   "objetivo": "Apresentar os critérios, hipóteses e resultados do dimensionamento das lajes, vigas e pilares do pavimento superior.",
   "materiais": {
     "Concreto": "C25 (fck = 25 MPa), agregado granítico",

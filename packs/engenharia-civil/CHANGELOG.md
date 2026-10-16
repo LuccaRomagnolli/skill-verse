@@ -1,5 +1,17 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.3.2 — 2026-10-15 (candidato)
+- Texto-base NBR 6118:2023 confrontado com a Emenda 1:2026 para os critérios implementados; matrizes de rastreabilidade da base e da emenda documentam cobertura e lacunas sem distribuir os PDFs.
+- **Correção de resistência:** `ηc` passa a reduzir o bloco comprimido e o diagrama de concreto para C45–C90. Recalcular saídas e memoriais gerados antes desta versão nessas classes.
+- Armadura mínima de flexão passa a considerar o momento mínimo e a altura útil, sem extrapolar a Tabela 17.3 (CA-50, d/h=0,8) para outros casos. Sugestões de barras respeitam diâmetro ≤ cobrimento nominal; alertas adicionados para bordas de laje sem continuidade e armadura de pele em vigas altas.
+- A triagem TQS de CAA/fck/cobrimento foi conferida contra as Tabelas 7.1/7.2 da referência 2026; deixou de reduzir cobrimento por flag genérica e passou a exigir 45 mm no trecho de pilar junto à fundação. Não equivale a validação do modelo estrutural.
+- **Ainda não liberado:** validação independente dos cálculos e modelos, ATP dos projetos, verificações fora do escopo e testes de operação nos programas reais.
+
+## 1.3.1 — 2026-10-15 (candidato)
+- Emenda 1 da NBR 6118:2026 conferida por item e mapeada em `concreto-armado-nbr6118/references/auditoria-emenda-1-2026.md`, sem reproduzir ou distribuir o PDF licenciado. O texto-base 2023 ainda não foi disponibilizado para confronto integral.
+- ATP do item 5.3: ficha registra classe, fundamento, estado e documento; impede dispensa de CC3 e exige evidência formal para dispensa/parecer. Memorial explicita a regra geral e as pendências. Responsável técnico deve confirmar classificação, acordo e independência do avaliador.
+- Alertas de laje e viga ampliados para balanços, flecha/combinações, vibração de piso e detalhamento alterado pela emenda. Os scripts não passaram a dimensionar verificações fora de seu escopo.
+
 ## 1.3.0 — 2026-10-15
 - **Candidato à liberação**: 12 skills revisadas para leitura da ficha na retomada, fontes/edições/itens oficiais, decisões, artefatos e pendências persistentes. A referência declarada é NBR 6118:2026; scripts herdados de 2023 exibem status pendente, sem alegar conformidade 2026.
 - As cinco skills de software incluem diagnóstico, plano em lotes, inspeção, salvamento e registro. NBR 8800 atualizada para edição 2024 corrigida em 2025. Instalador sugere só conexões selecionáveis, diferencia handshake de aplicativo operável e protege add-ins do Revit preexistentes/alterados.
@@ -20,7 +32,7 @@
   (add-in do Revit em `%APPDATA%`, mesclando sem apagar nada) e remoção só do que o pack instalou.
 
 ### Validação pendente no software real (sem máquina Windows nesta versão)
-- [ ] Confrontar cada critério herdado dos scripts com NBR 6118:2023 licenciada e Emenda 1:2026; revisar ATP (item 5.3) e balanços (item 20.6) com responsável técnico. O PDF da emenda não é distribuído.
+- [ ] Validar independentemente os cálculos corrigidos com casos de referência e software real; revisar ATP (item 5.3), balanços (item 20.6), demais verificações estruturais e detalhamento com responsável técnico. Nenhum PDF ABNT é distribuído.
 - [ ] Revit: add-in carrega em 2024/2025/2026; `verificar` com handshake; `lancamento.py` no exemplo (tipos C#,
       eixos irregulares C#, pilares/vigas/lajes) e marcas; receitas C# de `revit-api-csharp.md` compilam.
 - [ ] SOLIDWORKS: `uv sync` no Windows; chapa de base e perfil I do `perfis.py` com massa < 1% do script;

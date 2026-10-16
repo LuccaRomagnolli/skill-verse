@@ -25,7 +25,7 @@ python3 scripts/install.py manual
 ```
 No Windows use `py -3` no lugar de `python3`.
 
-`verificar` separa o servidor MCP da leitura do software aberto. Uma conexão ainda não testada no aplicativo não está validada. O pack Engenharia Civil 1.3.0 é candidato: consulte as pendências normativas e de testes reais no `MANUAL.md` gerado e no changelog.
+`verificar` separa o servidor MCP da leitura do software aberto. Uma conexão ainda não testada no aplicativo não está validada. Este pack é candidato: consulte as pendências normativas e de testes reais no `MANUAL.md` gerado e no changelog.
 
 ## Atualizar / remover
 - Versão nova: baixe o .zip novo, abra a pasta e diga **"atualize o pack"**.

@@ -221,9 +221,13 @@ def test_conferir_caa_fck_e_cobrimentos():
     r3 = tqs_edificio.conferir(dados, {"caa": {"classe": "III"}})
     assert r3["caa"] == "III" and r3["itens"][0]["status"] == "ALERTA"
     assert {i["item"]: i["status"] for i in r3["itens"]}["cobrimento beamCover"] == "ALERTA"
-    # controle de qualidade: Δc = 5 mm reduz o mínimo
+    # A flag do TQS não comprova a exceção normativa de Δc = 5 mm.
     dados["materials"]["qualityControl"] = 1
-    assert {i["item"]: i["status"] for i in tqs_edificio.conferir(dados)["itens"]}["cobrimento slabLowerCover"] == "OK"
+    st = {i["item"]: i["status"] for i in tqs_edificio.conferir(dados)["itens"]}
+    assert st["cobrimento slabLowerCover"] == "ALERTA"
+    assert st["redução de cobrimento"] == "PENDENTE"
+    dados["covers"]["columnSoilCover"] = 4.0
+    assert {i["item"]: i["status"] for i in tqs_edificio.conferir(dados)["itens"]}["cobrimento columnSoilCover"] == "ALERTA"
 
 
 def test_conferir_cli_fora_do_windows(tmp_path):

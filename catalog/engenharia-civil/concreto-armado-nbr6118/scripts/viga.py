@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dimensiona viga retangular de concreto armado (flexão simples + força cortante) — NBR 6118:2023.
+"""Calcula viga retangular de concreto armado (flexão simples + cortante) — NBR 6118:2026.
 
 Exemplos:
   python3 viga.py --b 15 --h 50 --fck 30 --Mk 85 --Vk 70
@@ -50,6 +50,9 @@ def main(argv=None) -> int:
     mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
     checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Cobrimento nominal (Tab. 7.2)", f"c = {c} mm")
+    if a.h > 60:
+        mem.alerta("Viga com h > 60 cm: dimensionar e detalhar armadura lateral de pele em cada face "
+                   "(item 17.3.5.2.3); o script não a inclui.")
 
     if a.biapoiada:
         if not a.vao:
@@ -92,6 +95,9 @@ def main(argv=None) -> int:
         cs["estribo"] = escolher_estribo(cs["Asw_s_cm2_m"], cs["s_max_cm"])
         mem.add("Estribos sugeridos", cs["estribo"]["texto"])
         res["cisalhamento"] = cs
+    mem.alerta("Sugestões de armadura não verificam ancoragem nos apoios, barras de amarração em estribos, "
+               "torção nem suspensão de cargas (itens 18.2 e 18.3 alterados pela Emenda 1:2026). "
+               "Exigem detalhamento independente.")
 
     res["norma_referencia"] = NORMA_REFERENCIA
     res["status_normativo"] = "pendente-validacao-2026"

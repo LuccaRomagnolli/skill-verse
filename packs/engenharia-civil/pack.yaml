@@ -1,6 +1,6 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.3.0
+version: 1.3.2
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,

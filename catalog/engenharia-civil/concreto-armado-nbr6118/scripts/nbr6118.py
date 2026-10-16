@@ -1,4 +1,4 @@
-"""Núcleo de cálculo de concreto armado — parâmetros implementados da ABNT NBR 6118:2023.
+"""Núcleo auxiliar de concreto armado — critérios selecionados da ABNT NBR 6118:2026.
 
 Unidades internas: N e mm (MPa = N/mm²). As funções públicas recebem/devolvem
 as unidades indicadas nos docstrings (cm, kN, kN·m, cm²).
@@ -14,8 +14,9 @@ GAMMA_C = 1.4
 GAMMA_S = 1.15
 ES = 210_000.0  # MPa
 NORMA_REFERENCIA = "ABNT NBR 6118:2026 (NBR 6118:2023 + Emenda 1:2026)"
-STATUS_NORMATIVO = ("Cálculo auxiliar baseado nos critérios implementados da edição 2023; "
-                    "confronto integral com a edição 2026 pendente. Não usar como verificação final de projeto.")
+STATUS_NORMATIVO = ("Cálculo auxiliar: critérios de seção selecionados foram confrontados com "
+                    "NBR 6118:2023 + Emenda 1:2026; verificações de sistema, serviço, detalhamento "
+                    "e avaliação independente permanecem pendentes. Não usar como verificação final de projeto.")
 
 ACOS = {"CA-25": 250.0, "CA-50": 500.0, "CA-60": 600.0}
 
@@ -76,6 +77,11 @@ class Concreto:
         return 0.85 if self.fck <= 50 else 0.85 * (1 - (self.fck - 50) / 200)
 
     @property
+    def eta_c(self) -> float:
+        """Redução da tensão de compressão para fck > 40 MPa (8.2.10.1 e 17.2.2)."""
+        return 1.0 if self.fck <= 40 else (40 / self.fck) ** (1 / 3)
+
+    @property
     def lam(self) -> float:
         return 0.8 if self.fck <= 50 else 0.8 - (self.fck - 50) / 400
 
@@ -127,7 +133,7 @@ class Concreto:
         """Diagrama parábola-retângulo (compressão positiva), MPa."""
         if eps <= 0:
             return 0.0
-        f = self.alpha_c * self.fcd
+        f = self.alpha_c * self.eta_c * self.fcd
         if eps >= self.eps_c2:
             return f
         return f * (1 - (1 - eps / self.eps_c2) ** self.n_parabola)
@@ -154,13 +160,38 @@ class Aco:
 
 
 def rho_min(fck: float) -> float:
-    """Taxa mínima (fração) para seção retangular — interpola a Tabela 17.3."""
+    """Taxa tabelada para CA-50 e d/h = 0,8; outros casos exigem momento mínimo."""
     keys = sorted(RHO_MIN)
     fck = min(max(fck, keys[0]), keys[-1])
     for a, b in zip(keys, keys[1:]):
         if a <= fck <= b:
             return (RHO_MIN[a] + (RHO_MIN[b] - RHO_MIN[a]) * (fck - a) / (b - a)) / 100
     return RHO_MIN[keys[-1]] / 100
+
+
+def as_minima_flexao(b_cm: float, h_cm: float, d_cm: float, conc: Concreto, aco: Aco) -> float:
+    """As mínima (cm²) pelo momento mínimo de 17.3.5.2.1, com piso absoluto de 0,15%.
+
+    A taxa tabelada também é respeitada no caso CA-50, mantendo compatibilidade
+    com a alternativa simplificada da Tabela 17.3. A geometria deve permitir
+    armadura simples no limite de dutilidade; caso contrário, não se emite valor.
+    """
+    b, h, d = b_cm * 10, h_cm * 10, d_cm * 10
+    if min(b, h, d) <= 0 or d >= h:
+        raise ValueError("b, h e d devem ser positivos, com d < h")
+    ac = conc.alpha_c * conc.eta_c
+    md_min = 0.8 * (b * h * h / 6) * (1.3 * conc.fctm)
+    disc = 1 - 2 * md_min / (ac * conc.fcd * b * d * d)
+    if disc < 0:
+        raise ValueError("momento mínimo não cabe na seção: reveja altura útil e geometria")
+    x = d / conc.lam * (1 - math.sqrt(disc))
+    if x / d > conc.xd_lim:
+        raise ValueError("momento mínimo excede limite de dutilidade: reveja seção")
+    as_mm2 = md_min / (aco.fyd * (d - conc.lam * x / 2))
+    minimo = max(as_mm2, 0.0015 * b * h) / 100
+    if aco.tipo == "CA-50":
+        minimo = max(minimo, rho_min(conc.fck) * b * h / 100)
+    return minimo
 
 
 # ------------------------------------------------------------------ memória de cálculo
@@ -205,9 +236,10 @@ def flexao_simples(Md_kNm: float, b_cm: float, h_cm: float, d_cm: float, conc: C
     Md = abs(Md_kNm) * 1e6
     b, h, d = b_cm * 10, h_cm * 10, d_cm * 10
     d2 = (d2_cm * 10) if d2_cm else (h - d)
-    fcd, fyd, ac, lam = conc.fcd, aco.fyd, conc.alpha_c, conc.lam
+    fcd, fyd, ac, lam = conc.fcd, aco.fyd, conc.alpha_c * conc.eta_c, conc.lam
     mem.add("Resistências de cálculo", f"fcd = {fmt(conc.fck,0)}/1,4 = {fmt(fcd)} MPa; fyd = {fmt(aco.fyk,0)}/1,15 = {fmt(fyd)} MPa")
-    mem.add("Parâmetros do bloco", f"αc = {fmt(ac,3)}; λ = {fmt(lam,3)}; (x/d)lim = {fmt(conc.xd_lim)}")
+    mem.add("Parâmetros do bloco", f"αc = {fmt(conc.alpha_c,3)}; ηc = {fmt(conc.eta_c,3)}; "
+                                      f"αc·ηc = {fmt(ac,3)}; λ = {fmt(lam,3)}; (x/d)lim = {fmt(conc.xd_lim)}")
 
     xlim = conc.xd_lim * d
     Mlim = ac * fcd * b * lam * xlim * (d - lam * xlim / 2)
@@ -230,9 +262,9 @@ def flexao_simples(Md_kNm: float, b_cm: float, h_cm: float, d_cm: float, conc: C
         mem.alerta("Seção com armadura dupla: considere aumentar a altura da seção.")
 
     Ac = b * h
-    rmin = rho_min(conc.fck)
-    As_min = rmin * Ac
-    mem.add("Armadura mínima (Tab. 17.3)", f"As,mín = {fmt(rmin*100,3)}% · {fmt(Ac/100,0)} cm² = {fmt(As_min/100)} cm²")
+    As_min = as_minima_flexao(b_cm, h_cm, d_cm, conc, aco) * 100
+    mem.add("Armadura mínima (17.3.5.2.1)", f"As,mín = {fmt(As_min/100)} cm² (momento mínimo, "
+                                               "piso 0,15% e Tabela 17.3 quando CA-50)")
     As_ef = max(As, As_min)
     if As + As2 > 0.04 * Ac:
         mem.alerta("As + As' excede 4% de Ac (item 17.3.5.2.4): redimensione a seção.")
@@ -291,6 +323,8 @@ def escolher_barras(As_cm2: float, b_cm: float, cobrimento_mm: float, phi_t_mm: 
     """Combinações viáveis de barras (uma bitola) que cabem na largura — item 18.3.2.2."""
     opcoes = []
     for phi in (8.0, 10.0, 12.5, 16.0, 20.0, 25.0, 32.0):
+        if phi > cobrimento_mm:  # 7.4.7.5: cobrimento nominal da barra ≥ seu diâmetro
+            continue
         a1 = math.pi * phi ** 2 / 4 / 100
         n = max(2, math.ceil(As_cm2 / a1 - 1e-9))
         ah = max(20.0, phi, 1.2 * d_agr_mm)

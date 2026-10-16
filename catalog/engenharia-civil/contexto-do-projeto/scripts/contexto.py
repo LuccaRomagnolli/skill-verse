@@ -149,6 +149,14 @@ def render(f: dict) -> str:
         linhas += ["", "## Artefatos", "", "| Tipo | Caminho | Revisão | Estado |", "|---|---|---|---|"]
         linhas += [f"| {x['tipo']} | {x['caminho']} | {x.get('revisao') or '—'} | {x['estado']} |"
                    for x in artefatos]
+    atp = f.get("atp") or {}
+    linhas += ["", "## Avaliação técnica do projeto — NBR 6118:2026, 5.3", "",
+              f"Classe de consequência: {atp.get('classe') or 'a definir pelo responsável técnico'}; "
+              f"situação: {atp.get('situacao') or 'pendente'}."]
+    if atp.get("fundamento"):
+        linhas.append(f"Fundamento: {atp['fundamento']}.")
+    if atp.get("documento"):
+        linhas.append(f"Documento: {atp['documento']}.")
     pend = pendencias_abertas(f)
     faltando = checklist_faltante(f)
     linhas += ["", "## Ainda a pesquisar / confirmar", ""]
@@ -174,7 +182,7 @@ def cmd_iniciar(a) -> int:
                  for n, (e, i) in enumerate(CHECKLIST_BASE + EXTRAS_POR_USO.get(a.uso or "", []), 1)]
     ficha = {"projeto": a.projeto, "municipio": municipio, "uf": uf, "uso": a.uso, "pavimentos": a.pavimentos,
              "area": a.area, "ambiente": a.ambiente, "caa": caa, "fontes": [], "requisitos": [],
-             "decisoes": [], "artefatos": [], "pendencias": [], "checklist": checklist,
+             "decisoes": [], "artefatos": [], "atp": {"situacao": "pendente"}, "pendencias": [], "checklist": checklist,
              "criado_em": dt.date.today().isoformat()}
     salvar(a.pasta, ficha)
     print(json.dumps({"ficha": str(f), "municipio": municipio, "uf": uf, "caa": caa,
@@ -268,12 +276,36 @@ def cmd_artefato(a) -> int:
     return 0
 
 
+def cmd_atp(a) -> int:
+    """Registra decisão profissional; não infere CC só pelo uso/pavimentos da ficha."""
+    ficha = carregar(a.pasta)
+    if a.situacao == "dispensada" and a.classe == "CC3":
+        sys.exit("a Emenda 1 não prevê dispensa da ATP para CC3")
+    if a.situacao in {"dispensada", "parecer-recebido"} and not a.documento:
+        sys.exit("decisão final de ATP exige documento formal na pasta da obra")
+    if a.situacao == "parecer-recebido" and not a.avaliador:
+        sys.exit("parecer de ATP exige identificação do avaliador independente")
+    relativo = None
+    if a.documento:
+        base = arq(a.pasta).parent
+        alvo = (base / a.documento).resolve()
+        if base not in alvo.parents or not alvo.is_file():
+            sys.exit("documento da ATP deve existir dentro da pasta do projeto")
+        relativo = alvo.relative_to(base).as_posix()
+    ficha["atp"] = {"classe": a.classe, "situacao": a.situacao, "fundamento": a.fundamento,
+                    "avaliador": a.avaliador, "documento": relativo, "registrado_em": dt.date.today().isoformat()}
+    salvar(a.pasta, ficha)
+    print(json.dumps(ficha["atp"], ensure_ascii=False))
+    return 0
+
+
 def cmd_resumo(a) -> int:
     ficha = carregar(a.pasta)
     dados = {"projeto": ficha.get("projeto"), "municipio": ficha.get("municipio"), "uf": ficha.get("uf"),
              "uso": ficha.get("uso"), "caa": ficha.get("caa"), "fontes": ficha.get("fontes", []),
              "requisitos": ficha.get("requisitos", []), "decisoes": ficha.get("decisoes", []),
-             "artefatos": ficha.get("artefatos", []), "pendencias": pendencias_abertas(ficha),
+             "artefatos": ficha.get("artefatos", []), "atp": ficha.get("atp") or {"situacao": "pendente"},
+             "pendencias": pendencias_abertas(ficha),
              "checklist_faltante": checklist_faltante(ficha), "atualizado_em": ficha.get("atualizado_em")}
     print(json.dumps(dados, indent=2, ensure_ascii=False))
     return 0
@@ -356,6 +388,13 @@ def main(argv=None) -> int:
     p.add_argument("--caminho", required=True, help="arquivo dentro da pasta do projeto")
     p.add_argument("--revisao", default="0")
     p.add_argument("--estado", choices=["rascunho", "em-revisao", "revisado"], default="rascunho")
+    p = sub.add_parser("atp")
+    p.add_argument("--pasta", default=".")
+    p.add_argument("--classe", choices=["CC1", "CC2", "CC3"], required=True)
+    p.add_argument("--situacao", choices=["pendente", "em-andamento", "parecer-recebido", "dispensada"], required=True)
+    p.add_argument("--fundamento", required=True, help="critérios da classificação e da decisão, informados pelo projetista")
+    p.add_argument("--avaliador", help="profissional independente, quando houver ATP")
+    p.add_argument("--documento", help="parecer ou decisão formal dentro da pasta da obra")
     p = sub.add_parser("nao-aplica")
     p.add_argument("--pasta", default=".")
     p.add_argument("--checklist", required=True)
@@ -379,7 +418,7 @@ def main(argv=None) -> int:
     p.add_argument("--uf")
     a = ap.parse_args(argv)
     return {"iniciar": cmd_iniciar, "fonte": cmd_fonte, "pendencia": cmd_pendencia, "mostrar": cmd_mostrar,
-            "requisito": cmd_requisito, "decisao": cmd_decisao, "artefato": cmd_artefato,
+            "requisito": cmd_requisito, "decisao": cmd_decisao, "artefato": cmd_artefato, "atp": cmd_atp,
             "resolver-pendencia": cmd_resolver_pendencia, "resumo": cmd_resumo, "nao-aplica": cmd_nao_aplica,
             "perfil": cmd_perfil}[a.cmd](a)
 

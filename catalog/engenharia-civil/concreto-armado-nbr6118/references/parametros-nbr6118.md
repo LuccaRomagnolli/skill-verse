@@ -1,6 +1,6 @@
-# Parâmetros implementados nos scripts (base NBR 6118:2023)
+# Parâmetros implementados — NBR 6118:2023 + Emenda 1:2026
 
-> Referência declarada do projeto: NBR 6118:2026. Os valores abaixo refletem a implementação herdada de 2023 e **não foram auditados integralmente** contra o texto-base licenciado e a Emenda 1 de 2026. Use esta página para explicar a origem de cada número, não para declarar conformidade. Em caso de divergência com a norma em mãos, suspenda o uso do resultado, registre pendência e peça revisão ao responsável técnico.
+> Referência declarada: NBR 6118:2026. Os critérios usados pelos scripts foram confrontados documentalmente com a base 2023 e a Emenda 1; veja `auditoria-base-2023-para-2026.md` e `auditoria-emenda-1-2026.md`. Isto não equivale a verificar a norma inteira nem validar um projeto. Saídas anteriores à correção de `ηc` devem ser recalculadas para C45–C90.
 
 ## Materiais
 | Grandeza | Expressão | Item |
@@ -8,6 +8,7 @@
 | fcd | fck / 1,4 | 12.3.3 |
 | fyd | fyk / 1,15 (CA-50: 434,8 MPa) | 12.3 |
 | αc | 0,85 (fck ≤ 50); 0,85·[1 − (fck − 50)/200] | 17.2.2 |
+| ηc | 1,0 (fck ≤ 40); (40/fck)^(1/3) (fck > 40), multiplicando a tensão resistente | 8.2.10.1; 17.2.2 |
 | λ (bloco) | 0,8 (fck ≤ 50); 0,8 − (fck − 50)/400 | 17.2.2 |
 | εc2 / εcu | 2‰ / 3,5‰ (fck ≤ 50) | 8.2.10.1 |
 | fct,m | 0,3·fck^(2/3) (≤ C50); 2,12·ln(1 + 0,11·fck) | 8.2.5 |
@@ -32,8 +33,8 @@ x/d ≤ 0,45 (fck ≤ 50) e ≤ 0,35 (50 < fck ≤ 90) — item 14.6.4.3. Acima 
 | IV | 45 | 50 |
 
 ## Armaduras mínimas e máximas
-- Flexão (vigas): ρmín da Tabela 17.3 (0,150% até C30; 0,164% C35; 0,179% C40; 0,194% C45; 0,208% C50…). As + As' ≤ 4% Ac.
-- Lajes (Tabela 19.1): negativa ≥ ρmín; positiva em cruz ≥ 0,67·ρmín; principal em uma direção ≥ ρmín; secundária ≥ máx(20% da principal; 0,9 cm²/m; 0,5·ρmín).
+- Flexão (vigas): a Tabela 17.3 pressupõe CA-50 e d/h = 0,8. O script considera também o momento mínimo de 17.3.5.2.1, com piso absoluto de 0,15% Ac; para CA-50 adota o maior valor entre o cálculo e a tabela. As + As' ≤ 4% Ac fora da zona de emendas. Barras efetivamente adotadas e emendas precisam conferência.
+- Lajes (Tabela 19.1): negativa ≥ ρmín; positiva em cruz ≥ 0,67·ρmín; principal em uma direção ≥ ρmín; secundária ≥ máx(20% da principal; 0,9 cm²/m; 0,5·ρmín). O `ρmín` empregado considera a altura útil estimada. Bordas sem continuidade ainda exigem armadura negativa própria, não calculada.
 - Pilares (17.3.5.3): As,mín = máx(0,15·Nd/fyd; 0,4% Ac); As,máx = 8% Ac incluindo emendas (o script usa 4% fora da emenda).
 - Estribos de viga: ρsw,mín = 0,2·fct,m/fywk; smáx = 0,6d ≤ 30 cm (VSd ≤ 0,67VRd2) ou 0,3d ≤ 20 cm.
 
@@ -42,7 +43,7 @@ VRd2 = 0,27·αv2·fcd·bw·d, αv2 = 1 − fck/250 · Vc = 0,6·fctd·bw·d (fl
 
 ## Lajes
 - Momentos: teoria de placas de Kirchhoff resolvida por diferenças finitas com extrapolação de Richardson (`scripts/placa.py`), validada contra Timoshenko & Woinowsky-Krieger: placa apoiada quadrada (w = 0,00406·qa⁴/D, Mx = 0,0479·qa², ν = 0,3) e engastada (Mx = 0,0231·qa², Mborda = −0,0513·qa²). ν = 0,2 por padrão (concreto).
-- Flecha: Branson (17.3.2.1.1), Mr = 1,5·fct,m·Ic/yt; flecha diferida αf = 1,32 (t0 = 1 mês, sem armadura de compressão); limite l/250 (Tabela 13.3), l = menor vão; balanço l = 2L.
+- Flecha: estimativa de rigidez tipo Branson para a faixa de laje, com Mr = 1,5·fct,m·Ic/yt e multiplicador diferido αf = 1,32 (hipótese fixa); comparação indicativa com l/250. Não implementa o método refinado para vãos de viga do item 17.3.2.1.1, nem conclui a verificação de deslocamento total da Tabela 13.3.
 - Reações nas vigas: charneiras a 45° entre bordas de mesmo tipo e 60° a partir do engaste (14.7.6.1).
 - Compatibilização de negativos entre lajes vizinhas: maior valor entre a média e 80% do maior.
 
@@ -56,5 +57,7 @@ VRd2 = 0,27·αv2·fcd·bw·d, αv2 = 1 − fck/250 · Vc = 0,6·fctd·bw·d (fl
 - Pré-dimensionamento: Ac = α·1,4·Nk/(0,85·fcd + 0,015·420), α = 1,3 (intermediário), 1,5 (extremidade), 1,8 (canto) — estimativa empírica de uso corrente no ensino.
 
 ## Emenda 1 de 2026 — verificações ainda não automatizadas
-- Item 5.3: determinar a necessidade de Avaliação Técnica do Projeto por profissional independente e registrar parecer/escopo quando aplicável.
-- Item 20.6: conferir armadura inferior de balanços sob a condição tratada pela emenda. O alerta do script de laje não calcula essa verificação.
+- Item 5.3: ATP é a regra geral. Classificação CC3 exige avaliação com modelo/análise independente; CC1/CC2 só podem ter dispensa por acordo formal documentado. Registre no contexto.
+- Item 20.6: conferir armadura inferior no apoio de lajes predominantemente em balanço para as ações permanentes; o alerta do script não a dimensiona.
+- Itens 11.8.3.1, 13.3 e 23.3: a flecha simplificada não cobre todas as situações de deslocamento total nem vibração mínima de piso. Veja a matriz de impacto da emenda.
+- Itens 12.3.3 e 12.4.1: o `fcd=fck/1,4` pressupõe material a partir de 28 dias e situação normal. Idade precoce ou γc específico requerem cálculo externo.

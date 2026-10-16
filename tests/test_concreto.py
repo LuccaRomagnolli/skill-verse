@@ -10,8 +10,8 @@ import pytest
 SCRIPTS = Path(__file__).resolve().parent.parent / "catalog/engenharia-civil/concreto-armado-nbr6118/scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from nbr6118 import (Aco, Concreto, camadas_retangulo, cisalhamento_modelo1,  # noqa: E402
-                     esforcos_secao, flexao_simples, momento_resistente, rho_min)
+from nbr6118 import (Aco, Concreto, as_minima_flexao, camadas_retangulo, cisalhamento_modelo1,  # noqa: E402
+                     escolher_barras, esforcos_secao, flexao_simples, momento_resistente, rho_min)
 from placa import resolver_refinado  # noqa: E402
 
 
@@ -34,6 +34,8 @@ def test_materiais_c25():
 def test_parametros_alta_resistencia():
     c = Concreto(70)
     assert c.alpha_c == pytest.approx(0.765)
+    assert c.eta_c == pytest.approx((40 / 70) ** (1 / 3))
+    assert c.sigma(c.eps_cu) == pytest.approx(c.alpha_c * c.eta_c * c.fcd)
     assert c.lam == pytest.approx(0.75)
     assert c.xd_lim == 0.35
 
@@ -53,6 +55,30 @@ def test_flexao_simples_solucao_fechada():
     As = 140e6 / (500 / 1.15 * (450 - 0.4 * x)) / 100
     assert r["As_cm2"] == pytest.approx(As, rel=1e-6)
     assert r["As2_cm2"] == 0
+
+
+def test_flexao_c70_inclui_eta_c():
+    c = Concreto(70)
+    r = flexao_simples(250, 20, 50, 45, c, Aco())
+    alpha_efetivo = c.alpha_c * (40 / 70) ** (1 / 3)
+    x = 450 / c.lam * (1 - math.sqrt(1 - 2 * 250e6 / (alpha_efetivo * c.fcd * 200 * 450 ** 2)))
+    as_esperada = 250e6 / ((500 / 1.15) * (450 - c.lam * x / 2)) / 100
+    assert r["As_calc_cm2"] == pytest.approx(as_esperada)
+    assert r["As2_cm2"] == 0
+
+
+def test_armadura_minima_para_outros_acos_e_altura_util():
+    c = Concreto(25)
+    as_ca50 = as_minima_flexao(20, 50, 40, c, Aco("CA-50"))
+    as_ca25 = as_minima_flexao(20, 50, 40, c, Aco("CA-25"))
+    as_d_menor = as_minima_flexao(20, 50, 35, c, Aco("CA-50"))
+    assert as_ca25 > as_ca50
+    assert as_d_menor >= as_ca50
+
+
+def test_barras_sugeridas_nao_ultrapassam_cobrimento_nominal():
+    opcoes = escolher_barras(15, 20, 25)
+    assert opcoes and all(o["phi_mm"] <= 25 for o in opcoes)
 
 
 def test_armadura_dupla_quando_excede_limite():
@@ -100,6 +126,18 @@ def test_laje_uma_direcao_biengastada():
     pd = r["cargas"]["pd"]
     assert r["positivo_x"]["m_kNm_m"] == pytest.approx(pd * 9 / 24, rel=0.02)
     assert r["negativos"]["esquerda"]["m_kNm_m"] == pytest.approx(pd * 9 / 12, rel=0.02)
+
+
+def test_laje_borda_apoiada_pede_armadura_negativa():
+    r = run("laje.py", "--lx", "4", "--ly", "5", "--h", "12", "--q", "2", "--fck", "25")
+    assert any("19.3.3.2" in a for a in r["memoria"]["alertas"])
+
+
+def test_emenda_alertas_de_balanco_e_flecha():
+    r = run("laje.py", "--balanco", "1.2", "--h", "12", "--q", "2", "--fck", "30")
+    alertas = " ".join(r["memoria"]["alertas"])
+    assert "20.6" in alertas and "ações permanentes" in alertas
+    assert "23.3" in alertas and "deslocamento total" in alertas
 
 
 def test_reacoes_somam_carga_total():

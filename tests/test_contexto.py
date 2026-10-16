@@ -95,6 +95,30 @@ def test_retomada_ficha_antiga_e_artefato_fora_da_pasta(tmp_path):
                "--origem", "usuario", home=home).returncode == 0
 
 
+def test_atp_exige_classe_documento_e_parecer_independente(tmp_path):
+    home = tmp_path / "sv"
+    assert ctx("iniciar", "--pasta", str(tmp_path), "--municipio", "São Paulo", "--uf", "SP",
+               home=home).returncode == 0
+    assert json.loads(ctx("resumo", "--pasta", str(tmp_path), home=home).stdout)["atp"]["situacao"] == "pendente"
+    (tmp_path / "decisao-atp.txt").write_text("Exemplo de documento formal", encoding="utf-8")
+    comum = ("atp", "--pasta", str(tmp_path), "--fundamento", "classe informada pelo projetista")
+    assert ctx(*comum, "--classe", "CC3", "--situacao", "dispensada",
+               "--documento", "decisao-atp.txt", home=home).returncode != 0
+    assert ctx(*comum, "--classe", "CC2", "--situacao", "dispensada", home=home).returncode != 0
+    assert ctx(*comum, "--classe", "CC2", "--situacao", "dispensada",
+               "--documento", "../fora.txt", home=home).returncode != 0
+    assert ctx(*comum, "--classe", "CC2", "--situacao", "dispensada",
+               "--documento", "decisao-atp.txt", home=home).returncode == 0
+    assert ctx(*comum, "--classe", "CC3", "--situacao", "parecer-recebido",
+               "--documento", "decisao-atp.txt", home=home).returncode != 0
+    assert ctx(*comum, "--classe", "CC3", "--situacao", "parecer-recebido",
+               "--avaliador", "Avaliador informado", "--documento", "decisao-atp.txt", home=home).returncode == 0
+    resumo = json.loads(ctx("resumo", "--pasta", str(tmp_path), home=home).stdout)
+    assert resumo["atp"]["classe"] == "CC3"
+    assert resumo["atp"]["documento"] == "decisao-atp.txt"
+    assert "parecer-recebido" in (tmp_path / "projeto-contexto.md").read_text(encoding="utf-8")
+
+
 def test_projeto_demo_com_fontes_municipais_oficiais(tmp_path):
     home = tmp_path / "sv"
     obra = tmp_path / "obra"

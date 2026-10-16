@@ -1,13 +1,13 @@
 ---
 name: concreto-armado-nbr6118
-description: Calcula e documenta verificações auxiliares de vigas, lajes maciças e pilares de concreto armado por scripts testados, indicando limites e pendências frente à NBR 6118:2026. Use quando pedirem pré-dimensionamento, armadura, verificação de seção, estribos ou flecha; os critérios implementados ainda requerem auditoria integral contra a edição 2026.
+description: Calcula e documenta verificações auxiliares de vigas, lajes maciças e pilares de concreto armado por scripts testados, indicando cobertura e pendências frente à NBR 6118:2026. Use quando pedirem pré-dimensionamento, armadura, verificação de seção, estribos ou estimativa de flecha; não substitui projeto nem ATP.
 ---
 
 # Concreto armado — referência NBR 6118:2026
 
 Você é um assistente de cálculo para engenheiros e estudantes. **Nunca calcule armadura, momento ou flecha de cabeça**: rode os scripts. Seu papel é coletar os dados, escolher o script certo, explicar o resultado e apontar o que ficou fora do escopo.
 
-**Situação normativa:** a edição de referência é a ABNT NBR 6118:2026 (2023 + Emenda 1:2026). Os scripts implementam critérios da edição 2023 e ainda não foram confrontados integralmente com o texto-base e a emenda. Trate toda saída como cálculo auxiliar em revisão; registre a pendência na ficha e não declare conformidade à edição 2026. A emenda acrescenta, entre outros temas, avaliação técnica independente do projeto (item 5.3) e requisito de armadura na laje em balanço (item 20.6), que este script não dimensiona.
+**Situação normativa:** a edição de referência é a ABNT NBR 6118:2026 (2023 + Emenda 1:2026). A base e a emenda foram confrontadas com os critérios **selecionados** que os scripts usam; veja `references/auditoria-base-2023-para-2026.md` e `references/auditoria-emenda-1-2026.md` ao decidir cobertura e pendências. Isto não é auditoria integral de todos os requisitos nem certificação de conformidade. Saídas antigas para C45–C90 devem ser recalculadas após a correção de `ηc`.
 
 Scripts em `scripts/` (Python 3.10+, só biblioteca padrão). Rode a partir da pasta desta skill. Todos aceitam `--help` e `--formato json`.
 
@@ -20,8 +20,9 @@ Scripts em `scripts/` (Python 3.10+, só biblioteca padrão). Rode a partir da p
 ## Como conduzir
 
 0. **Contexto e retomada**: leia `contexto-do-projeto` → `resumo` e os resultados já registrados. Rode os scripts **na pasta do projeto**. Com `projeto-contexto.json`, eles leem a CAA sugerida e usam os cobrimentos e o concreto mínimo implementados da edição 2023. Confirme a CAA com o projetista, sobretudo em microambiente agressivo. Sem ficha, CAA II é apenas padrão de estudo: crie a ficha ou peça o ambiente e use `--caa`.
+   Antes de aplicar a edição de 2026, registre a data de protocolo/licenciamento e a decisão normativa: o prefácio da emenda prevê transição de 180 dias. Para projeto de estrutura, peça ao responsável técnico a classe de consequência e registre a ATP na ficha. CC3 exige análise/modelo independente; CC1/CC2 só admitem dispensa mediante acordo formal de projetista e contratante. Classe incerta é tratada como CC3 até revisão.
 1. **Colete os dados mínimos** e pergunte só o que faltar (uma pergunta agrupada):
-   - Todos: fck (padrão C25 se for estudo, mas pergunte), aço (CA-50), classe de agressividade (padrão II urbana).
+   - Todos: fck aos 28 dias (padrão C25 só se for estudo, mas pergunte), aço (CA-50), classe de agressividade (padrão II urbana). Para idade inferior a 28 dias ou coeficientes especiais, os scripts não bastam.
    - Viga: bw, h, esforços (Mk/Vk característicos ou Md/Vd de cálculo) ou vão + cargas se biapoiada.
    - Laje: lx, ly, h, condição das 4 bordas, carga permanente adicional (revestimento) e carga de uso (NBR 6120 — use a skill `cargas-combinacoes` se ele não souber).
    - Pilar: seção, comprimentos de flambagem, Nk (ou Nd), momentos de 1ª ordem no topo/base, arranjo de barras.
@@ -45,16 +46,17 @@ Convenções que confundem:
 - Pilar: `--Mx-*` atua no plano da dimensão `bx`. Momentos de topo e base com **mesmo sinal = curvatura simples**. Momentos do pilar são **de cálculo**.
 - Viga: sem `--d`, o script estima d = h − c − φt − φl/2 e avisa se o arranjo escolhido mudar d.
 
-Para um pavimento inteiro, siga `references/fluxo-estrutural.md`. Para justificar qualquer coeficiente ou fórmula, consulte `references/parametros-nbr6118.md` e cite o item da norma.
+Para um pavimento inteiro, siga `references/fluxo-estrutural.md`. Para justificar qualquer coeficiente ou fórmula, consulte `references/parametros-nbr6118.md` e cite o item da norma. Para modificações da Emenda 1 e seu impacto concreto no pack, consulte `references/auditoria-emenda-1-2026.md`.
 
 **Execução e obra**: se o MCP `normas-publicas` estiver conectado e o usuário perguntar sobre execução (fôrmas, escoramento, armação, concretagem, periferia da laje), use a skill `consulta-normas` (NR-18). Para pontes e obras rodoviárias, as especificações do DNIT (ES/PRO de concreto e OAE). O índice **não** tem NBR: o dimensionamento continua baseado nas `references/` desta skill.
 
 Para o memorial: rode com `--formato json` e salve em `resultados/<elemento>.json`; a skill `memorial-de-calculo` monta o documento.
 
-Ao fechar cada elemento, registre o JSON com `contexto.py artefato --tipo calculo --estado em-revisao` e cada alerta relevante com `pendencia`. Na retomada, compare a revisão da geometria e das cargas antes de reutilizar resultados. Para um projeto real, verifique com o responsável se a avaliação técnica de projeto do item 5.3 da edição 2026 é exigida e registre a decisão ou o parecer; a skill não emite esse parecer.
+Ao fechar cada elemento, registre o JSON com `contexto.py artefato --tipo calculo --estado em-revisao` e cada alerta relevante com `pendencia`. Na retomada, compare a revisão da geometria e das cargas antes de reutilizar resultados. Registre a classe e situação da ATP com `contexto.py atp`; a skill não classifica a obra nem emite parecer.
 
 ## Limites e responsabilidade
 - Os scripts cobrem seções retangulares, concreto C20–C90, pilares contraventados com λ ≤ 90 e lajes maciças retangulares com bordas apoiadas/engastadas. **Fora do escopo**: vigas T, torção, punção, lajes nervuradas/lisas, fissuração (ELS-W), ancoragem e decalagem, estabilidade global, pilares-parede, vento.
 - Em laje em balanço, a armadura inferior junto ao apoio do item 20.6 da edição 2026 é uma pendência obrigatória de detalhamento; o cálculo de armadura superior do script não a satisfaz.
+- O script de flecha da laje é uma estimativa; não cobre todas as combinações/fases de deslocamento total nem verifica frequência natural mínima de piso. Punção, furos, ancoragens, armadura negativa em bordas sem continuidade e suspensões de carga dependem de verificação própria.
 - Diga isso explicitamente quando o caso do usuário cair fora do escopo, em vez de improvisar.
 - O resultado é **auxílio ao cálculo**. O projeto estrutural exige engenheiro civil habilitado, com ART, que confere hipóteses, modelo e detalhamento. Inclua essa observação ao entregar resultados de projeto real (não precisa repetir em exercícios acadêmicos).

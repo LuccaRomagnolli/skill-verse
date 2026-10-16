@@ -47,17 +47,24 @@ def blocos(projeto: dict, resultados: list[tuple[str, dict]], contexto: dict | N
         normas.append(NORMA_VENTO)
     normas += p.get("normas_extras", [])
     B += [("h", 1, "3. Normas técnicas"), ("ul", normas)]
-    pendentes = [(nome, r.get("norma_base_calculo"), r.get("status_normativo") or "sem validação registrada")
+    pendentes = [(nome, r.get("norma_base_calculo") or r.get("norma_referencia"),
+                  r.get("status_normativo") or "sem validação registrada")
                 for nome, r in resultados if r.get("status_normativo") != "validado"]
     if pendentes:
         B.append(("p", "Situação normativa: os resultados abaixo são auxiliares e exigem confronto "
                        "com as edições vigentes antes da revisão e assinatura do projeto."))
         B.append(("table", ["Resultado", "Base implementada", "Situação"],
-                  [[nome, base or "NBR 6118:2023", situacao] for nome, base, situacao in pendentes]))
-    atp = p.get("avaliacao_tecnica") or {}
-    B.append(("p", "Avaliação técnica independente do projeto (NBR 6118:2026, item 5.3): "
-                   + (atp.get("situacao") or "aplicabilidade e parecer ainda não registrados pelo responsável técnico")
-                   + (f"; parecer: {atp['parecer']}" if atp.get("parecer") else "") + "."))
+                  [[nome, base or "edição a confirmar", situacao] for nome, base, situacao in pendentes]))
+    atp = ctx.get("atp") or p.get("avaliacao_tecnica") or {}
+    atp_status = atp.get("situacao") or "pendente"
+    classe = atp.get("classe") or "a definir"
+    B.append(("p", "Avaliação técnica do projeto (NBR 6118:2026, item 5.3): classe de consequência "
+                   f"{classe}; situação {atp_status}. A ATP é a regra geral antes da construção; "
+                   "CC3 requer análises/modelos independentes, e eventual dispensa em CC1/CC2 requer "
+                   "acordo formal do projetista e contratante. "
+                   + (f"Fundamento registrado: {atp['fundamento']}. " if atp.get("fundamento") else "")
+                   + (f"Documento na ficha: {atp['documento']}." if atp.get("documento") else
+                      "Documento/parecer ainda não registrado; não tratar esta etapa como concluída.")))
     fontes = [f for f in ctx.get("fontes", []) if f.get("esfera") != "abnt"]
     if fontes:
         B.append(("p", f"Legislação e normas locais consultadas ({local}):"))
@@ -75,7 +82,7 @@ def blocos(projeto: dict, resultados: list[tuple[str, dict]], contexto: dict | N
     B += [("h", 1, "6. Modelo e métodos de cálculo")]
     for par in p.get("metodos", [
         "Lajes maciças: momentos pela teoria de placas delgadas (Kirchhoff), resolvida por diferenças finitas; "
-        "flechas pelo modelo de Branson com fluência pelo coeficiente αf (NBR 6118, 17.3.2).",
+        "flechas estimadas por rigidez tipo Branson e multiplicador diferido αf fixo; ELS de deslocamento total pendente.",
         "Vigas: flexão simples no ELU com diagrama retangular de tensões e força cortante pelo Modelo de cálculo I.",
         "Pilares: momentos mínimos, efeitos locais de 2ª ordem pelo pilar-padrão com curvatura aproximada e "
         "flexo-compressão oblíqua pela verificação simplificada (17.2.5.2).",

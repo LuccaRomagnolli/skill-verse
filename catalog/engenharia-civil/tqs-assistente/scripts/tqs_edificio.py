@@ -3,7 +3,7 @@
 
   ler       --edificio NOME [--saida f.json]   pisos/plantas (nome, classe, altura, repetição, cota), materiais,
                                                cobrimentos, modelo estrutural e coeficientes dos carregamentos
-  conferir  --edificio NOME | --json f.json    CAA × fck mínimo (NBR 6118:2023, Tab. 7.1) e cobrimentos mínimos
+  conferir  --edificio NOME | --json f.json    CAA × fck mínimo e cobrimento (NBR 6118:2026, Tab. 7.1/7.2)
             [--contexto projeto-contexto.json]  (Tab. 7.2), comparando com a ficha do projeto, se houver
   aplicar   --edificio NOME --dados alt.json --salvar-como NOVO   grava alterações num edifício NOVO (cópia).
             Com --sobrescrever no lugar de --salvar-como, altera o original (só com "sim" do usuário).
@@ -36,16 +36,17 @@ PREFIXOS = ["PP", "PERM", "ACID", "VENT", "DESA", "EMPU", "TEMP", "RETR", "ADIC"
 CAMPOS_CARGA = ["titulo", "ipermacid", "ivigtrans", "ireduzida", "imulaxi", "gamaf", "igamafd", "gamafd",
                 "psi0", "psi1", "psi2", "ipavimento", "numcasos", "istat"]
 
-# NBR 6118:2023 — síntese numérica das tabelas (concreto armado)
+# NBR 6118:2026 — síntese numérica das tabelas para concreto armado (base 2023 + Emenda 1)
 FCK_MIN = {"I": 20, "II": 25, "III": 30, "IV": 40}                      # Tab. 7.1, classe mínima
 COB_MIN_CM = {                                                          # Tab. 7.2, cobrimento nominal (Δc = 10 mm)
     "laje": {"I": 2.0, "II": 2.5, "III": 3.5, "IV": 4.5},
     "viga_pilar": {"I": 2.5, "II": 3.0, "III": 4.0, "IV": 5.0},
     "solo": {"I": 3.0, "II": 3.0, "III": 4.0, "IV": 5.0},
+    "pilar_solo": {"I": 4.5, "II": 4.5, "III": 4.5, "IV": 5.0},  # nota d: trecho junto à fundação ≥45 mm
 }
 GRUPO_COBRIMENTO = {"slabLowerCover": "laje", "slabUpperCover": "laje", "beamCover": "viga_pilar",
                     "columnCover": "viga_pilar", "foundationCover": "solo", "beamAndSlabSoilCover": "solo",
-                    "columnSoilCover": "solo"}
+                    "columnSoilCover": "pilar_solo"}
 
 
 # ------------------------------------------------------------------ leitura
@@ -114,17 +115,19 @@ def conferir(dados: dict, ficha: dict | None = None) -> dict:
         else:
             ok = f >= minimo
             itens.append({"item": f"fck {rot}", "status": "OK" if ok else "ALERTA",
-                          "msg": f"C{f:g} {'≥' if ok else '<'} C{minimo} (mínimo para CAA {caa_ref}, NBR 6118:2023 Tab. 7.1)"})
-    reducao = 0.5 if mat.get("qualityControl") == 1 else 0.0  # Δc = 5 mm com controle rigoroso de execução
+                          "msg": f"C{f:g} {'≥' if ok else '<'} C{minimo} (mínimo para CAA {caa_ref}, NBR 6118:2026 Tab. 7.1)"})
+    if mat.get("qualityControl") == 1:
+        itens.append({"item": "redução de cobrimento", "status": "PENDENTE",
+                      "msg": "Indicador de controle do TQS não comprova as condições específicas de Δc = 5 mm "
+                             "do item 7.4.7.4; triagem mantém Δc = 10 mm."})
     for campo, grupo in GRUPO_COBRIMENTO.items():
         v = cov.get(campo)
         if not isinstance(v, (int, float)) or v <= 0:
             continue
-        req = round(COB_MIN_CM[grupo][caa_ref] - reducao, 2)
+        req = COB_MIN_CM[grupo][caa_ref]
         ok = v + 1e-9 >= req
         itens.append({"item": f"cobrimento {campo}", "status": "OK" if ok else "ALERTA",
-                      "msg": f"{v:g} cm {'≥' if ok else '<'} {req:g} cm (CAA {caa_ref}, NBR 6118:2023 Tab. 7.2"
-                             + (", Δc = 5 mm" if reducao else "") + ")"})
+                      "msg": f"{v:g} cm {'≥' if ok else '<'} {req:g} cm (CAA {caa_ref}, NBR 6118:2026 Tab. 7.2, Δc = 10 mm)"})
     norma = dados.get("project", {}).get("concreteCode")
     return {"caa": caa_ref, "norma_concreto_tqs": norma, "itens": itens,
             "resumo": {s: sum(1 for i in itens if i["status"] == s) for s in ("OK", "ALERTA", "PENDENTE")}}

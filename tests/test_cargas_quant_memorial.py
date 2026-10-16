@@ -141,6 +141,7 @@ def test_memorial_gera_tres_formatos(tmp_path):
     md = (out / "MEMORIAL.md").read_text(encoding="utf-8")
     assert md.index("7.1. L1") < md.index("7.2. V1")
     assert "pendente-validacao-2026" in md
+    assert "CC1/CC2" in md and "ATP é a regra geral" in md
     assert "<table>" in (out / "MEMORIAL.html").read_text(encoding="utf-8")
     with zipfile.ZipFile(out / "MEMORIAL.docx") as z:
         assert "word/document.xml" in z.namelist()

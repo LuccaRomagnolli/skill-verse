@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Laje maciça retangular — momentos, armaduras, flecha e reações nas vigas (NBR 6118:2023).
+"""Laje maciça retangular — momentos, armaduras e flecha auxiliar (NBR 6118:2026).
 
 Momentos pela teoria de placas (diferenças finitas, equivalente às tabelas de Czerny/Bares).
 Bordas: 4 letras A (apoiada) / E (engastada) na ordem esquerda, direita, inferior, superior;
@@ -19,8 +19,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, ES, NORMA_REFERENCIA, STATUS_NORMATIVO,
-                     Aco, Concreto, Memoria, barras_por_metro,  # noqa: E402
-                     flexao_simples, fmt, rho_min)
+                     Aco, Concreto, Memoria, as_minima_flexao, barras_por_metro,  # noqa: E402
+                     flexao_simples, fmt)
 from placa import resolver_refinado  # noqa: E402
 
 NOMES = ("esquerda", "direita", "inferior", "superior")
@@ -89,23 +89,30 @@ def main(argv=None) -> int:
     p = pp + a.g + a.q
     pd = 1.4 * p
     pqp = pp + a.g + a.psi2 * a.q
-    rmin = rho_min(a.fck)
-    As_min_neg = rmin * 100 * a.h
+    d1 = a.h - c / 10 - 0.5  # 1ª camada, φ ≈ 10 mm
+    d_min = d1 if a.balanco else d1 - 1.0  # faixa de 1 m; duas camadas nas lajes em cruz
+    As_min_neg = as_minima_flexao(100, a.h, d_min, conc, aco)
+    rmin = As_min_neg / (100 * a.h)
     titulo = (f"Laje em balanço L = {fmt(a.balanco)} m" if a.balanco else
               f"Laje {fmt(a.lx)} × {fmt(a.ly)} m, bordas {a.bordas.upper()}")
     mem = Memoria(f"{titulo} — h = {fmt(a.h,0)} cm, C{fmt(a.fck,0)}")
     mem.alerta(STATUS_NORMATIVO)
+    mem.alerta("Flecha é estimativa simplificada: conferir combinação de serviço, deslocamento total e efeitos "
+               "de longa duração (itens 11.8.3.1 e 13.3 da Emenda 1:2026); vibração de piso (item 23.3) "
+               "não é verificada por este script.")
     mem.add("Cargas", f"pp = 25·{fmt(a.h/100)} = {fmt(pp)}; p = {fmt(p)} kN/m²; pd = 1,4·p = {fmt(pd)} kN/m²; "
                       f"p,qp = g + ψ2·q = {fmt(pqp)} kN/m²")
     mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
     checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Cobrimento (Tab. 7.2)", f"c = {c} mm")
     res: dict = {"entrada": vars(a), "cargas": {"pp": pp, "p": p, "pd": pd, "pqp": pqp}}
-    d1 = a.h - c / 10 - 0.5  # 1ª camada, φ ≈ 10 mm
+    mem.add("Armadura mínima", f"As,mín = {fmt(As_min_neg)} cm²/m pelo momento mínimo de 17.3.5.2.1, "
+                                "Tabela 17.3 quando CA-50 e altura útil estimada; conferir arranjo adotado")
 
     if a.balanco:
-        mem.alerta("Laje em balanço: verificar e detalhar também a armadura inferior junto ao apoio "
-                   "prevista no item 20.6 da NBR 6118:2026; este script não a dimensiona.")
+        mem.alerta("Laje predominantemente em balanço: dimensionar e ancorar armadura inferior ao longo do apoio "
+                   "para resistir às ações permanentes (item 20.6 da NBR 6118:2026). Este script só calcula "
+                   "a armadura superior de flexão e não verifica a armadura inferior de segurança.")
         L = a.balanco
         M = pd * L ** 2 / 2
         res["negativo"] = armar("Engaste (negativo)", M, a.h, d1, conc, aco, mem, As_min_neg)
@@ -126,6 +133,9 @@ def main(argv=None) -> int:
         if not (a.lx and a.ly):
             ap.error("informe --lx e --ly (ou --balanco)")
         b = a.bordas.upper()
+        if "A" in b:
+            mem.alerta("Bordas apoiadas sem continuidade podem exigir armadura negativa de borda "
+                       "e extensão mínima (item 19.3.3.2/Tabela 19.1); o script não as dimensiona.")
         pl = resolver_refinado(a.lx, a.ly, b, a.nu)
         lam = max(a.lx, a.ly) / min(a.lx, a.ly)
         uma_dir = lam > 2

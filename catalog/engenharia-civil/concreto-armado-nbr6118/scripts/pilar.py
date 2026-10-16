@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pilar retangular de concreto armado — NBR 6118:2023.
+"""Pilar retangular de concreto armado — critérios selecionados da NBR 6118:2026.
 
 - Pré-dimensionamento (--predim): área estimada pela carga e posição do pilar.
 - Dimensionamento: momento mínimo, efeitos de 2ª ordem pelo pilar-padrão com curvatura
@@ -117,10 +117,12 @@ def dimensionar(Nd_kN, bx, by, Mx, My, d2_cm, nface, faces, conc, aco, As_min, A
     return hi, {"MRdx": mrx, "MRdy": mry, "utilizacao": u}
 
 
-def escolher_barras_pilar(As_cm2: float, n_total: int, bmin_cm: float) -> dict | None:
+def escolher_barras_pilar(As_cm2: float, n_total: int, bmin_cm: float, cobrimento_mm: float) -> dict | None:
     for phi in (10.0, 12.5, 16.0, 20.0, 25.0, 32.0):
         if phi > bmin_cm * 10 / 8:
             break
+        if phi > cobrimento_mm:  # 7.4.7.5
+            continue
         area = n_total * math.pi * phi ** 2 / 4 / 100
         if area >= As_cm2:
             return {"n": n_total, "phi_mm": phi, "As_ef_cm2": round(area, 2),
@@ -213,16 +215,17 @@ def main(argv=None) -> int:
                                             f"{fmt(dx['Md_tot_min'])} e {fmt(dy['Md_tot_min'])} kN·m")
         mem.add("Armadura calculada", f"As = {fmt(As)} cm² (MRd,x = {fmt(info['MRdx'])}; MRd,y = {fmt(info['MRdy'])} kN·m; "
                                       f"utilização = {fmt(info['utilizacao'],3)})")
-        barras = escolher_barras_pilar(As, n_total, bmin)
+        barras = escolher_barras_pilar(As, n_total, bmin, c)
         res.update({"As_cm2": As, "verificacao": info, "barras": barras})
         if barras:
-            phi_t = max(5.0, barras["phi_mm"] / 4)
+            phi_t = next(phi for phi in (5.0, 6.3, 8.0, 10.0) if phi >= max(5.0, barras["phi_mm"] / 4))
             s_t = min(200, bmin * 10, 12 * barras["phi_mm"])
             mem.add("Detalhamento", f"{barras['texto']} em {a.faces} faces; estribos φ{phi_t:g} c/ {fmt(s_t/10,0)} cm "
                                     "(φt ≥ φ/4 e 5 mm; s ≤ 20 cm, menor dimensão e 12φ)".replace(".", ","))
             res["estribos"] = {"phi_mm": phi_t, "s_cm": s_t / 10}
         else:
-            mem.alerta(f"Nenhuma bitola ≤ b/8 atende com {n_total} barras: aumente --barras-face.")
+            mem.alerta(f"Nenhuma bitola ≤ b/8 e ≤ cobrimento nominal atende com {n_total} barras: "
+                       "revise seção, cobrimento e --barras-face.")
     res["norma_referencia"] = NORMA_REFERENCIA
     res["status_normativo"] = "pendente-validacao-2026"
     res["memoria"] = mem.dict()

@@ -24,8 +24,8 @@ Quatro hábitos que dão resultado melhor:
 ## Teste das conexões que você escolheu
 Depois de instalar, rode `python3 instalador/scripts/install.py verificar` na pasta do pack. Um servidor MCP iniciado **não** prova que o aplicativo responde. Abra o projeto no software e faça uma leitura sem alterar nada: AutoCAD `system → status` e `drawing → info` (ou DXF headless), Revit `get_current_view_info`, SOLIDWORKS `solidworks_list_documents`, ArchiCAD `get_project_info`. Só depois, com sua confirmação, faça um objeto de teste numa cópia, inspecione-o no programa e salve. Para TQS, use `tqs_ambiente.py`, leia um edifício de teste e confira os dados na interface; TQS não usa MCP neste pack. Se uma conexão não estiver instalada, ignore esse teste e registre a pendência se precisar dela depois.
 
-## Estado da versão 1.3.0
-Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. Os scripts herdados da edição 2023 exigem comparação com o texto-base licenciado e a Emenda 1 antes de uso profissional como verificação normativa. As demais edições devem ser confirmadas no Catálogo ABNT; textos ABNT não acompanham o ZIP. As integrações exigem teste no programa real antes de serem anunciadas como validadas.
+## Estado da versão {{VERSAO}}
+Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com os critérios selecionados que os scripts implementam; os demais requisitos, as hipóteses de cada projeto e a avaliação técnica independente continuam exigindo revisão profissional. Resultados antigos com concreto C45–C90 devem ser recalculados após a correção de `ηc`. Confirme as demais edições no Catálogo ABNT; textos ABNT não acompanham o ZIP. As integrações exigem teste no programa real antes de serem anunciadas como validadas.
 
 ## Suas skills
 {{SKILLS}}
@@ -50,4 +50,4 @@ Este ZIP é **candidato**, não certificação de conformidade. A referência de
 | Remover o pack | Abra a pasta do pack ({{PASTA}}) e diga "desinstale o pack". |
 
 ## Responsabilidade técnica
-As skills são **ferramentas de apoio**. Projeto, laudo e orçamento continuam sob responsabilidade do profissional habilitado que os assina (ART/RRT). Confira hipóteses, dados de entrada, normas vigentes, resultados e necessidade de Avaliação Técnica do Projeto independente antes de usar em obra.
+As skills são **ferramentas de apoio**. Projeto, laudo e orçamento continuam sob responsabilidade do profissional habilitado que os assina (ART/RRT). Confira hipóteses, dados de entrada, normas vigentes e resultados. Para projetos sujeitos à NBR 6118:2026, a ATP é a regra geral antes da construção; a eventual dispensa em CC1/CC2 exige acordo formal, e CC3 requer análise independente.

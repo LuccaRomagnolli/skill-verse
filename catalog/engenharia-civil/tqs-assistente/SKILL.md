@@ -27,7 +27,7 @@ python scripts/tqs_edificio.py ler --edificio "<nome>" --saida ed.json
 python scripts/tqs_edificio.py conferir --edificio "<nome>"            # ou --json ed.json (fora do Windows)
 ```
 - `ler`: plantas (nome, classe, altura, repetições e **cota calculada**), materiais (CAA, fck), cobrimentos, modelo estrutural (IV/VI, γz/P-Delta), coeficientes dos carregamentos.
-- `conferir`: triagem de fck mínimo por CAA e cobrimentos mínimos baseada nas tabelas 7.1 e 7.2 da edição **2023** implementada. A referência declarada é **NBR 6118:2026**, cuja Emenda 1 e texto-base licenciado ainda exigem confronto integral. Mostre OK/ALERTA como triagem, nunca como atestado de conformidade 2026.
+- `conferir`: triagem de fck mínimo por CAA e cobrimentos nominais baseada nas Tabelas 7.1 e 7.2 da **NBR 6118:2026** (base 2023 + Emenda 1). Os números foram confrontados com ambos os documentos, mas não cobrem exceções, relação a/c, microambiente nem cobrimento real. Mostre OK/ALERTA como triagem, nunca como atestado de conformidade.
 - **Alterar**: só numa cópia, com "sim" do usuário:
   ```bash
   python scripts/tqs_edificio.py aplicar --edificio "<nome>" --dados alt.json --salvar-como "<nome>-C30"
@@ -71,6 +71,6 @@ Fluxo completo do projeto no TQS (o que cada etapa faz, o que conferir, onde a a
 ## Limites e responsabilidade
 - O TQS calcula, e o **engenheiro analisa e assina** (responsável técnico). O agente confere dados de entrada, organiza, automatiza tarefas repetitivas e explica, mas não valida estabilidade global, dimensionamento nem detalhamento.
 - Alterações no edifício são feitas numa **cópia** por padrão. Sobrescrever o original e executar o processamento exigem "sim" explícito.
-- A conferência normativa cobre só itens objetivos herdados da edição 2023 (fck e cobrimentos por CAA). A aplicabilidade à NBR 6118:2026 continua pendente; verifique também a necessidade de Avaliação Técnica do Projeto e o caso de balanços conforme os itens alterados pela Emenda 1. Normas citadas por número; nenhum texto protegido é reproduzido.
+- A conferência numérica cobre só fck e cobrimento de concreto armado por CAA das Tabelas 7.1 e 7.2, documentadas em `concreto-armado-nbr6118/references/auditoria-base-2023-para-2026.md`. A ATP do item 5.3 é a regra geral antes da construção (dispensa formal só para CC1/CC2); confira também o item 20.6 para balanços. Registre a classe/decisão na ficha, sem supor que o processamento do TQS cobre essas exigências. Normas citadas por número; nenhum texto protegido é reproduzido.
 - A API do TQS varia entre versões. Os scripts toleram diferenças e avisam, mas resultados de leitura devem ser conferidos na interface do TQS na primeira vez em cada versão.
 - Requer Windows com TQS licenciado (V23+). TQS é marca da TQS Informática Ltda. Esta skill não tem vínculo com a empresa.

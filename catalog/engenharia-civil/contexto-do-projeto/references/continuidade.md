@@ -8,7 +8,7 @@
 python3 scripts/contexto.py resumo --pasta <pasta-da-obra>
 ```
 
-Leia `municipio`, `uf`, uso, CAA, fontes, requisitos, decisões, artefatos, pendências e `checklist_faltante`. Confira se um artefato citado ainda existe antes de usá-lo. Se a ficha não existir, use `iniciar`; não use `--forcar` numa ficha existente. Confirme com o usuário a obra e a revisão em que continuará.
+Leia `municipio`, `uf`, uso, CAA, fontes, requisitos, decisões, artefatos, **atp**, pendências e `checklist_faltante`. Confira se um artefato citado ainda existe antes de usá-lo. Se a ficha não existir, use `iniciar`; não use `--forcar` numa ficha existente. Confirme com o usuário a obra e a revisão em que continuará.
 
 ## Registrar evidência e decisões
 
@@ -24,6 +24,17 @@ python3 scripts/contexto.py pendencia --pasta <pasta-da-obra> --texto "confirmar
 ```
 
 `fonte` devolve seu ID. Um `requisito` exige URL e vigência confirmada; registre o artigo/item e a unidade, sem transformar uma recomendação em obrigação. Fontes sem vigência comprovada permanecem no checklist. `decisao` registra a origem (`usuario`, `projetista`, `fonte-oficial` ou `hipotese`); uma hipótese não vira dado confirmado por ter sido salva.
+
+Para projeto de estruturas de concreto, registre também a data de protocolo e a escolha da edição normativa em `decisao`, com evidência. A Emenda 1:2026 traz regra transitória de 180 dias; não deduza a edição aplicável só da data atual. A ATP do item 5.3 deve ter classe atribuída pelo projetista e estado rastreável:
+
+```bash
+python3 scripts/contexto.py atp --pasta <pasta-da-obra> --classe CC3 --situacao em-andamento \
+  --fundamento "edifício com subsolo, classificação informada pelo projetista" --avaliador "profissional independente"
+python3 scripts/contexto.py atp --pasta <pasta-da-obra> --classe CC2 --situacao dispensada \
+  --fundamento "classificação confirmada; acordo de projetista e contratante" --documento "atp/acordo-assinado.pdf"
+```
+
+`dispensada` não é aceita para CC3; `parecer-recebido` exige avaliador e documento. O script confere o arquivo e a coerência básica, **não** verifica a assinatura, a independência, a classificação ou a suficiência da ATP. O responsável técnico confirma esses pontos.
 
 ## Registrar a saída e encerrar uma etapa
 
