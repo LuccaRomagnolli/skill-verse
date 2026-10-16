@@ -1,49 +1,19 @@
-# Cargas usuais — valores de referência
+# Levantamento de ações — NBR 6120:2019, versão corrigida 12.11.2019
 
-> **Confirme na norma** antes de usar em projeto: os valores abaixo são os mais usados no dia a dia e servem para estudo e pré-dimensionamento. A NBR 6120:2019 tem tabelas extensas (por material, espessura e uso). Quando o caso não estiver aqui, **peça ao usuário o valor da tabela da norma**, em vez de supor.
+Esta referência é um **roteiro**, não um catálogo substituto da norma. Consulte a edição licenciada e confirme vigência/emendas no Catálogo ABNT. A carga é escolhida por ambiente e elemento, não pela classificação geral da edificação.
 
-## Pesos específicos (kN/m³)
-| Material | γ |
+| Verificação | Registro mínimo no mapa |
 |---|---|
-| Concreto armado | 25 |
-| Concreto simples | 24 |
-| Aço | 78,5 |
-| Argamassa de cimento e areia | 21 |
-| Argamassa de cal, cimento e areia | 19 |
+| Ação permanente direta | Peso próprio estrutural e camadas com espessura, massa/peso específico, fabricante ou item da Tabela 1–9; separar peso próprio do modelo e permanente adicional para evitar duplicidade |
+| Uso/ocupação | Subcategoria da Tabela 10, carga uniformemente distribuída e concentrada quando aplicável; por exemplo, sala residencial e varanda residencial não têm o mesmo q |
+| Divisórias/vedações | Local, tipo, espessura, altura, aberturas e apoio; conferir itens e tabelas específicas; preservar carga linear/concentrada quando o caminho de forças assim exigir |
+| Cobertura/terraço | Acesso, manutenção, equipamentos, painéis solares, reservatórios, eventual uso público e combinações compatíveis |
+| Garagem | Classe do veículo, área de circulação/manobra, ações concentradas, impacto e critérios específicos; não reduzir tudo a um único q |
+| Guarda-corpo e elementos locais | Ações horizontais/verticais específicas e destino estrutural |
+| Construção e equipamentos | Fase, massa, posição, cargas móveis e procedimento executivo; verificar combinações próprias |
 
-## Revestimentos e vedações — composição típica (kN/m²)
-Monte a carga permanente adicional da laje somando camadas: **espessura (m) × γ (kN/m³)**.
-- Contrapiso de argamassa 3 cm: 0,03 × 21 = 0,63
-- Reboco de teto 1,5 cm: 0,015 × 19 = 0,29
-- Piso cerâmico/porcelanato colado: confira na NBR 6120 (ordem de 0,2–0,3 incluindo argamassa colante)
-- Forro de gesso: confira na NBR 6120 (ordem de 0,1–0,25)
-- Alvenaria sobre laje: peso por m² de parede × altura ÷ área da laje (ou linha de carga na viga). A NBR 6120:2019 tabela alvenarias **por m² de parede** conforme bloco e espessura — use a tabela.
+Exemplo de distinção observado na Tabela 10 do exemplar fornecido: dormitórios/salas residenciais têm q distribuído de 1,5 kN/m², enquanto varanda residencial tem 2,5 kN/m². Este exemplo **não cobre** as cargas concentradas nem substitui a leitura das notas e da linha exata da tabela. Para uso desconhecido, não atribua q automaticamente; abra pendência.
 
-## Cargas variáveis de uso (NBR 6120:2019) — kN/m²
-| Uso | q |
-|---|---|
-| Residencial: dormitórios, sala, cozinha, banheiro | 1,5 |
-| Residencial: despensa, área de serviço, lavanderia | 2,0 |
-| Corredores e escadas de uso comum | 3,0 |
-| Escritórios: salas de uso geral | 2,5 |
-| Garagens de veículos de passeio | 3,0 |
+O mapa aceita ações `distribuida` em kN/m², `linear` em kN/m e `concentrada` em kN. Uma carga linear de parede e uma carga concentrada devem gerar casos/efeitos próprios no modelo. Não divida pelo vão ou área apenas para caber em uma entrada de laje. A conversão, quando justificável, exige modelo, região de influência e assinatura do projetista.
 
-Outros usos (lojas, bibliotecas, coberturas, forros, academias, auditórios): **consulte a Tabela 10 da NBR 6120:2019**.
-
-## Fatores de combinação ψ (NBR 6118 Tabela 11.2)
-| Ação | ψ0 | ψ1 | ψ2 |
-|---|---|---|---|
-| Residencial (sem predominância de pesos fixos) | 0,5 | 0,4 | 0,3 |
-| Comercial/escritórios/edifícios públicos | 0,7 | 0,6 | 0,4 |
-| Bibliotecas, arquivos, oficinas, garagens | 0,8 | 0,7 | 0,6 |
-| Vento | 0,6 | 0,3 | 0 |
-| Temperatura | 0,6 | 0,5 | 0,3 |
-
-## Coeficientes de ponderação no ELU (NBR 6118 Tabela 11.1)
-| Combinação | γg desf./fav. | γq | γε (retração/temperatura) |
-|---|---|---|---|
-| Normal | 1,4 / 1,0 | 1,4 | 1,2 / 0 |
-| Especial ou de construção | 1,3 / 1,0 | 1,2 | 1,2 / 0 |
-| Excepcional | 1,2 / 1,0 | 1,0 | 0 / 0 |
-
-Use `--gamma-g` no script para combinações especiais.
+Para combinar, use `references/combinacoes-normativas.md`; categorias de fator ψ não são categorias de carga de uso da NBR 6120.

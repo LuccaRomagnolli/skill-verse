@@ -13,6 +13,7 @@ sys.path.insert(0, str(EC / "cargas-combinacoes/scripts"))
 sys.path.insert(0, str(EC / "quantitativos-sinapi/scripts"))
 
 import combinacoes  # noqa: E402
+import mapa_acoes  # noqa: E402
 import quantitativos  # noqa: E402
 import vento  # noqa: E402
 
@@ -42,6 +43,44 @@ def test_so_permanentes():
     assert r["envoltoria"]["ELU"]["max"] == pytest.approx(14)
 
 
+def test_perfis_normativos_e_variaveis_favoraveis():
+    acoes = [combinacoes.parse(s) for s in ("G:permanente:100", "Q:residencial:20", "W:vento:-10")]
+    concreto = combinacoes.combinar(acoes, "concreto-6118")
+    geral = combinacoes.combinar(acoes, "geral-8681")
+    assert concreto["envoltoria"]["ELU"] == pytest.approx({"max": 168, "min": 86})
+    assert geral["envoltoria"]["ELU"] == pytest.approx({"max": 165, "min": 86})
+    assert concreto["envoltoria"]["ELS_quase_permanente"]["max"] == pytest.approx(106)
+    assert all("W" not in x["expressao"] for x in concreto["combinacoes"]["ELU"] if x["sentido"] == "max")
+
+
+def test_gamma_variavel_por_acao_e_especial_bloqueada():
+    acoes = [combinacoes.parse(s) for s in ("G:permanente:10", "Q:comercial:10", "T:temperatura:10")]
+    r = combinacoes.combinar(acoes, "geral-8681")
+    # T principal: 1,2·10 + Q secundária: 1,5·0,7·10.
+    assert r["envoltoria"]["ELU"]["max"] == pytest.approx(13.5 + 12 + 1.5 * 0.7 * 10)
+    with pytest.raises(ValueError, match="combinação especial"):
+        combinacoes.combinar(acoes, gamma_g=(1.3, 1.0))
+
+
+def test_mapa_acoes_rejeita_uso_generico_e_preserva_concentrada():
+    zona = {"id": "L1", "pavimento": "térreo", "elemento": "laje L1", "uso_especifico": "varanda residencial",
+            "area_m2": 8.0,
+            "checagens": {k: {"estado": "verificada", "justificativa": "levantamento didático"} for k in mapa_acoes.CHECAGENS},
+            "acoes": [{"id": "Qd", "natureza": "variavel", "forma": "distribuida", "valor": 2.5,
+                       "unidade": "kN/m²", "origem": {"tipo": "norma", "documento": "NBR 6120:2019",
+                                               "item": "Tabela 10", "data": "2026-10-15"}},
+                      {"id": "Qc", "natureza": "variavel", "forma": "concentrada", "valor": 1.0,
+                       "posicao": "canto externo — hipótese didática",
+                       "unidade": "kN", "origem": {"tipo": "norma", "documento": "NBR 6120:2019",
+                                             "item": "Tabela 10 (valor didático não normativo)", "data": "2026-10-15"}}]}
+    resultado = mapa_acoes.compilar({"projeto": "teste", "zonas": [zona]})
+    assert resultado["zonas"][0]["totais_distribuidos"]["variavel_kN_m2"] == 2.5
+    assert resultado["zonas"][0]["acoes"][1]["forma"] == "concentrada"
+    zona["uso_especifico"] = "residencial"
+    with pytest.raises(ValueError, match="uso genérico"):
+        mapa_acoes.compilar({"projeto": "teste", "zonas": [zona]})
+
+
 # --------------------------------------------------------------- vento
 
 def test_s2_categoria_ii_classe_a_10m():
@@ -53,11 +92,21 @@ def test_s2_minimo_5m():
 
 
 def test_pressao_dinamica():
-    out = json.loads(run(EC / "cargas-combinacoes/scripts/vento.py", "--V0", "40", "--categoria", "II", "--classe", "A",
-                         "--alturas", "10", "--formato", "json"))
+    out = json.loads(run(EC / "cargas-combinacoes/scripts/vento.py", "--V0", "40", "--S1", "1", "--categoria", "II",
+                         "--classe", "A", "--S3-grupo", "3", "--alturas", "10", "--formato", "json"))
     c = out["cotas"][0]
     assert c["Vk"] == pytest.approx(40.0)
     assert c["q_kN_m2"] == pytest.approx(0.613 * 1600 / 1000)
+
+
+def test_vento_2023_grupos_e_area_faixas():
+    assert vento.S3 == {1: 1.11, 2: 1.06, 3: 1.0, 4: 0.95, 5: 0.83}
+    assert vento.s2(3, "V", "A") == pytest.approx(vento.s2(10, "V", "A"))
+    out = json.loads(run(EC / "cargas-combinacoes/scripts/vento.py", "--V0", "40", "--S1", "1", "--categoria", "II",
+                         "--classe", "A", "--S3-grupo", "3", "--alturas", "3", "6", "10",
+                         "--Ca", "1.2", "--fv", "1", "--largura", "20", "--formato", "json"))
+    assert sum(x["Ae_m2"] for x in out["cotas"]) == pytest.approx(200)
+    assert out["cotas"][-1]["F_kN"] == pytest.approx(out["cotas"][-1]["q_kN_m2"] * 1.2 * 20 * 4)
 
 
 # --------------------------------------------------------------- quantitativos

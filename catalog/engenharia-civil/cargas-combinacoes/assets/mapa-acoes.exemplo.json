@@ -1,0 +1,35 @@
+{
+  "projeto": "Exemplo didático — não usar como projeto",
+  "zonas": [
+    {
+      "id": "L1-varanda",
+      "pavimento": "térreo",
+      "elemento": "laje L1",
+      "uso_especifico": "varanda residencial",
+      "area_m2": 8.0,
+      "checagens": {
+        "concentrada": {"estado": "pendente", "justificativa": "Conferir carga concentrada e notas da Tabela 10 no exemplar licenciado"},
+        "paredes_divisorias": {"estado": "nao_se_aplica", "justificativa": "Hipótese didática: nenhuma parede apoiada na laje; confirmar na arquitetura"},
+        "cobertura": {"estado": "nao_se_aplica", "justificativa": "L1 não é cobertura"},
+        "garagem": {"estado": "nao_se_aplica", "justificativa": "L1 não tem trânsito/estacionamento de veículos"},
+        "equipamentos": {"estado": "pendente", "justificativa": "Confirmar instalações e equipamentos junto ao projeto"},
+        "construcao": {"estado": "pendente", "justificativa": "Confirmar cargas temporárias e escoramento no plano executivo"}
+      },
+      "acoes": [
+        {
+          "id": "Q-uso",
+          "natureza": "variavel",
+          "forma": "distribuida",
+          "valor": 2.5,
+          "unidade": "kN/m²",
+          "origem": {
+            "tipo": "norma",
+            "documento": "ABNT NBR 6120:2019, versão corrigida 12.11.2019",
+            "item": "Tabela 10 — varanda residencial; conferir subcategoria e carga concentrada no exemplar licenciado",
+            "data": "2026-10-15"
+          }
+        }
+      ]
+    }
+  ]
+}

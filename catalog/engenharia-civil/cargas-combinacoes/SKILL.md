@@ -1,44 +1,53 @@
 ---
 name: cargas-combinacoes
-description: Organiza cargas permanentes e de uso e calcula vento e combinações auxiliares com memória e origem dos parâmetros. Use quando pedirem carga, vento, pressão, ELU, ELS ou envoltória; os scripts de vento e combinações ainda exigem validação frente às edições normativas vigentes antes do uso em projeto real.
+description: Inventaria ações por ambiente/elemento, calcula vento estático auxiliar e combina efeitos ELU/ELS com perfis normativos explícitos. Use quando pedirem cargas, mapa de ações, vento, pressão, ELU, ELS ou envoltória de uma edificação brasileira.
 ---
 
 # Cargas e combinações
 
-Scripts em `scripts/` (Python 3.10+, stdlib). Rode a partir da pasta desta skill. Os números saem dos scripts; você conduz e explica.
+Scripts Python 3.10+ em `scripts/`. Comece sempre pelo `resumo` da skill `contexto-do-projeto`: município/UF, uso, fontes, decisões, artefatos e pendências. O uso **geral** da ficha não determina a carga de cada laje. Consulte a edição aplicável no Catálogo ABNT; os PDFs licenciados são apenas para consulta local, nunca para o ZIP. O PDF recebido da NBR 6123 é a edição 2023; a ABNT anunciou Errata 1:2025, ainda não conferida neste pack. Logo, resultados permanecem **em revisão técnica**.
 
-Comece por `contexto-do-projeto` → `resumo` para obter município/UF, uso, fontes e pendências. Registre na ficha a origem de cada carga e decisão. Os scripts `vento.py` e `combinacoes.py` implementam parâmetros declarados das edições 1988 da NBR 6123 e 2003/2023 da NBR 8681/6118. **Não os apresente como verificação normativa atual** antes do confronto com as edições vigentes. Para projeto real, obtenha os coeficientes de edição licenciada ou software verificado e registre a verificação independente.
+## 1. Mapa de ações por ambiente e elemento
 
-## 1. Cargas permanentes e de uso
-Se existir `projeto-contexto.json` (skill `contexto-do-projeto`), parta do **uso** da ficha para escolher a carga de uso e o tipo de ação nas combinações (`residencial` ou `comercial`) e confirme com o usuário. Use `references/cargas-usuais.md`. Monte uma **tabela de carga por m²** com as camadas (material, espessura, γ, carga) e some. Regras:
-- Valor que não está na referência → **peça ao usuário** o valor da Tabela da NBR 6120:2019 que ele tem. Não chute.
-- Alvenaria sobre laje sem viga embaixo: distribua o peso da parede pela área da laje (laje armada em cruz) ou trate como linha de carga, e diga qual hipótese usou.
-- Entregue: g (permanente adicional, sem peso próprio da laje) e q (uso), prontos para a skill `concreto-armado-nbr6118`.
-- Registre em `contexto.py decisao` as camadas, densidades e categorias adotadas; diferencie valor medido, dado de fabricante, norma e estimativa. Se faltar ocupação, espessura ou carga de equipamento, crie `pendencia`.
+Leia `references/cargas-usuais.md` e use `assets/mapa-acoes.exemplo.json` apenas como formato. Para cada zona, identifique pavimento, elemento, **uso específico** (quarto, varanda, circulação, cobertura, garagem etc.), geometria e estado de ocupação. Confira no exemplar licenciado da NBR 6120:2019, versão corrigida, a linha aplicável da Tabela 10, inclusive carga distribuída e concentrada, além das cláusulas específicas quando pertinentes. Para elementos de vedação, instalações, reservatórios, equipamentos, paredes móveis, cargas de construção e garagens, levante as ações que efetivamente atuam; não converta automaticamente carga concentrada ou linear em carga por área.
+
+Registre cada ação característica como `permanente` ou `variavel`, forma `distribuida` (kN/m²), `linear` (kN/m) ou `concentrada` (kN), valor, documento/edição, item, data de consulta e origem (norma, fabricante, medição, levantamento ou hipótese). Ação distribuída exige `area_m2` da zona; ação linear exige `extensao_m` e concentrada exige `posicao` no elemento. Em cada zona, preencha as seis `checagens` do exemplo: concentrada, paredes/divisórias, cobertura, garagem, equipamentos e construção, com estado e justificativa; `pendente` permanece visível no JSON. Para camadas permanentes, calcule espessura (m) × peso específico (kN/m³), com valores e dimensões verificados. Paredes exigem localização, composição/altura e caminho de cargas; a diluição pela área da laje só pode resultar de modelo e justificativa do projetista. Compare o mapa com arquitetura/BIM e marque mudanças de uso previstas.
+
+```bash
+python3 scripts/mapa_acoes.py --entrada /obra/mapa-acoes.entrada.json --saida /obra/mapa-acoes.json
+```
+
+O script **rejeita** uso genérico, ações sem fonte/item/data, unidade incompatível e zonas sem ações. Não atribui valores nem analisa esforços. Se faltar categoria, carga concentrada, especificação de parede/equipamento ou condição de construção, pare a definição daquela zona e registre `contexto.py pendencia`; não preencha com o uso geral da ficha. O exemplo de varanda demonstra a distinção de carga distribuída, mas não dispensa a checagem da carga concentrada. Após conferência, registre o mapa com `contexto.py artefato --tipo mapa-de-acoes --estado em-revisao` e as escolhas com `contexto.py decisao` (comandos em `contexto-do-projeto/references/continuidade.md`).
 
 ## 2. Vento
+
+Leia `references/vento-nbr6123.md`. Confirme V0 na isopleta/estudo local para o município, S1 pela topografia, categoria por **direção** e entorno, classe pela dimensão frontal e S3 pelo risco/uso. `Ca` e `fv` exigem leitura dos critérios aerodinâmicos e de vizinhança no caso concreto. O script não os escolhe. Entrada mínima: V0 em m/s, S1, categoria, classe ou dimensão, S3 e cotas em m.
+
 ```bash
-python3 scripts/vento.py --V0 35 --categoria IV --maior-dimensao 25 --altura-total 15 --passo 3 --S3-grupo 2
-python3 scripts/vento.py --V0 35 --categoria IV --classe B --alturas 3 6 9 12 15 --Ca 1.3 --largura 20
+python3 scripts/vento.py --V0 35 --S1 1 --categoria IV --maior-dimensao 25 \
+  --altura-total 15 --passo 3 --S3-grupo 3 --formato json
+python3 scripts/vento.py --V0 35 --S1 1 --categoria IV --classe B \
+  --alturas 3 6 9 12 15 --S3-grupo 3 --Ca 1.3 --fv 1 --largura 20 --formato json
 ```
-Antes de rodar, confirme com o usuário: **V0 da cidade da obra** (mapa de isopletas; o município está em `projeto-contexto.json` se a ficha da skill `contexto-do-projeto` existir; a classe de rugosidade também pode ser discutida a partir do endereço do lote), categoria do terreno, maior dimensão da edificação e grupo de S3. Descrições de cada fator em `references/vento-nbr6123.md`. O Ca vem do ábaco da norma: ajude a ler, mas o valor é do usuário.
 
-Para uma obra real, não transforme a saída histórica do script em ação de projeto até conferir na edição vigente mapa, fatores, coeficientes aerodinâmicos, vizinhança e aplicabilidade do método. Registre V0, S1/S2/S3, Ca e suas fontes; se algum não estiver confirmado, registre `pendencia`.
+Saídas: S2, Vk (m/s), q (kN/m²) e, se todos os parâmetros de arrasto forem fornecidos, Fa (kN) por faixa. A pressão na cota superior representa a faixa (aproximação explícita); não substitui integração/refinamento do modelo. Registre fontes de cada fator, direção, coeficientes e revisão independente. Sem a Errata 1:2025 conferida, não marque o cálculo como conforme à edição vigente.
 
-## 3. Combinações
-Cada ação entra como `nome:tipo:valor[:grupo]`, com o **efeito característico** (esforço numa seção, reação, carga). Ações do mesmo grupo são exclusivas (ex.: vento em direções diferentes).
+## 3. Combinações de efeitos
+
+Leia `references/combinacoes-normativas.md`. A entrada de `combinacoes.py` é o **efeito característico assinado** de cada ação na mesma seção e unidade (por exemplo, todos momentos em kN·m); não misture força, momento e carga linear. Transforme as cargas do mapa em efeitos por um modelo estrutural antes de combinar. Registre ações que podem ocorrer juntas, alternativas de um mesmo grupo e condições favoráveis/desfavoráveis. Escolha explicitamente `--perfil concreto-6118` para a estrutura de concreto ou `--perfil geral-8681` para o caso geral da NBR 8681:2025; o perfil geral usa permanentes diretas **agrupadas** e variáveis **separadas**. O projetista deve documentar a compatibilização entre 8681:2025 e a tabela específica da 6118:2023 + Emenda 1:2026.
+
 ```bash
-python3 scripts/combinacoes.py --acao G:permanente:120 --acao Q:comercial:45 \
-    --acao W0:vento:30:vento --acao W90:vento:-25:vento
+python3 scripts/combinacoes.py --perfil concreto-6118 --acao G:permanente:120 \
+  --acao Q:comercial:45 --acao W0:vento:30:vento --acao W90:vento:-25:vento --formato json
 ```
-Tipos: `permanente`, `retracao`, `residencial`, `comercial`, `biblioteca`, `vento`, `temperatura`. Combinação especial/de construção: `--gamma-g 1.3 1.0`.
 
-O script gera todas as combinações de ELU normal (cada variável como principal, permanentes com γ desfavorável ou favorável conforme o sentido) e as de ELS (rara, frequente, quase permanente), além da envoltória máx./mín. Destaque para o usuário a **combinação que governa** e para que serve cada ELS (quase permanente → flecha; frequente → fissuração/vibração; rara → formação de fissuras).
+Tipos de fator ψ: `residencial` (acesso restrito), `comercial` (comércio/escritório/acesso público), `biblioteca` (inclui arquivos, oficinas, garagens), `vento`, `temperatura`; `cobertura` apenas no perfil geral. Esses nomes **não** selecionam q da NBR 6120. O script gera ELU **normal** e ELS rara/frequente/quase permanente; exclui ações variáveis favoráveis do ELU e não combina ações alternativas do mesmo grupo. Interprete a envoltória e identifique combinação governante, mas verifique manualmente ações correlatas inseparáveis, sequência construtiva, deslocamentos, estabilidade e resistência. `--gamma-g` antigo é recusado: combinações especiais/de construção e excepcionais não são simuláveis por esse único parâmetro.
 
-Salve as saídas JSON na pasta da obra, registre com `contexto.py artefato --estado em-revisao` e abra pendência para parâmetros normativos ainda não verificados. Unidades dos efeitos em todas as ações da mesma execução devem ser idênticas; não misture força, momento e carga linear na mesma envoltória.
+Salve JSONs na pasta da obra, confira `status_normativo` e `limites`, registre como artefatos `em-revisao` e abra pendências para fontes ou verificações não concluídas. Um memorial só deve usar resultados acompanhados do mapa, modelo, unidade, perfil e revisão independente.
 
 ## Limites e responsabilidade
-- Os valores de referência não substituem a NBR 6120:2019, a NBR 6123 e a NBR 8681. Cite a tabela de onde cada valor saiu e marque como "a confirmar" o que veio do usuário ou de estimativa.
-- Vento: só a parte estática simplificada (Vk, q, força global com Ca informado). Coeficientes de pressão em paredes e coberturas, efeitos dinâmicos, vizinhança e excentricidade ficam fora.
-- Combinações excepcionais (sismo, incêndio, impacto) e ações de protensão: fora do escopo.
-- O resultado é auxílio ao projeto. A definição das ações é responsabilidade do engenheiro (ART).
+
+- NBR 6120:2019, NBR 8681:2025 e NBR 6118:2023/Em1:2026 foram consultadas em exemplares locais; a vigência e erratas devem ser verificadas no Catálogo ABNT em cada projeto. NBR 6123:2023/Errata 1:2025 está **pendente de confronto com o texto da errata**.
+- Vento cobre Vk, q e arrasto estático simplificado com coeficientes fornecidos. Pressões em paredes/coberturas, pressão interna, efeitos dinâmicos, topografia/vizinhança complexas e classes/tempos especiais permanecem fora do script.
+- Combinações cobrem efeitos lineares e carregamento normal. Não verificam estabilidade como corpo rígido, fadiga, incêndio, impacto, ações excepcionais, protensão ou fase de construção. Para efeitos não lineares, combinar ações antes da análise pode ser necessário.
+- Nenhum JSON constitui aprovação, ART, ATP ou parecer independente. A definição das ações, compatibilização normativa e liberação do projeto cabem ao responsável técnico.

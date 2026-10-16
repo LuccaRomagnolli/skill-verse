@@ -17,7 +17,7 @@ Quatro hábitos que dão resultado melhor:
 ## Seu primeiro projeto guiado
 1. Abra uma pasta exclusiva da obra e peça: **"Inicie a ficha de um projeto de <uso> em <município>/<UF>; pergunte o que faltar."** Confirme uso, pavimentos, área, ambiente/CAA e revisão. O município do perfil é só sugestão; a obra pode ser em outro local.
 2. Peça: **"Liste fontes oficiais vigentes e requisitos aplicáveis, com edição, artigo/item, link e data de acesso; registre as pendências."** Código de obras, zoneamento, Bombeiros, concessionárias e NRs dependem do local e do escopo.
-3. Peça um cálculo pequeno ou uma auditoria de modelo. Forneça dimensões, unidades, origem dos valores e arquivo de entrada. Solicite o relatório de alertas e verificações não cobertas.
+3. Peça um **mapa de ações por ambiente e elemento** (inclusive cargas concentradas, paredes, cobertura e garagem quando aplicáveis). Resolva os itens pendentes com o responsável técnico; depois peça um cálculo pequeno ou auditoria de modelo, fornecendo dimensões, unidades e fontes.
 4. Peça para salvar o entregável na pasta da obra e registrá-lo na ficha. Antes de usar em aprovação ou obra, solicite revisão ao responsável técnico.
 5. Em outra sessão, abra a mesma pasta e diga: **"Retome este projeto pelo projeto-contexto.json; resuma decisões, arquivos, fontes e pendências antes de continuar."**
 
@@ -25,7 +25,7 @@ Quatro hábitos que dão resultado melhor:
 Depois de instalar, rode `python3 instalador/scripts/install.py verificar` na pasta do pack. Um servidor MCP iniciado **não** prova que o aplicativo responde. Abra o projeto no software e faça uma leitura sem alterar nada: AutoCAD `system → status` e `drawing → info` (ou DXF headless), Revit `get_current_view_info`, SOLIDWORKS `solidworks_list_documents`, ArchiCAD `get_project_info`. Só depois, com sua confirmação, faça um objeto de teste numa cópia, inspecione-o no programa e salve. Para TQS, use `tqs_ambiente.py`, leia um edifício de teste e confira os dados na interface; TQS não usa MCP neste pack. Se uma conexão não estiver instalada, ignore esse teste e registre a pendência se precisar dela depois.
 
 ## Estado da versão {{VERSAO}}
-Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com os critérios selecionados que os scripts implementam; os demais requisitos, as hipóteses de cada projeto e a avaliação técnica independente continuam exigindo revisão profissional. Resultados antigos com concreto C45–C90 devem ser recalculados após a correção de `ηc`. Confirme as demais edições no Catálogo ABNT; textos ABNT não acompanham o ZIP. As integrações exigem teste no programa real antes de serem anunciadas como validadas.
+Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com critérios selecionados, não com todos os requisitos de um projeto. A NBR 6120:2019 corrigida orienta o mapa de ações; combinações têm perfil explícito 6118/8681; vento usa a base NBR 6123:2023, mas sua Errata 1:2025 ainda precisa ser conferida. Recalcule resultados antigos de vento/combinações e resultados com concreto C45–C90 anteriores à correção de `ηc`. Confirme as edições no Catálogo ABNT; PDFs licenciados não acompanham o ZIP. Revisão técnica independente e testes nos programas reais continuam pendentes.
 
 ## Suas skills
 {{SKILLS}}

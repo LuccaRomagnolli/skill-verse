@@ -1,6 +1,6 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.3.2
+version: 1.3.3
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
@@ -45,7 +45,7 @@ fluxos:
   - titulo: Do lançamento ao memorial (pavimento de concreto armado)
     passos:
       - "Descreva o pavimento: \"Tenho 4 lajes, 6 vigas e 6 pilares; as lajes são…\" — o agente organiza o lançamento."
-      - "Peça as cargas: \"Quais cargas uso em apartamento com porcelanato e forro de gesso?\" (cargas-combinacoes)."
+      - "Peça um mapa de ações por ambiente/elemento, incluindo varanda, paredes, cargas concentradas, cobertura e garagem quando aplicável; resolva as pendências antes de dimensionar (cargas-combinacoes)."
       - "Calcule as lajes uma a uma e anote as reações nas vigas (concreto-armado-nbr6118)."
       - "Calcule as vigas com essas reações e depois os pilares com a carga acumulada."
       - "Peça: \"Gere o memorial com tudo que calculamos\" (memorial-de-calculo) — sai em Word e PDF."

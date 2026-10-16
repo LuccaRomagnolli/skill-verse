@@ -1,5 +1,11 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.3.3 — 2026-10-15 (candidato)
+- `cargas-combinacoes` 1.3.0: mapa de ações por zona/elemento com unidade, origem, item e checagens explícitas de carga concentrada, paredes, cobertura, garagem, equipamentos e construção. Uso genérico deixa de ser aceito como critério de carga; ações concentradas/lineares não são diluídas na área.
+- Combinações normais com perfil obrigatório na CLI: NBR 6118:2023 + Emenda 1:2026 para concreto ou hipótese geral agrupada da NBR 8681:2025. Corrigida a ponderação por tipo de variável e a exclusão de variáveis favoráveis no ELU; `--gamma-g` isolado não gera mais combinação especial. A diferença entre normas específicas e gerais depende de decisão documentada do projetista.
+- Vento passa da base NBR 6123:1988 para a base 2023: S3 reclassificado (residências usuais no grupo 3), limite de altura de S2 e categoria V corrigidos, fator de vizinhança `fv` exigido para força, faixas de influência sem perda de área. **Recalcule todo resultado antigo de vento e combinações.**
+- **Ainda não liberado:** confrontar a Errata 1:2025 da NBR 6123 (divulgada pela ABNT, não fornecida), confirmar vigência/erratas no Catálogo ABNT, compatibilizar 8681:2025 com 6118:2026 em revisão independente, conferir projetos reais e testar integrações nos softwares.
+
 ## 1.3.2 — 2026-10-15 (candidato)
 - Texto-base NBR 6118:2023 confrontado com a Emenda 1:2026 para os critérios implementados; matrizes de rastreabilidade da base e da emenda documentam cobertura e lacunas sem distribuir os PDFs.
 - **Correção de resistência:** `ηc` passa a reduzir o bloco comprimido e o diagrama de concreto para C45–C90. Recalcular saídas e memoriais gerados antes desta versão nessas classes.

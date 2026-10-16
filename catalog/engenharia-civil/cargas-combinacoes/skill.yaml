@@ -1,9 +1,9 @@
 titulo: Cargas e combinações (NBR 6120 / 6123 / 8681)
 categoria: engenharia-civil
-version: 1.2.0
-resumo: Levanta cargas permanentes e de uso, calcula vento pela NBR 6123 e gera todas as combinações de ELU e ELS com envoltória.
+version: 1.3.0
+resumo: Mapeia ações por ambiente/elemento, calcula vento estático auxiliar e combina efeitos em ELU normal e ELS com perfis normativos explícitos.
 mcps: []
 exemplos:
-  - "Quais cargas uso numa laje de apartamento com piso cerâmico e forro de gesso?"
+  - "Monte o mapa de ações por ambiente: salas, varandas, garagem e cobertura, incluindo cargas concentradas e paredes"
   - "Calcule o vento num prédio de 15 m em Brasília, terreno com casas e prédios baixos"
   - "Monte as combinações de ELU e ELS com G = 120 kN, Q = 45 kN (escritório) e vento ±30 kN"
