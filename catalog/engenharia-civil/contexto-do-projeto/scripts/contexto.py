@@ -76,14 +76,41 @@ def carregar(pasta: str) -> dict:
     f = arq(pasta)
     if not f.is_file():
         sys.exit(f"Ficha não encontrada em {f.parent}. Rode 'iniciar' primeiro.")
-    return json.loads(f.read_text(encoding="utf-8"))
+    ficha = json.loads(f.read_text(encoding="utf-8"))
+    for chave, prefixo in (("fontes", "f"), ("pendencias", "p")):
+        itens = ficha.setdefault(chave, [])
+        for item in itens:
+            if not item.get("id"):
+                item["id"] = proximo_id(itens, prefixo)
+    return ficha
 
 
 def salvar(pasta: str, ficha: dict) -> None:
     f = arq(pasta)
     ficha["atualizado_em"] = dt.date.today().isoformat()
-    f.write_text(json.dumps(ficha, indent=2, ensure_ascii=False), encoding="utf-8")
-    f.with_suffix(".md").write_text(render(ficha), encoding="utf-8")
+    for destino, conteudo in ((f, json.dumps(ficha, indent=2, ensure_ascii=False) + "\n"),
+                              (f.with_suffix(".md"), render(ficha))):
+        temporario = destino.with_name(destino.name + ".tmp")
+        temporario.write_text(conteudo, encoding="utf-8")
+        temporario.replace(destino)
+
+
+def proximo_id(itens: list[dict], prefixo: str) -> str:
+    usados = {str(x.get("id", "")) for x in itens}
+    n = 1
+    while f"{prefixo}{n}" in usados:
+        n += 1
+    return f"{prefixo}{n}"
+
+
+def pendencias_abertas(ficha: dict) -> list[dict]:
+    return [p for p in ficha.get("pendencias", []) if not p.get("resolvida")]
+
+
+def checklist_faltante(ficha: dict) -> list[dict]:
+    atendidos = {x.get("checklist") for x in ficha.get("fontes", [])
+                 if x.get("vigente") == "sim" and x.get("url")}
+    return [c for c in ficha.get("checklist", []) if c["id"] not in atendidos and not c.get("nao_aplica")]
 
 
 def render(f: dict) -> str:
@@ -101,18 +128,32 @@ def render(f: dict) -> str:
               "", "## Fontes normativas encontradas", ""]
     fontes = f.get("fontes", [])
     if fontes:
-        linhas += ["| Esfera | Tipo | Documento | Vigência confirmada | Link | Acesso |", "|---|---|---|---|---|---|"]
+        linhas += ["| ID | Esfera | Tipo | Documento | Vigência confirmada | Link | Acesso |", "|---|---|---|---|---|---|---|"]
         for x in fontes:
             vig = {"sim": "sim", "nao": "não", None: "a confirmar"}.get(x.get("vigente"), "a confirmar")
-            linhas.append(f"| {x['esfera']} | {x['tipo']} | {x['titulo']} | {vig} | {x.get('url') or '—'} | {x['acessado_em']} |")
+            linhas.append(f"| {x.get('id') or '—'} | {x['esfera']} | {x['tipo']} | {x['titulo']} | {vig} | {x.get('url') or '—'} | {x['acessado_em']} |")
     else:
         linhas.append("_Nenhuma fonte registrada ainda._")
-    pend = [p for p in f.get("pendencias", []) if not p.get("resolvida")]
-    atendidos = {x.get("checklist") for x in fontes}
-    faltando = [c for c in f.get("checklist", []) if c["id"] not in atendidos and not c.get("nao_aplica")]
+    requisitos = f.get("requisitos", [])
+    if requisitos:
+        linhas += ["", "## Exigências verificadas", "", "| Critério | Valor | Fonte / item | Impacto |", "|---|---|---|---|"]
+        linhas += [f"| {x['criterio']} | {x.get('valor') or '—'} {x.get('unidade') or ''} | "
+                   f"{x['fonte_id']} / {x['item']} | {x.get('impacto') or '—'} |" for x in requisitos]
+    decisoes = f.get("decisoes", [])
+    if decisoes:
+        linhas += ["", "## Decisões e hipóteses", ""]
+        linhas += [f"- `{x['id']}` {x['assunto']}: {x['decisao']} "
+                   f"(origem: {x['origem']}; {x['registrado_em']})" for x in decisoes]
+    artefatos = f.get("artefatos", [])
+    if artefatos:
+        linhas += ["", "## Artefatos", "", "| Tipo | Caminho | Revisão | Estado |", "|---|---|---|---|"]
+        linhas += [f"| {x['tipo']} | {x['caminho']} | {x.get('revisao') or '—'} | {x['estado']} |"
+                   for x in artefatos]
+    pend = pendencias_abertas(f)
+    faltando = checklist_faltante(f)
     linhas += ["", "## Ainda a pesquisar / confirmar", ""]
     linhas += [f"- [ ] `{c['id']}` ({c['esfera']}) {c['item']}" for c in faltando] or ["- (checklist completo)"]
-    linhas += [f"- [ ] {p['texto']}" for p in pend]
+    linhas += [f"- [ ] `{p.get('id') or '?'}` {p['texto']}" for p in pend]
     return "\n".join(linhas) + "\n"
 
 
@@ -132,7 +173,8 @@ def cmd_iniciar(a) -> int:
     checklist = [{"id": f"c{n}", "esfera": e, "item": i}
                  for n, (e, i) in enumerate(CHECKLIST_BASE + EXTRAS_POR_USO.get(a.uso or "", []), 1)]
     ficha = {"projeto": a.projeto, "municipio": municipio, "uf": uf, "uso": a.uso, "pavimentos": a.pavimentos,
-             "area": a.area, "ambiente": a.ambiente, "caa": caa, "fontes": [], "pendencias": [], "checklist": checklist,
+             "area": a.area, "ambiente": a.ambiente, "caa": caa, "fontes": [], "requisitos": [],
+             "decisoes": [], "artefatos": [], "pendencias": [], "checklist": checklist,
              "criado_em": dt.date.today().isoformat()}
     salvar(a.pasta, ficha)
     print(json.dumps({"ficha": str(f), "municipio": municipio, "uf": uf, "caa": caa,
@@ -142,28 +184,109 @@ def cmd_iniciar(a) -> int:
 
 def cmd_fonte(a) -> int:
     ficha = carregar(a.pasta)
+    if a.vigente == "sim" and not a.url:
+        sys.exit("fonte com vigência confirmada exige URL oficial")
     if a.checklist and a.checklist not in {c["id"] for c in ficha["checklist"]}:
         sys.exit(f"item de checklist '{a.checklist}' não existe")
-    item = {"checklist": a.checklist, "esfera": a.esfera, "tipo": a.tipo, "titulo": a.titulo, "numero": a.numero, "ano": a.ano, "url": a.url,
-            "vigente": a.vigente, "observacao": a.obs, "acessado_em": dt.date.today().isoformat()}
+    anteriores = [x for x in ficha["fontes"] if x["titulo"] == a.titulo and x["esfera"] == a.esfera]
+    item = {"id": (anteriores[0].get("id") if anteriores else None) or proximo_id(ficha["fontes"], "f"),
+            "checklist": a.checklist, "esfera": a.esfera, "tipo": a.tipo, "titulo": a.titulo,
+            "numero": a.numero, "ano": a.ano, "url": a.url, "vigente": a.vigente,
+            "observacao": a.obs, "acessado_em": dt.date.today().isoformat()}
     ficha["fontes"] = [x for x in ficha["fontes"] if not (x["titulo"] == a.titulo and x["esfera"] == a.esfera)] + [item]
     salvar(a.pasta, ficha)
-    print(f"Fonte registrada ({len(ficha['fontes'])} no total).")
+    print(json.dumps({"fonte_id": item["id"], "total": len(ficha["fontes"])}, ensure_ascii=False))
     return 0
 
 
 def cmd_pendencia(a) -> int:
     ficha = carregar(a.pasta)
-    ficha["pendencias"].append({"texto": a.texto, "resolvida": False})
+    pendencias = ficha.setdefault("pendencias", [])
+    item = {"id": proximo_id(pendencias, "p"), "texto": a.texto, "resolvida": False,
+            "responsavel": a.responsavel, "registrado_em": dt.date.today().isoformat()}
+    pendencias.append(item)
     salvar(a.pasta, ficha)
+    print(json.dumps(item, ensure_ascii=False))
+    return 0
+
+
+def cmd_resolver_pendencia(a) -> int:
+    ficha = carregar(a.pasta)
+    for item in ficha.get("pendencias", []):
+        if item.get("id") == a.id:
+            item.update({"resolvida": True, "solucao": a.solucao, "resolvida_em": dt.date.today().isoformat()})
+            salvar(a.pasta, ficha)
+            return 0
+    sys.exit(f"pendência '{a.id}' não encontrada; use 'resumo' para listar IDs")
+
+
+def cmd_requisito(a) -> int:
+    ficha = carregar(a.pasta)
+    fontes = ficha.get("fontes", [])
+    fonte = next((x for x in fontes if x.get("id") == a.fonte), None)
+    if fonte is None or fonte.get("vigente") != "sim" or not fonte.get("url"):
+        sys.exit("requisito exige fonte oficial registrada com URL e vigência confirmada")
+    itens = ficha.setdefault("requisitos", [])
+    item = {"id": proximo_id(itens, "r"), "fonte_id": a.fonte, "item": a.item,
+            "criterio": a.criterio, "valor": a.valor, "unidade": a.unidade,
+            "impacto": a.impacto, "registrado_em": dt.date.today().isoformat()}
+    itens.append(item)
+    salvar(a.pasta, ficha)
+    print(json.dumps(item, ensure_ascii=False))
+    return 0
+
+
+def cmd_decisao(a) -> int:
+    ficha = carregar(a.pasta)
+    itens = ficha.setdefault("decisoes", [])
+    item = {"id": proximo_id(itens, "d"), "assunto": a.assunto, "decisao": a.decisao,
+            "origem": a.origem, "fonte_id": a.fonte, "registrado_em": dt.date.today().isoformat()}
+    if a.fonte and a.fonte not in {x.get("id") for x in ficha.get("fontes", [])}:
+        sys.exit(f"fonte '{a.fonte}' não encontrada")
+    itens.append(item)
+    salvar(a.pasta, ficha)
+    print(json.dumps(item, ensure_ascii=False))
+    return 0
+
+
+def cmd_artefato(a) -> int:
+    ficha = carregar(a.pasta)
+    base = arq(a.pasta).parent
+    caminho = Path(a.caminho)
+    alvo = (base / caminho).resolve()
+    if alvo != base and base not in alvo.parents:
+        sys.exit("artefato deve estar dentro da pasta do projeto")
+    if not alvo.is_file():
+        sys.exit(f"artefato não encontrado: {alvo}")
+    relativo = alvo.relative_to(base).as_posix()
+    itens = ficha.setdefault("artefatos", [])
+    item = {"tipo": a.tipo, "caminho": relativo, "revisao": a.revisao, "estado": a.estado,
+            "registrado_em": dt.date.today().isoformat()}
+    ficha["artefatos"] = [x for x in itens if x.get("caminho") != relativo] + [item]
+    salvar(a.pasta, ficha)
+    print(json.dumps(item, ensure_ascii=False))
+    return 0
+
+
+def cmd_resumo(a) -> int:
+    ficha = carregar(a.pasta)
+    dados = {"projeto": ficha.get("projeto"), "municipio": ficha.get("municipio"), "uf": ficha.get("uf"),
+             "uso": ficha.get("uso"), "caa": ficha.get("caa"), "fontes": ficha.get("fontes", []),
+             "requisitos": ficha.get("requisitos", []), "decisoes": ficha.get("decisoes", []),
+             "artefatos": ficha.get("artefatos", []), "pendencias": pendencias_abertas(ficha),
+             "checklist_faltante": checklist_faltante(ficha), "atualizado_em": ficha.get("atualizado_em")}
+    print(json.dumps(dados, indent=2, ensure_ascii=False))
     return 0
 
 
 def cmd_nao_aplica(a) -> int:
     ficha = carregar(a.pasta)
+    if a.fonte and a.fonte not in {x.get("id") for x in ficha.get("fontes", [])}:
+        sys.exit(f"fonte '{a.fonte}' não encontrada")
     for c in ficha["checklist"]:
         if c["id"] == a.checklist:
             c["nao_aplica"] = a.motivo
+            c["fonte_id"] = a.fonte
             salvar(a.pasta, ficha)
             return 0
     sys.exit(f"item '{a.checklist}' não existe")
@@ -213,13 +336,41 @@ def main(argv=None) -> int:
     p.add_argument("--vigente", choices=["sim", "nao"])
     p.add_argument("--obs")
     p.add_argument("--checklist", help="id do item do checklist que esta fonte atende (ex.: c1)")
+    p = sub.add_parser("requisito")
+    p.add_argument("--pasta", default=".")
+    p.add_argument("--fonte", required=True, help="ID devolvido pelo comando fonte (ex.: f1)")
+    p.add_argument("--item", required=True, help="artigo ou item da fonte")
+    p.add_argument("--criterio", required=True)
+    p.add_argument("--valor")
+    p.add_argument("--unidade")
+    p.add_argument("--impacto")
+    p = sub.add_parser("decisao")
+    p.add_argument("--pasta", default=".")
+    p.add_argument("--assunto", required=True)
+    p.add_argument("--decisao", required=True)
+    p.add_argument("--origem", required=True, choices=["usuario", "projetista", "fonte-oficial", "hipotese"])
+    p.add_argument("--fonte", help="ID da fonte que fundamenta a decisão")
+    p = sub.add_parser("artefato")
+    p.add_argument("--pasta", default=".")
+    p.add_argument("--tipo", required=True)
+    p.add_argument("--caminho", required=True, help="arquivo dentro da pasta do projeto")
+    p.add_argument("--revisao", default="0")
+    p.add_argument("--estado", choices=["rascunho", "em-revisao", "revisado"], default="rascunho")
     p = sub.add_parser("nao-aplica")
     p.add_argument("--pasta", default=".")
     p.add_argument("--checklist", required=True)
     p.add_argument("--motivo", required=True)
+    p.add_argument("--fonte", help="ID da fonte oficial que fundamenta a dispensa")
     p = sub.add_parser("pendencia")
     p.add_argument("--pasta", default=".")
     p.add_argument("--texto", required=True)
+    p.add_argument("--responsavel")
+    p = sub.add_parser("resolver-pendencia")
+    p.add_argument("--pasta", default=".")
+    p.add_argument("--id", required=True)
+    p.add_argument("--solucao", required=True)
+    p = sub.add_parser("resumo")
+    p.add_argument("--pasta", default=".")
     p = sub.add_parser("mostrar")
     p.add_argument("--pasta", default=".")
     p.add_argument("--json", action="store_true")
@@ -228,7 +379,8 @@ def main(argv=None) -> int:
     p.add_argument("--uf")
     a = ap.parse_args(argv)
     return {"iniciar": cmd_iniciar, "fonte": cmd_fonte, "pendencia": cmd_pendencia, "mostrar": cmd_mostrar,
-            "nao-aplica": cmd_nao_aplica,
+            "requisito": cmd_requisito, "decisao": cmd_decisao, "artefato": cmd_artefato,
+            "resolver-pendencia": cmd_resolver_pendencia, "resumo": cmd_resumo, "nao-aplica": cmd_nao_aplica,
             "perfil": cmd_perfil}[a.cmd](a)
 
 

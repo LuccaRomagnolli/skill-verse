@@ -14,7 +14,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, Aco, Concreto, Memoria, cisalhamento_modelo1,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, NORMA_REFERENCIA, STATUS_NORMATIVO,
+                     Aco, Concreto, Memoria, cisalhamento_modelo1,  # noqa: E402
                      escolher_barras, escolher_estribo, flexao_simples, fmt)
 
 
@@ -45,6 +46,7 @@ def main(argv=None) -> int:
     a.caa, origem_caa = caa_do_projeto(a.caa, a.contexto)
     c = COBRIMENTO[a.caa]["viga"]
     mem = Memoria(f"Viga {fmt(a.b,0)}×{fmt(a.h,0)} cm — C{fmt(a.fck,0)}, {a.aco}, CAA {a.caa}")
+    mem.alerta(STATUS_NORMATIVO)
     mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
     checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Cobrimento nominal (Tab. 7.2)", f"c = {c} mm")
@@ -91,6 +93,8 @@ def main(argv=None) -> int:
         mem.add("Estribos sugeridos", cs["estribo"]["texto"])
         res["cisalhamento"] = cs
 
+    res["norma_referencia"] = NORMA_REFERENCIA
+    res["status_normativo"] = "pendente-validacao-2026"
     res["memoria"] = mem.dict()
     if a.formato == "json":
         print(json.dumps(res, indent=2, ensure_ascii=False, default=str))

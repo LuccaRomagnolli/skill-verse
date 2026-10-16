@@ -1,6 +1,6 @@
 titulo: Assistente TQS
 categoria: engenharia-civil
-version: 1.0.0
+version: 1.1.0
 resumo: Orienta o fluxo completo do TQS e automatiza pela API Python oficial (Windows) a leitura e a conferência dos dados do edifício contra a NBR 6118, variantes numa cópia, processamento global em fila, leitura do modelo, conversão para o Revit, exportação de desenhos DXF/PDF e conversões tf↔kN.
 mcps: []
 exemplos:

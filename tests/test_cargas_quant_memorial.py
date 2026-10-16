@@ -139,7 +139,8 @@ def test_memorial_gera_tres_formatos(tmp_path):
     run(EC / "memorial-de-calculo/scripts/gerar_memorial.py", "--projeto",
         str(EC / "memorial-de-calculo/assets/projeto.exemplo.json"), "--resultados", str(res), "--saida", str(out))
     md = (out / "MEMORIAL.md").read_text(encoding="utf-8")
-    assert md.index("7.1. L1") < md.index("V1")
+    assert md.index("7.1. L1") < md.index("7.2. V1")
+    assert "pendente-validacao-2026" in md
     assert "<table>" in (out / "MEMORIAL.html").read_text(encoding="utf-8")
     with zipfile.ZipFile(out / "MEMORIAL.docx") as z:
         assert "word/document.xml" in z.namelist()

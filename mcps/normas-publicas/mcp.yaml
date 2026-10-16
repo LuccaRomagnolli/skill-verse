@@ -31,6 +31,7 @@ servidor:
     NORMAS_DIR: "{SKILLVERSE_HOME}/normas-publicas"
 teste:
   tool_esperada: buscar_normas
+  chamada_leitura: {name: status, arguments: {}}
 pos_instalacao:
   todos:
     - "Já estão no índice as NRs da construção civil (NR-1, 6, 8, 10, 11, 12, 17, 18, 23, 24, 33, 35) e seus manuais oficiais. Normas do DNIT e cadernos do SINAPI são baixados quando o agente precisar."

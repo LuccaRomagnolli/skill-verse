@@ -8,9 +8,11 @@ description: Opera o SOLIDWORKS pelo chat via MCP para peças e montagens de eng
 MCP `solidworks` (ferramentas `solidworks_*`, todas em **mm e graus**). O catálogo completo, com o que **não** existe (desenho 2D, DXF, chapa metálica, soldagem), está em `references/mcp-ferramentas.md`.
 
 ## 1. Antes de modelar
+0. Retome `projeto-contexto.json` com `contexto-do-projeto` → `resumo`; obtenha revisão, cálculo que definiu a peça, material e pendências. Sem origem verificável, trate as dimensões como hipótese para estudo, não como ligação dimensionada.
 1. O SOLIDWORKS precisa estar **aberto** no Windows. `solidworks_list_documents` testa a conexão e mostra o que está aberto. Falha de conexão = SOLIDWORKS fechado ou ainda carregando.
 2. Junte os dados de entrada com o usuário: dimensões, furação, material, perfil pela designação do catálogo (ex.: "W200 × 22,5"). **Não invente medidas** de perfis nem de furação de ligação. Confirme com o catálogo/projeto do usuário (`references/estruturas-metalicas.md`).
 3. Defina onde salvar: pasta do projeto do usuário (caminho absoluto). Sem caminho, o arquivo vai para a pasta `workspace` do servidor.
+4. Antes das chamadas, apresente plano de lotes: documento ativo, sketch/plano, dimensões em mm, features, material, arquivos de saída e critérios de conferência. Salve uma cópia antes de modificar peça existente. Após cada lote, releia features/corpos; não prossiga se aparecer feature falha ou referência perdida.
 
 ## 2. Perfis e chapas (com peso calculado)
 Use `scripts/perfis.py`. Ele gera as chamadas do MCP **e** a área, a massa por metro e o peso, para conferir depois com o SOLIDWORKS:
@@ -29,6 +31,7 @@ Siga o roteiro de `references/boas-praticas-modelagem.md`:
 4. `rename_feature` logo após cada operação. `set_material` (ex.: `ASTM A36 Steel`).
 5. Verificação: `get_body_info`, `look_at_model` (mostre a imagem ao usuário), `get_mass_properties`.
 6. `save_document` com caminho absoluto. Para outro software, `save_document` com `.STEP`.
+7. Reabra ou inspecione o arquivo exportado, compare dimensões e massa calculada com a fonte, e registre SLDPRT/SLDASM/STEP na ficha (`contexto.py artefato`). Se a massa, material, interferência ou aprovação da ligação não estiverem conferidos, registre `pendencia` com responsável.
 
 Para selecionar faces/arestas, use **sempre** pontos devolvidos por `get_faces`/`get_edges`/`find_face`, nunca coordenadas estimadas: a seleção depende da câmera.
 
@@ -49,7 +52,7 @@ Não há ferramenta no MCP. Gere a macro de `references/api-vba.md` (3 vistas no
 - Cargas na peça (reação de apoio, vento) vêm do cálculo: skill `cargas-combinacoes`.
 
 ## Limites e responsabilidade
-- O SOLIDWORKS **não dimensiona** a peça pela NBR 8800:2008 / NBR 14762:2010: o modelo materializa a geometria definida pelo engenheiro. Espessuras, furos, soldas e parafusos são decisão do projetista, que assina como responsável técnico.
+- O SOLIDWORKS **não dimensiona** a peça pela NBR 8800:2024 (corrigida em 2025) nem pela NBR 14762 (confirme a edição vigente no Catálogo ABNT): o modelo materializa a geometria definida pelo engenheiro. Espessuras, furos, soldas e parafusos são decisão do projetista, que assina como responsável técnico.
 - Pesos calculados com cantos vivos são aproximados. Para orçamento de perfis laminados, prefira a massa nominal do catálogo do fabricante.
 - Macros VBA são executadas pelo usuário. Explique o que cada uma faz antes. `close_document` descarta alterações não salvas: confirme antes.
 - Requer Windows com SOLIDWORKS 2022+ aberto e ativado. Sem ele, nenhuma ferramenta funciona.

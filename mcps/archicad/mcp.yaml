@@ -26,6 +26,7 @@ servidor:
   env: {}
 teste:
   tool_esperada: get_project_info
+  chamada_leitura: {name: get_project_info, arguments: {}}
 pos_instalacao:
   todos:
     - "Instale o add-on Tapir (https://github.com/ENZYME-APD/tapir-archicad-automation/releases) para criar elementos, issues e checar IFC."

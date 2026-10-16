@@ -1,6 +1,8 @@
 # Changelog — Pack Engenharia Civil
 
 ## 1.3.0 — 2026-10-15
+- **Candidato à liberação**: 12 skills revisadas para leitura da ficha na retomada, fontes/edições/itens oficiais, decisões, artefatos e pendências persistentes. A referência declarada é NBR 6118:2026; scripts herdados de 2023 exibem status pendente, sem alegar conformidade 2026.
+- As cinco skills de software incluem diagnóstico, plano em lotes, inspeção, salvamento e registro. NBR 8800 atualizada para edição 2024 corrigida em 2025. Instalador sugere só conexões selecionáveis, diferencia handshake de aplicativo operável e protege add-ins do Revit preexistentes/alterados.
 - Nova skill **revit-assistente** + conexão **revit** (mcp-servers-for-revit v1.0.0, MIT): o agente lê e cria
   níveis, eixos, pilares, vigas, lajes, cotas, tags e ambientes no Revit 2020–2026; `lancamento.py` converte o
   cálculo em chamadas com os tipos de seção certos; quantitativos de concreto por nível; IFC; C# com confirmação.
@@ -18,6 +20,7 @@
   (add-in do Revit em `%APPDATA%`, mesclando sem apagar nada) e remoção só do que o pack instalou.
 
 ### Validação pendente no software real (sem máquina Windows nesta versão)
+- [ ] Confrontar cada critério herdado dos scripts com NBR 6118:2023 licenciada e Emenda 1:2026; revisar ATP (item 5.3) e balanços (item 20.6) com responsável técnico. O PDF da emenda não é distribuído.
 - [ ] Revit: add-in carrega em 2024/2025/2026; `verificar` com handshake; `lancamento.py` no exemplo (tipos C#,
       eixos irregulares C#, pilares/vigas/lajes) e marcas; receitas C# de `revit-api-csharp.md` compilam.
 - [ ] SOLIDWORKS: `uv sync` no Windows; chapa de base e perfil I do `perfis.py` com massa < 1% do script;
@@ -25,6 +28,7 @@
 - [ ] TQS: `tqs_ambiente.py` (32/64 bits) em V23/V24/V25; `tqs_edificio.py ler/conferir/aplicar` no
       "Mod-Padrão"; `tqs_processar.py --executar`; `tqs_modelo.py listar/para-revit`; `tqs_dwg.py ler/exportar`.
 - [ ] AutoCAD: `prancha.py` em modo IPC (Windows) e headless; `plot_pdf`.
+- [ ] ArchiCAD 29: conexão, auditoria sem travamento de propriedades, destaque, issues e BCF reimportável.
 
 ## 1.2.0 — 2026-10-15
 - Nova skill **contexto-do-projeto**: ficha do projeto (município, UF, uso, porte, ambiente → classe de agressividade)

@@ -18,7 +18,7 @@
 
 ## Convenções
 - **Marca**: P1, V1, L1 iguais ao cálculo e ao TQS (`marcas_csharp` do `lancamento.py`).
-- **Material**: um material por classe de concreto (`Concreto C30`), com o fck na descrição. A classe vem da ficha do projeto (CAA → classe mínima, NBR 6118:2023, Tab. 7.1) via `contexto-do-projeto`.
+- **Material**: um material por classe de concreto (`Concreto C30`), com o fck na descrição. A classe vem da ficha do projeto; a triagem automática de CAA usa a tabela 7.1 da NBR 6118:2023 e precisa ser confrontada com a referência declarada NBR 6118:2026 antes de aprovação.
 - **Modelo analítico**: o Revit gera, mas o cálculo oficial é do software estrutural (TQS etc.). Não use resultados analíticos do Revit como dimensionamento.
 - **Armaduras** (Rebar) no Revit: possível via C#, mas trabalhoso. O detalhamento oficial costuma sair do TQS. Ofereça apenas se o usuário pedir.
 

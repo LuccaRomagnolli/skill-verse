@@ -18,7 +18,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, ES, Aco, Concreto, Memoria, barras_por_metro,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, ES, NORMA_REFERENCIA, STATUS_NORMATIVO,
+                     Aco, Concreto, Memoria, barras_por_metro,  # noqa: E402
                      flexao_simples, fmt, rho_min)
 from placa import resolver_refinado  # noqa: E402
 
@@ -93,6 +94,7 @@ def main(argv=None) -> int:
     titulo = (f"Laje em balanço L = {fmt(a.balanco)} m" if a.balanco else
               f"Laje {fmt(a.lx)} × {fmt(a.ly)} m, bordas {a.bordas.upper()}")
     mem = Memoria(f"{titulo} — h = {fmt(a.h,0)} cm, C{fmt(a.fck,0)}")
+    mem.alerta(STATUS_NORMATIVO)
     mem.add("Cargas", f"pp = 25·{fmt(a.h/100)} = {fmt(pp)}; p = {fmt(p)} kN/m²; pd = 1,4·p = {fmt(pd)} kN/m²; "
                       f"p,qp = g + ψ2·q = {fmt(pqp)} kN/m²")
     mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}")
@@ -102,6 +104,8 @@ def main(argv=None) -> int:
     d1 = a.h - c / 10 - 0.5  # 1ª camada, φ ≈ 10 mm
 
     if a.balanco:
+        mem.alerta("Laje em balanço: verificar e detalhar também a armadura inferior junto ao apoio "
+                   "prevista no item 20.6 da NBR 6118:2026; este script não a dimensiona.")
         L = a.balanco
         M = pd * L ** 2 / 2
         res["negativo"] = armar("Engaste (negativo)", M, a.h, d1, conc, aco, mem, As_min_neg)
@@ -173,6 +177,8 @@ def main(argv=None) -> int:
         mem.add("Reações nas vigas (característica)", "; ".join(f"{k}: {fmt(v)} kN/m" for k, v in reac.items()))
         res["coeficientes"] = pl
 
+    res["norma_referencia"] = NORMA_REFERENCIA
+    res["status_normativo"] = "pendente-validacao-2026"
     res["memoria"] = mem.dict()
     if a.formato == "json":
         print(json.dumps(res, indent=2, ensure_ascii=False, default=str))

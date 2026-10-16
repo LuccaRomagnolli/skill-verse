@@ -8,6 +8,7 @@ description: Torna o agente proficiente no TQS (software brasileiro de cálculo 
 O TQS não tem MCP. A automação é feita por **scripts Python que usam a API oficial do TQS** (pacote `TQS`, wheel TQSPythonInterface, que vem com o TQS V23 ou mais novo). Ela só roda **no Windows, com o TQS instalado**. Fora disso, a skill orienta o uso da interface e confere arquivos JSON exportados.
 
 ## 1. Sempre primeiro: diagnóstico
+Leia `contexto-do-projeto` → `resumo`, selecione a revisão/variante do edifício e verifique fontes, hipóteses e pendências. Se a ficha não existir, inicie-a. Registre o caminho do edifício e a origem de cargas, materiais e geometria.
 ```bash
 python scripts/tqs_ambiente.py
 ```
@@ -18,6 +19,7 @@ Como os nomes da API mudam entre versões do TQS e esta skill não foi testada e
 python scripts/tqs_ambiente.py --introspectar TQSModel --saida api-tqsmodel.json
 ```
 e use os nomes reais da versão instalada. A síntese da API (módulos, objetos, unidades, padrões) está em `references/tqspy-api.md`.
+Antes de rodar qualquer mutação, apresente plano por lote (edifício de origem, cópia, alterações, unidades, saídas, confirmação e reversão). Depois de cada lote, releia dados e compare com o plano. Salve/exporte resultados e registre os arquivos na ficha com `contexto.py artefato`; lance `pendencia` para avisos e verificações de engenharia não cobertas.
 
 ## 2. Dados do edifício (TQSBuild)
 ```bash
@@ -25,7 +27,7 @@ python scripts/tqs_edificio.py ler --edificio "<nome>" --saida ed.json
 python scripts/tqs_edificio.py conferir --edificio "<nome>"            # ou --json ed.json (fora do Windows)
 ```
 - `ler`: plantas (nome, classe, altura, repetições e **cota calculada**), materiais (CAA, fck), cobrimentos, modelo estrutural (IV/VI, γz/P-Delta), coeficientes dos carregamentos.
-- `conferir`: fck mínimo por CAA (NBR 6118:2023, Tab. 7.1) e cobrimentos mínimos (Tab. 7.2, com Δc = 5 mm se houver controle de qualidade), comparando com a ficha do projeto (`projeto-contexto.json`, skill `contexto-do-projeto`). Mostre a tabela de OK/ALERTA ao usuário.
+- `conferir`: triagem de fck mínimo por CAA e cobrimentos mínimos baseada nas tabelas 7.1 e 7.2 da edição **2023** implementada. A referência declarada é **NBR 6118:2026**, cuja Emenda 1 e texto-base licenciado ainda exigem confronto integral. Mostre OK/ALERTA como triagem, nunca como atestado de conformidade 2026.
 - **Alterar**: só numa cópia, com "sim" do usuário:
   ```bash
   python scripts/tqs_edificio.py aplicar --edificio "<nome>" --dados alt.json --salvar-como "<nome>-C30"
@@ -69,6 +71,6 @@ Fluxo completo do projeto no TQS (o que cada etapa faz, o que conferir, onde a a
 ## Limites e responsabilidade
 - O TQS calcula, e o **engenheiro analisa e assina** (responsável técnico). O agente confere dados de entrada, organiza, automatiza tarefas repetitivas e explica, mas não valida estabilidade global, dimensionamento nem detalhamento.
 - Alterações no edifício são feitas numa **cópia** por padrão. Sobrescrever o original e executar o processamento exigem "sim" explícito.
-- A conferência normativa cobre só itens objetivos (fck mínimo e cobrimentos por CAA, NBR 6118:2023, Tab. 7.1 e 7.2). Normas citadas por número. Nenhum texto de norma ou da documentação do TQS é reproduzido.
+- A conferência normativa cobre só itens objetivos herdados da edição 2023 (fck e cobrimentos por CAA). A aplicabilidade à NBR 6118:2026 continua pendente; verifique também a necessidade de Avaliação Técnica do Projeto e o caso de balanços conforme os itens alterados pela Emenda 1. Normas citadas por número; nenhum texto protegido é reproduzido.
 - A API do TQS varia entre versões. Os scripts toleram diferenças e avisam, mas resultados de leitura devem ser conferidos na interface do TQS na primeira vez em cada versão.
 - Requer Windows com TQS licenciado (V23+). TQS é marca da TQS Informática Ltda. Esta skill não tem vínculo com a empresa.

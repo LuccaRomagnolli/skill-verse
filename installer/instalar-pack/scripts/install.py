@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import glob
+import hashlib
 import html
 import io
 import json
@@ -225,13 +226,17 @@ def detect(pack: dict) -> dict:
     softwares = {}
     for m in pack.get("mcps", []):
         found = detected_paths(m)
+        compativel = osk in m["requisitos"]["so"]
+        utilizavel = bool(found) or bool(m.get("util_sem_software"))
         softwares[m["nome"]] = {
             "titulo": m["titulo"],
             "detectado": bool(found),
             "caminhos": found,
-            "suporta_este_so": osk in m["requisitos"]["so"],
+            "suporta_este_so": compativel,
             "util_sem_software": bool(m.get("util_sem_software")),
             "recomendado": bool(m.get("recomendado")),
+            "selecionavel": compativel and utilizavel,
+            "sugerir_conexao": compativel and utilizavel and (bool(found) or bool(m.get("recomendado"))),
             "descricao": m.get("descricao", ""),
             "opcional": m.get("opcional", True),
             "ferramentas_faltando": ferramentas_faltando(m),
@@ -328,26 +333,43 @@ def versoes_detectadas(m: dict, step: dict, log: Log) -> list[str]:
     return [v for v in achadas if v in suportadas]
 
 
-def extrair_mesclando(data: bytes, dest: Path, ignorar: list[str] | None = None) -> list[str]:
-    """Extrai o zip DENTRO de dest sem apagar o que já existe lá. Devolve os arquivos gravados."""
+def sha256_arquivo(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def extrair_mesclando(data: bytes, dest: Path, ignorar: list[str] | None = None,
+                      hashes_anteriores: dict[str, str] | None = None, escrever: bool = True) -> list[str]:
+    """Extrai no destino sem sobrescrever arquivos alheios ou alterados após a instalação."""
     gravados = []
     base = dest.resolve()
     with zipfile.ZipFile(io.BytesIO(data)) as z:
+        entradas = []
         for info in z.infolist():
             alvo = (dest / info.filename).resolve()
             if base != alvo and base not in alvo.parents:
                 raise RuntimeError(f"zip com caminho fora do destino: {info.filename}")
             if info.is_dir() or info.filename in (ignorar or []):
                 continue
-            alvo.parent.mkdir(parents=True, exist_ok=True)
-            alvo.write_bytes(z.read(info))
+            conteudo = z.read(info)
+            if alvo.exists() and alvo.read_bytes() != conteudo:
+                hash_antigo = (hashes_anteriores or {}).get(str(alvo))
+                if hash_antigo is None or sha256_arquivo(alvo) != hash_antigo:
+                    raise RuntimeError(f"arquivo preexistente ou alterado: {alvo}; mantido sem sobrescrever")
+            entradas.append((alvo, conteudo))
+        for alvo, conteudo in entradas:
+            if alvo.exists() and str(alvo) not in (hashes_anteriores or {}):
+                continue  # arquivo idêntico pré-existente: não passa a pertencer ao pack
+            if escrever:
+                alvo.parent.mkdir(parents=True, exist_ok=True)
+                alvo.write_bytes(conteudo)
             gravados.append(str(alvo))
     return gravados
 
 
-def prepare_mcp(m: dict, log: Log, pack_root: Path) -> dict:
+def prepare_mcp(m: dict, log: Log, pack_root: Path, hashes_anteriores: dict[str, str] | None = None,
+                pastas_anteriores: list[str] | None = None) -> dict:
     """Executa o preparo. Devolve {'arquivos': [...], 'pastas_base': [...]} do que foi extraído fora do MCP_DIR."""
-    criados: dict[str, list[str]] = {"arquivos": [], "pastas_base": []}
+    criados: dict = {"arquivos": [], "pastas_base": [], "pastas_mcp": [], "hashes": {}}
     for step in subst(m.get("preparo") or [], ctx()):
         if "copiar_do_pack" in step:
             src, dest = pack_root / step["copiar_do_pack"], Path(step["destino"])
@@ -360,6 +382,8 @@ def prepare_mcp(m: dict, log: Log, pack_root: Path) -> dict:
                         shutil.copy2(f, alvo)
         elif "baixar_zip" in step:
             dest = Path(step["destino"])
+            if dest.exists() and str(dest.resolve()) not in (pastas_anteriores or []):
+                raise RuntimeError(f"pasta MCP preexistente sem registro de propriedade: {dest}; preservada")
             log.passo(f"baixar {step['baixar_zip']} → {dest}")
             if log.simular:
                 continue
@@ -373,15 +397,23 @@ def prepare_mcp(m: dict, log: Log, pack_root: Path) -> dict:
                 if dest.exists():
                     shutil.rmtree(dest)
                 shutil.move(str(src), str(dest))
+                criados["pastas_mcp"].append(str(dest.resolve()))
         elif "extrair_zip" in step:
             # complemento por versão do software (ex.: add-in do Revit em %APPDATA%/Autodesk/Revit/Addins/<ano>)
+            downloads = []
             for v in versoes_detectadas(m, step, log):
                 url = step["extrair_zip"].replace("{VERSAO}", v)
                 dest = Path(step["destino"].replace("{VERSAO}", v))
                 log.passo(f"baixar {url} → {dest} (mesclando)")
                 if log.simular:
                     continue
-                criados["arquivos"] += extrair_mesclando(baixar_url(url), dest, step.get("ignorar"))
+                data = baixar_url(url)
+                extrair_mesclando(data, dest, step.get("ignorar"), hashes_anteriores, escrever=False)
+                downloads.append((data, dest))
+            for data, dest in downloads:
+                novos = extrair_mesclando(data, dest, step.get("ignorar"), hashes_anteriores)
+                criados["arquivos"] += novos
+                criados["hashes"].update({p: sha256_arquivo(Path(p)) for p in novos})
                 criados["pastas_base"].append(str(dest.resolve()))
         elif "comando" in step:
             cmd = list(step["comando"])
@@ -396,6 +428,9 @@ def remover_extraidos(reg: dict, log: Log) -> None:
     for f in reg.get("arquivos", []):
         p = Path(f)
         if p.is_file():
+            if sha256_arquivo(p) != reg.get("hashes", {}).get(f):
+                log.aviso(f"mantido arquivo modificado ou sem registro de integridade: {p}")
+                continue
             log.passo(f"remover {p}")
             if log.simular:
                 continue
@@ -472,8 +507,8 @@ def unregister_codex_mcp(nome: str, log: Log) -> None:
 
 # ---------------------------------------------------------------- MCP handshake
 
-def mcp_handshake(srv: dict, timeout: float = 180.0) -> dict:
-    """Inicia o servidor stdio, faz initialize + tools/list e devolve os nomes das tools."""
+def mcp_handshake(srv: dict, timeout: float = 180.0, probe: dict | None = None) -> dict:
+    """Inicia o servidor, lista tools e chama uma operação de leitura quando configurada."""
     env = {**os.environ, **srv["env"]}
     try:
         p = subprocess.Popen([srv["command"], *srv["args"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -516,7 +551,29 @@ def mcp_handshake(srv: dict, timeout: float = 180.0) -> dict:
         send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
         tl = wait(2)
         tools = [t["name"] for t in (tl or {}).get("result", {}).get("tools", [])]
-        return {"ok": bool(tools), "servidor": init["result"].get("serverInfo", {}), "tools": tools}
+        resultado = {"ok": bool(tools), "servidor": init["result"].get("serverInfo", {}), "tools": tools}
+        if probe:
+            nome = probe["name"]
+            if nome not in tools:
+                resultado["aplicativo"] = {"ok": False, "erro": f"tool de diagnóstico '{nome}' ausente"}
+            else:
+                send({"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+                      "params": {"name": nome, "arguments": probe.get("arguments", {})}})
+                resposta = wait(3)
+                if not resposta or "result" not in resposta:
+                    resultado["aplicativo"] = {"ok": False, "erro": "operação de leitura sem resposta"}
+                else:
+                    dados = resposta["result"]
+                    conteudo = " ".join(str(c.get("text", "")) for c in dados.get("content", []) if isinstance(c, dict))
+                    modo = "headless" if probe.get("permite_headless") and "ezdxf" in conteudo.lower() else "software"
+                    falhou = bool(dados.get("isError"))
+                    try:
+                        obj = json.loads(conteudo)
+                        falhou = falhou or obj.get("connected") is False or obj.get("is_connected") is False
+                    except (ValueError, AttributeError):
+                        pass
+                    resultado["aplicativo"] = {"ok": not falhou, "modo": modo, "resumo": conteudo[:500]}
+        return resultado
     finally:
         p.kill()
 
@@ -536,6 +593,7 @@ def parse_list(s: str | None) -> list[str]:
 def cmd_instalar(args) -> int:
     root = find_pack_root(args.pack)
     pack = load_pack(root)
+    anterior = load_state()["packs"].get(pack["id"], {})
     log = Log(args.simular)
     plataformas = ["claude", "codex"] if args.plataforma == "ambas" else [args.plataforma]
     mcps_by_name = {m["nome"]: m for m in pack.get("mcps", [])}
@@ -549,6 +607,8 @@ def cmd_instalar(args) -> int:
 
     print(f"Instalando {pack['nome']} v{pack['version']} em: {', '.join(plataformas)}")
     dest = sv_home() / "packs" / pack["id"]
+    if dest.exists() and (not anterior or Path(anterior.get("pasta", "")).resolve() != dest.resolve()):
+        sys.exit(f"destino preexistente sem registro deste pack: {dest}; preservado")
     log.passo(f"copiar pack → {dest}")
     if not log.simular and root.resolve() != dest.resolve():
         copy_tree(root, dest)
@@ -575,11 +635,22 @@ def cmd_instalar(args) -> int:
             log.aviso(f"{m['titulo']}: falta {', '.join(faltam)} — " + "; ".join(COMO_INSTALAR.get(f, f) for f in faltam))
             continue
         try:
-            criados = prepare_mcp(m, log, installed_root)
+            criados = prepare_mcp(m, log, installed_root,
+                                 anterior.get("mcps", {}).get(n, {}).get("hashes", {}),
+                                 anterior.get("mcps", {}).get(n, {}).get("pastas_mcp", []))
             srv = resolve_server(m)
             reg = {"servidor": srv, "plataformas": []}
             if criados["arquivos"]:
                 reg.update(criados)
+            elif criados.get("pastas_mcp"):
+                reg["pastas_mcp"] = criados["pastas_mcp"]
+            velho = anterior.get("mcps", {}).get(n, {})
+            if velho.get("arquivos"):
+                reg["arquivos"] = list(dict.fromkeys(velho["arquivos"] + reg.get("arquivos", [])))
+                reg["hashes"] = {**velho.get("hashes", {}), **reg.get("hashes", {})}
+                reg["pastas_base"] = list(dict.fromkeys(velho.get("pastas_base", []) + reg.get("pastas_base", [])))
+            if velho.get("pastas_mcp"):
+                reg["pastas_mcp"] = list(dict.fromkeys(velho["pastas_mcp"] + reg.get("pastas_mcp", [])))
             if m.get("dados"):
                 reg["dados"] = subst(m["dados"], ctx())
             if "claude" in plataformas and register_claude_mcp(n, srv, log):
@@ -636,10 +707,13 @@ def cmd_verificar(args) -> int:
     for nome, r in reg["mcps"].items():
         if args.sem_mcp:
             continue
-        res = mcp_handshake(r["servidor"], timeout=args.timeout)
-        esperada = (mcps.get(nome, {}).get("teste") or {}).get("tool_esperada")
+        teste = mcps.get(nome, {}).get("teste") or {}
+        res = mcp_handshake(r["servidor"], timeout=args.timeout, probe=teste.get("chamada_leitura"))
+        esperada = teste.get("tool_esperada")
         if res.get("ok") and esperada and esperada not in res["tools"]:
             res = {**res, "ok": False, "erro": f"tool '{esperada}' não encontrada"}
+        if res.get("aplicativo") and not res["aplicativo"]["ok"]:
+            res["ok"] = False
         res["tools"] = len(res.get("tools", []))
         out["mcps"][nome] = res
     out["ok"] = all(v["ok"] for v in out["skills"].values()) and all(v["ok"] for v in out["mcps"].values())
@@ -811,15 +885,18 @@ def cmd_desinstalar(args) -> int:
         if "codex" in r["plataformas"]:
             unregister_codex_mcp(nome, log)
         remover_extraidos(r, log)
-        if r.get("dados") and Path(r["dados"]).is_dir():
-            log.passo(f"remover {r['dados']}")
-            if not log.simular:
-                shutil.rmtree(r["dados"], ignore_errors=True)
-        d = mcp_dir()
-        for leftover in d.glob(f"{nome}*") if d.is_dir() else []:
-            log.passo(f"remover {leftover}")
-            if not log.simular:
-                shutil.rmtree(leftover)
+        if r.get("dados") and Path(r["dados"]).exists():
+            log.aviso(f"mantidos dados e documentos locais: {r['dados']}")
+        d = mcp_dir().resolve()
+        for caminho in r.get("pastas_mcp", []):
+            leftover = Path(caminho).resolve()
+            if leftover == d or d not in leftover.parents:
+                log.aviso(f"destino MCP fora da pasta gerenciada, mantido: {leftover}")
+                continue
+            if leftover.is_dir():
+                log.passo(f"remover MCP baixado em {leftover}")
+                if not log.simular:
+                    shutil.rmtree(leftover)
     pasta = Path(reg["pasta"])
     if pasta.is_dir():
         log.passo(f"remover {pasta}")
@@ -832,7 +909,7 @@ def cmd_desinstalar(args) -> int:
             if d.is_dir() and not any(d.iterdir()):
                 d.rmdir()
     print("Desinstalado." if not log.simular else "Simulação concluída.")
-    print(f"Mantidos (seus arquivos): manual em {sv_home() / pack['id']} e regras personalizáveis em {sv_home()}.")
+    print(f"Mantidos (seus arquivos): manual, regras personalizáveis e documentos locais em {sv_home()}.")
     return 0
 
 

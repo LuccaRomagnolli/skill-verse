@@ -31,6 +31,7 @@ servidor:
     windows: {command: cmd, args: ["/c", "npx", "-y", "mcp-server-for-revit@1.0.0"]}
 teste:
   tool_esperada: get_current_view_info
+  chamada_leitura: {name: get_current_view_info, arguments: {}}
 pos_instalacao:
   windows:
     - "Abra o Revit. Na mensagem de segurança do complemento 'mcp-servers-for-revit', clique em 'Sempre carregar'."

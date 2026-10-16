@@ -1,13 +1,14 @@
 ---
 name: relatorio-tecnico
-description: Redige e formata documentos técnicos de engenharia — relatório técnico, laudo de vistoria/perícia (NBR 13752), parecer técnico e relatório de inspeção predial (NBR 16747) — com estrutura normativa, tabela de constatações, fotos numeradas com legenda, e entrega em Word (.docx editável) e HTML pronto para PDF. Use quando o usuário pedir "laudo", "relatório técnico", "parecer técnico", "inspeção predial", "relatório de vistoria", "relatório fotográfico" ou quiser transformar anotações e fotos de campo em documento.
+description: Organiza evidências de vistoria e redige relatório, laudo, parecer ou inspeção predial com fotos, constatações, fontes e pendências, gerando DOCX e HTML. Use quando pedirem laudo, parecer, relatório técnico ou transformação de anotações e fotos de campo em documento.
 ---
 
 # Relatórios e laudos técnicos
 
 ## Fluxo
+Se houver `projeto-contexto.json`, comece com `contexto-do-projeto` → `resumo`: confira endereço, município/UF, revisão, fontes oficiais e pendências. Em trabalho isolado, confirme esses dados diretamente com o usuário.
 1. **Tipo de documento**: identifique (relatório, laudo, parecer, inspeção predial) e use a estrutura de `references/modelos.md`. Se não estiver claro, pergunte qual o objetivo e quem vai ler (cliente, juiz, condomínio, prefeitura).
-2. **Coleta**: peça o que faltar, de uma vez — identificação (solicitante, endereço, data), anotações de campo, medições, fotos (caminhos dos arquivos) e o responsável técnico. Não invente medições, datas, registros profissionais ou números de ART: deixe `[preencher]`.
+2. **Coleta**: peça o que faltar, de uma vez — identificação (solicitante, endereço, data), anotações de campo, medições com unidade e método, fotos (caminhos dos arquivos) e responsável técnico. Identifique quem observou cada fato e quando. Não invente medições, datas, registros profissionais ou números de ART: deixe `[preencher]`.
 3. **Redação**: escreva o `.md` (cabeçalho de metadados + seções; partida em `assets/laudo.exemplo.md`).
    - Uma linha de constatação por anomalia, com local inequívoco e medida.
    - Fotos: `![legenda descritiva](fotos/arquivo.jpg)`, caminho relativo ao `.md`. Cite as figuras no texto.
@@ -18,7 +19,8 @@ description: Redige e formata documentos técnicos de engenharia — relatório 
    python3 scripts/gerar_relatorio.py caminho/laudo.md --saida caminho/saida/
    ```
    Saídas: `.docx` (edição final no Word/Google Docs, fotos embutidas) e `.html` (abrir no navegador → Imprimir → PDF A4).
-5. **Revisão**: liste os `[preencher]` pendentes e as afirmações que dependem de confirmação do responsável.
+5. **Revisão**: liste os `[preencher]` pendentes, verifique se cada foto corresponde ao local descrito e se cada conclusão é sustentada por evidência. Separe fato observado, hipótese causal e recomendação; opinião não vira constatação medida.
+6. **Continuidade**: registre `.md`, `.docx` e `.html` com `contexto.py artefato --tipo relatorio --estado em-revisao` quando houver ficha; registre lacunas de vistoria e ensaios com `pendencia`. Só marque `revisado` após o profissional conferir e assumir as conclusões.
 
 Quando o documento tratar de segurança do trabalho, canteiro, trabalho em altura, espaço confinado ou de critérios de obras rodoviárias, e o MCP `normas-publicas` estiver conectado, fundamente as constatações com a skill `consulta-normas`: cite o item literal da NR/DNIT e a página. Isso dá força técnica ao laudo.
 

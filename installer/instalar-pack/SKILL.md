@@ -19,7 +19,7 @@ Se o Python não existir ou for < 3.10, oriente a instalação (python.org) e pa
 
 ## 2. Perguntas (uma mensagem só)
 1. **Onde instalar**: só aqui (a plataforma atual) ou também na outra (`claude`, `codex`, `ambas`). Padrão: a atual.
-2. **Quais softwares conectar**: liste cada item de `softwares` com o status detectado. Recomende conectar os detectados e os marcados com `recomendado: true` (ex.: índice de normas públicas, que não depende de software, só de internet; use a `descricao` para explicar). Para os não detectados, ofereça só se `util_sem_software` for true (explique o que funciona sem o software). Não ofereça os que `suporta_este_so` é false.
+2. **Quais softwares conectar**: liste cada item de `softwares` com o status detectado. Recomende somente `sugerir_conexao: true`; ofereça como opcional apenas `selecionavel: true`. Explique quando `util_sem_software` significar modo limitado (AutoCAD headless só DXF). Não ofereça `selecionavel: false` como operável neste computador.
 3. Pergunte **como ele trabalha** (ex.: tipo de projeto, escritório/autônomo, normas que mais usa) — uma linha basta. Isso vai personalizar o manual.
 4. Pergunte **em qual município/UF ele mais atua**. Vira o padrão das fichas de projeto: o agente usa o município para pesquisar código de obras, Corpo de Bombeiros e concessionárias, e sempre confirma o da obra em cada projeto novo. Grave:
    ```bash
@@ -50,7 +50,7 @@ Resuma o que vai acontecer e peça confirmação. Então rode sem `--simular`.
 ```bash
 python3 scripts/install.py verificar
 ```
-A primeira verificação dos MCPs pode levar alguns minutos (baixa dependências). Se um MCP falhar porque o software não está aberto, isso é normal: diga que funciona quando ele abrir o programa.
+A primeira verificação dos MCPs pode levar alguns minutos (baixa dependências). Leia separadamente `servidor`, `tools` e `aplicativo`: handshake não prova software operável. Se a leitura do aplicativo falhar, abra o software/projeto, ative o add-in e repita. AutoCAD `modo: headless` só prova o backend DXF. TQS não é MCP: rode o diagnóstico da skill TQS no Windows. Anote testes reais ainda não feitos como pendência, sem prometer que a conexão funciona.
 
 ## 6. Manual personalizado
 Escreva um arquivo temporário `para-voce.md` começando com `## Para você`, com 3–5 sugestões de uso ligadas ao que o usuário contou nos passos 2.3 e 2.4. Use os exemplos das skills, adaptados ao trabalho dele, e cite as skills pelo nome. Depois:
@@ -61,6 +61,7 @@ O script gera `MANUAL.md` e `MANUAL.html` (abre em qualquer navegador e imprime 
 
 ## 7. Encerramento
 - Liste os **passos manuais** que o script imprimiu (ex.: carregar o arquivo LISP no AutoCAD, instalar o add-on Tapir, ligar o serviço MCP no Revit) como checklist.
+- Faça um teste de leitura no software aberto para cada conexão escolhida e, com autorização, um teste pequeno de escrita + inspeção do arquivo no aplicativo. Se não houver programa/licença, mantenha esse teste pendente.
 - Diga para **reiniciar o Claude Code/Codex** para as skills aparecerem.
 - Sugira um primeiro pedido de teste tirado do manual.
 

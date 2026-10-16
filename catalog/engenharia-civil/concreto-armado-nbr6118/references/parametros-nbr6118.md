@@ -1,6 +1,6 @@
-# Parâmetros usados pelos scripts (NBR 6118:2023)
+# Parâmetros implementados nos scripts (base NBR 6118:2023)
 
-> Valores implementados em `scripts/nbr6118.py`. Use esta página para explicar a origem de cada número ao usuário. Em caso de divergência com a norma em mãos, a norma prevalece: avise o autor do pack.
+> Referência declarada do projeto: NBR 6118:2026. Os valores abaixo refletem a implementação herdada de 2023 e **não foram auditados integralmente** contra o texto-base licenciado e a Emenda 1 de 2026. Use esta página para explicar a origem de cada número, não para declarar conformidade. Em caso de divergência com a norma em mãos, suspenda o uso do resultado, registre pendência e peça revisão ao responsável técnico.
 
 ## Materiais
 | Grandeza | Expressão | Item |
@@ -54,3 +54,7 @@ VRd2 = 0,27·αv2·fcd·bw·d, αv2 = 1 − fck/250 · Vc = 0,6·fctd·bw·d (fl
 - Flexão oblíqua: (MRd,x/MRd,xx)^1,2 + (MRd,y/MRd,yy)^1,2 ≤ 1 — 17.2.5.2. Envoltória mínima de 2ª ordem: elipse com semieixos Md,tot,mín,x e Md,tot,mín,y — 11.3.3.4.3.
 - Seção: integração por fibras com diagrama parábola-retângulo, domínios 2 a 5.
 - Pré-dimensionamento: Ac = α·1,4·Nk/(0,85·fcd + 0,015·420), α = 1,3 (intermediário), 1,5 (extremidade), 1,8 (canto) — estimativa empírica de uso corrente no ensino.
+
+## Emenda 1 de 2026 — verificações ainda não automatizadas
+- Item 5.3: determinar a necessidade de Avaliação Técnica do Projeto por profissional independente e registrar parecer/escopo quando aplicável.
+- Item 20.6: conferir armadura inferior de balanços sob a condição tratada pela emenda. O alerta do script de laje não calcula essa verificação.

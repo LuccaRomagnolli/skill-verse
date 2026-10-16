@@ -1,6 +1,6 @@
 titulo: Assistente Revit
 categoria: engenharia-civil
-version: 1.0.0
+version: 1.1.0
 resumo: Opera o Revit pelo chat (níveis, eixos, pilares, vigas, lajes, cotas, tags, ambientes), lança a estrutura a partir do cálculo com os tipos certos, extrai quantitativos de concreto, colore elementos para revisão, exporta IFC e roda C# da Revit API com confirmação.
 mcps: [revit]
 exemplos:

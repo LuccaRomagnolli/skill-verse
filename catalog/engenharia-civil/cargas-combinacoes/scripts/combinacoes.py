@@ -98,7 +98,9 @@ def combinar(acoes: list[dict], gamma_g: tuple[float, float] | None = None) -> d
                 uniq.append(item)
         out[k] = uniq
     resumo = {k: {"max": max(i["valor"] for i in v), "min": min(i["valor"] for i in v)} for k, v in out.items() if v}
-    return {"combinacoes": out, "envoltoria": resumo}
+    return {"norma_base_calculo": "ABNT NBR 8681:2003 / ABNT NBR 6118:2023",
+            "status_normativo": "edicao-vigente-pendente-validacao",
+            "combinacoes": out, "envoltoria": resumo}
 
 
 def main(argv=None) -> int:
@@ -122,6 +124,8 @@ def main(argv=None) -> int:
     print("\n**Envoltória**\n")
     for k, v in r["envoltoria"].items():
         print(f"- {k.replace('_', ' ')}: máx {v['max']:.2f} · mín {v['min']:.2f}")
+    print("\n_Cálculo auxiliar com coeficientes das edições implementadas; confira os coeficientes "
+          "nas edições vigentes antes de usar no projeto._")
     return 0
 
 

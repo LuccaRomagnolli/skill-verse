@@ -21,10 +21,10 @@ import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-NORMAS_BASE = ["ABNT NBR 6118:2023 — Projeto de estruturas de concreto",
+NORMAS_BASE = ["ABNT NBR 6118:2026 — referência para a revisão técnica (2023 + Emenda 1:2026)",
                "ABNT NBR 6120:2019 — Ações para o cálculo de estruturas de edificações",
-               "ABNT NBR 8681:2003 — Ações e segurança nas estruturas"]
-NORMA_VENTO = "ABNT NBR 6123:1988 — Forças devidas ao vento em edificações"
+               "ABNT NBR 8681 — confirmar edição aplicável e coeficientes"]
+NORMA_VENTO = "ABNT NBR 6123 — confirmar edição aplicável e parâmetros"
 
 
 # ------------------------------------------------------------------ montagem do conteúdo (blocos)
@@ -47,6 +47,17 @@ def blocos(projeto: dict, resultados: list[tuple[str, dict]], contexto: dict | N
         normas.append(NORMA_VENTO)
     normas += p.get("normas_extras", [])
     B += [("h", 1, "3. Normas técnicas"), ("ul", normas)]
+    pendentes = [(nome, r.get("norma_base_calculo"), r.get("status_normativo") or "sem validação registrada")
+                for nome, r in resultados if r.get("status_normativo") != "validado"]
+    if pendentes:
+        B.append(("p", "Situação normativa: os resultados abaixo são auxiliares e exigem confronto "
+                       "com as edições vigentes antes da revisão e assinatura do projeto."))
+        B.append(("table", ["Resultado", "Base implementada", "Situação"],
+                  [[nome, base or "NBR 6118:2023", situacao] for nome, base, situacao in pendentes]))
+    atp = p.get("avaliacao_tecnica") or {}
+    B.append(("p", "Avaliação técnica independente do projeto (NBR 6118:2026, item 5.3): "
+                   + (atp.get("situacao") or "aplicabilidade e parecer ainda não registrados pelo responsável técnico")
+                   + (f"; parecer: {atp['parecer']}" if atp.get("parecer") else "") + "."))
     fontes = [f for f in ctx.get("fontes", []) if f.get("esfera") != "abnt"]
     if fontes:
         B.append(("p", f"Legislação e normas locais consultadas ({local}):"))

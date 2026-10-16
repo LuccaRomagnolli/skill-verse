@@ -1,6 +1,6 @@
 titulo: Memorial de cálculo
 categoria: engenharia-civil
-version: 1.1.0
+version: 1.2.0
 resumo: Monta o memorial de cálculo estrutural (Word editável, PDF/HTML e Markdown) a partir dos resultados das skills de cálculo, no formato aceito por prefeituras e clientes.
 mcps: []
 exemplos:

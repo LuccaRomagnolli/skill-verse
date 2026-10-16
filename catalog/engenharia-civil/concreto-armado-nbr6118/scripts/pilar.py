@@ -20,7 +20,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, Aco, Concreto, Memoria, camadas_retangulo,  # noqa: E402
+from nbr6118 import (caa_do_projeto, checar_durabilidade, COBRIMENTO, NORMA_REFERENCIA, STATUS_NORMATIVO,
+                     Aco, Concreto, Memoria, camadas_retangulo,  # noqa: E402
                      fmt, momento_resistente)
 
 POSICAO = {"intermediario": 1.3, "extremidade": 1.5, "canto": 1.8}
@@ -160,7 +161,9 @@ def main(argv=None) -> int:
         sigma = 0.85 * conc.fcd + 0.015 * 420  # MPa, ρ = 1,5 %, σs(2‰) ≈ 420 MPa
         Ac = alfa * 1.4 * Nk * 1e3 / sigma / 100  # cm²
         lado = max(19.0, math.ceil(math.sqrt(Ac) / 5) * 5)
-        out = {"Ac_cm2": Ac, "posicao": a.posicao, "alfa": alfa, "sugestao": f"{lado:g} × {max(lado, math.ceil(Ac/lado/5)*5):g} cm"}
+        out = {"Ac_cm2": Ac, "posicao": a.posicao, "alfa": alfa,
+               "sugestao": f"{lado:g} × {max(lado, math.ceil(Ac/lado/5)*5):g} cm",
+               "norma_referencia": NORMA_REFERENCIA, "status_normativo": "pendente-validacao-2026"}
         if a.formato == "json":
             print(json.dumps(out, indent=2, ensure_ascii=False))
         else:
@@ -182,6 +185,7 @@ def main(argv=None) -> int:
     Ac = a.bx * a.by
     nu = Nd * 1e3 / (Ac * 100 * conc.fcd)
     mem = Memoria(f"Pilar {fmt(a.bx,0)}×{fmt(a.by,0)} cm — C{fmt(a.fck,0)}, {a.aco}, CAA {a.caa}")
+    mem.alerta(STATUS_NORMATIVO)
     mem.add("Classe de agressividade", f"CAA {a.caa} — {origem_caa}; cobrimento {c} mm (Tab. 7.2)")
     checar_durabilidade(a.fck, a.caa, mem)
     mem.add("Esforço normal", f"Nd = γn·γf·Nk = {fmt(gn,2)}·{fmt(Nd/gn)} = {fmt(Nd)} kN; ν = Nd/(Ac·fcd) = {fmt(nu,3)}")
@@ -219,6 +223,8 @@ def main(argv=None) -> int:
             res["estribos"] = {"phi_mm": phi_t, "s_cm": s_t / 10}
         else:
             mem.alerta(f"Nenhuma bitola ≤ b/8 atende com {n_total} barras: aumente --barras-face.")
+    res["norma_referencia"] = NORMA_REFERENCIA
+    res["status_normativo"] = "pendente-validacao-2026"
     res["memoria"] = mem.dict()
     if a.formato == "json":
         print(json.dumps(res, indent=2, ensure_ascii=False, default=str))

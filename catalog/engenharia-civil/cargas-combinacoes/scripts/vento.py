@@ -77,7 +77,8 @@ def main(argv=None) -> int:
             area = a.largura * (h_inf + h_sup) / 2
             linha["F_kN"] = a.Ca * q * area
         linhas.append(linha)
-    res = {"V0": a.V0, "S1": a.S1, "categoria": a.categoria, "classe": classe, "S3": s3,
+    res = {"norma_base_calculo": "ABNT NBR 6123:1988", "status_normativo": "edicao-vigente-pendente-validacao",
+           "V0": a.V0, "S1": a.S1, "categoria": a.categoria, "classe": classe, "S3": s3,
            "S3_grupo": S3_TXT[a.S3_grupo], "cotas": linhas}
     if a.formato == "json":
         print(json.dumps(res, indent=2, ensure_ascii=False))
@@ -93,7 +94,8 @@ def main(argv=None) -> int:
         print(f"| {l['z']:.2f} | {l['S2']:.3f} | {l['Vk']:.2f} | {l['q_kN_m2']:.3f} |{extra}")
     if a.Ca and a.largura:
         print(f"\nForça por nível: F = Ca·q·Ae, Ca = {a.Ca}, largura {a.largura} m, área de influência meia altura acima/abaixo.")
-    print("\n_Confira V0 no mapa de isopletas e se há revisão vigente da NBR 6123 para o seu projeto._")
+    print("\n_Cálculo auxiliar implementado a partir da edição 1988. Não aplicar ao projeto atual sem "
+          "conferir integralmente a edição vigente, inclusive V0, fatores e coeficientes._")
     return 0
 
 

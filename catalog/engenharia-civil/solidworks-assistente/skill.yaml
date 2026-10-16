@@ -1,6 +1,6 @@
 titulo: Assistente SOLIDWORKS
 categoria: engenharia-civil
-version: 1.0.0
+version: 1.1.0
 resumo: Modela no SOLIDWORKS pelo chat peças e montagens metálicas de obra (chapas de base, ligações, perfis, insertos, suportes, fôrmas), com peso de aço calculado e conferido, variações por configuração, interferência, STEP e macros para folha de desenho, PDF e DXF de corte.
 mcps: [solidworks]
 exemplos:

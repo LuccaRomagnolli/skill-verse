@@ -1,4 +1,4 @@
-"""Núcleo de cálculo de concreto armado — ABNT NBR 6118:2023 (somente biblioteca padrão).
+"""Núcleo de cálculo de concreto armado — parâmetros implementados da ABNT NBR 6118:2023.
 
 Unidades internas: N e mm (MPa = N/mm²). As funções públicas recebem/devolvem
 as unidades indicadas nos docstrings (cm, kN, kN·m, cm²).
@@ -13,6 +13,9 @@ from pathlib import Path
 GAMMA_C = 1.4
 GAMMA_S = 1.15
 ES = 210_000.0  # MPa
+NORMA_REFERENCIA = "ABNT NBR 6118:2026 (NBR 6118:2023 + Emenda 1:2026)"
+STATUS_NORMATIVO = ("Cálculo auxiliar baseado nos critérios implementados da edição 2023; "
+                    "confronto integral com a edição 2026 pendente. Não usar como verificação final de projeto.")
 
 ACOS = {"CA-25": 250.0, "CA-50": 500.0, "CA-60": 600.0}
 

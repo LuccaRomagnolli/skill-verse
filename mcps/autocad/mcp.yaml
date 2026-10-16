@@ -30,6 +30,7 @@ servidor:
     linux: {env: {AUTOCAD_MCP_BACKEND: ezdxf}}
 teste:
   tool_esperada: system
+  chamada_leitura: {name: system, arguments: {operation: status}, permite_headless: true}
 pos_instalacao:
   windows:
     - "Abra o AutoCAD LT e digite APPLOAD."

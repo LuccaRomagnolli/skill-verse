@@ -69,12 +69,30 @@ def test_ciclo_codex(pacote, home):
     assert r.returncode == 0, r.stderr
     md = (home / "SkillVerse/engenharia-civil/MANUAL.md").read_text(encoding="utf-8")
     assert "Codex `$concreto-armado-nbr6118`" in md and "{{" not in md
+    assert "Seu primeiro projeto guiado" in md and "NBR 6118:2026" in md
     assert "<table>" in (home / "SkillVerse/engenharia-civil/MANUAL.html").read_text(encoding="utf-8")
 
     r = cli(pacote, "desinstalar")
     assert r.returncode == 0
     assert not (skills / "concreto-armado-nbr6118").exists()
     assert not (home / "SkillVerse/packs").exists()
+
+
+def test_ciclo_ambas_plataformas_com_atualizacao(pacote, home):
+    r = cli(pacote, "instalar", "--plataforma", "ambas", "--sem-plugin")
+    assert r.returncode == 0, r.stderr
+    for pasta in (home / ".claude/skills", home / ".codex/skills"):
+        assert (pasta / "contexto-do-projeto/SKILL.md").is_file()
+    r = cli(pacote, "verificar", "--sem-mcp")
+    assert r.returncode == 0 and json.loads(r.stdout)["ok"]
+    r = cli(pacote, "atualizar")
+    assert r.returncode == 0, r.stderr
+    r = cli(pacote, "verificar", "--sem-mcp")
+    assert r.returncode == 0 and json.loads(r.stdout)["ok"]
+    r = cli(pacote, "desinstalar")
+    assert r.returncode == 0, r.stderr
+    for pasta in (home / ".claude/skills", home / ".codex/skills"):
+        assert not (pasta / "contexto-do-projeto").exists()
 
 
 def test_nao_sobrescreve_skill_alheia(pacote, home):
@@ -178,6 +196,72 @@ def test_extrair_zip_por_versao_mescla_e_desinstala_so_o_que_e_do_pack(tmp_path,
 def test_extrair_zip_recusa_caminho_fora_do_destino(tmp_path):
     with pytest.raises(RuntimeError, match="fora do destino"):
         install.extrair_mesclando(_zip({"../fora.txt": b"x"}), tmp_path / "dest")
+
+
+def test_revit_nao_sobrescreve_arquivo_alheio_e_preserva_alteracao_do_usuario(tmp_path):
+    dest = tmp_path / "Addins/2025"
+    dest.mkdir(parents=True)
+    (dest / "plugin.addin").write_bytes(b"do usuario")
+    with pytest.raises(RuntimeError, match="preexistente"):
+        install.extrair_mesclando(_zip({"plugin.addin": b"do pack", "plugin/a.dll": b"1"}), dest)
+    assert (dest / "plugin.addin").read_bytes() == b"do usuario"
+    assert not (dest / "plugin/a.dll").exists()  # preflight evita instalação parcial
+
+    (dest / "plugin.addin").unlink()
+    arquivos = install.extrair_mesclando(_zip({"plugin.addin": b"do pack"}), dest)
+    reg = {"arquivos": arquivos, "pastas_base": [str(dest)],
+           "hashes": {arquivos[0]: install.sha256_arquivo(dest / "plugin.addin")}}
+    (dest / "plugin.addin").write_bytes(b"alterado depois")
+    log = install.Log(simular=False)
+    install.remover_extraidos(reg, log)
+    assert (dest / "plugin.addin").read_bytes() == b"alterado depois"
+    assert any("mantido" in x for x in log.avisos)
+
+
+def test_revit_preflight_todas_as_versoes_antes_de_escrever(tmp_path, monkeypatch):
+    monkeypatch.setenv("APPDATA", str(tmp_path / "Roaming"))
+    monkeypatch.setattr(install, "os_key", lambda: "windows")
+    monkeypatch.setattr(install.glob, "glob", lambda pat: ["C:/Program Files/Autodesk/Revit 2024",
+                                                            "C:/Program Files/Autodesk/Revit 2025"])
+    monkeypatch.setattr(install, "baixar_url", lambda url: _zip({"plugin.addin": b"do pack"}))
+    ocupado = tmp_path / "Roaming/Addins/2025/plugin.addin"
+    ocupado.parent.mkdir(parents=True)
+    ocupado.write_bytes(b"do usuario")
+    with pytest.raises(RuntimeError, match="preexistente"):
+        install.prepare_mcp(REVIT, install.Log(simular=False), tmp_path)
+    assert not (tmp_path / "Roaming/Addins/2024/plugin.addin").exists()
+    assert ocupado.read_bytes() == b"do usuario"
+
+
+def test_mcp_zip_nao_remove_pasta_preexistente_sem_registro(tmp_path):
+    dest = tmp_path / "mcp"
+    dest.mkdir()
+    (dest / "meu.txt").write_text("meu", encoding="utf-8")
+    m = {"preparo": [{"baixar_zip": "https://example.org/mcp.zip", "destino": str(dest)}]}
+    with pytest.raises(RuntimeError, match="preexistente"):
+        install.prepare_mcp(m, install.Log(simular=False), tmp_path)
+    assert (dest / "meu.txt").read_text(encoding="utf-8") == "meu"
+
+
+def test_verificacao_mcp_distingue_handshake_de_aplicativo(tmp_path):
+    servidor = tmp_path / "mcp_falso.py"
+    servidor.write_text("""import json, sys
+for line in sys.stdin:
+    msg = json.loads(line)
+    if 'id' not in msg:
+        continue
+    if msg['method'] == 'initialize':
+        result = {'serverInfo': {'name': 'falso', 'version': '1'}, 'protocolVersion': '2025-06-18', 'capabilities': {}}
+    elif msg['method'] == 'tools/list':
+        result = {'tools': [{'name': 'estado', 'description': 'read', 'inputSchema': {'type': 'object'}}]}
+    else:
+        result = {'isError': True, 'content': [{'type': 'text', 'text': 'software fechado'}]}
+    print(json.dumps({'jsonrpc': '2.0', 'id': msg['id'], 'result': result}), flush=True)
+""", encoding="utf-8")
+    resultado = install.mcp_handshake({"command": sys.executable, "args": [str(servidor)], "env": {}},
+                                      timeout=3, probe={"name": "estado", "arguments": {}})
+    assert resultado["ok"] is True and resultado["tools"] == ["estado"]
+    assert resultado["aplicativo"]["ok"] is False
 
 
 def test_sem_software_detectado_nao_baixa(tmp_path, monkeypatch):

@@ -8,9 +8,11 @@ description: Opera o Autodesk Revit pelo chat via MCP. Lê a vista, a seleção 
 MCP `revit` (mcp-servers-for-revit). As ferramentas recebem **milímetros e graus**, e o "nível" nas criações é a **cota do nível em mm**. Tabela completa com parâmetros: `references/mcp-ferramentas.md`.
 
 ## 1. Antes de qualquer coisa
+0. Leia `contexto-do-projeto` → `resumo` se houver ficha. Identifique decisões, arquivos e pendências; se não houver, inicie uma. Peça origem do modelo, revisão, planta/eixos e resultados de cálculo. Marque dados assumidos como hipótese.
 1. `get_current_view_info`. Se falhar com erro de conexão, peça ao usuário: Revit aberto **com o projeto**, faixa Suplementos → "Revit MCP Plugin" → **Revit MCP Switch** (ligar). Primeira vez: **Settings** → marcar todos os comandos → salvar. Outros sintomas: `references/solucao-de-problemas.md`.
 2. Entenda o modelo antes de criar: `analyze_model_statistics` (o que existe) e níveis existentes (receita "Listar níveis" em `references/revit-api-csharp.md`, ou `ai_element_filter` com `filterCategory: "OST_Levels"`).
 3. Confirme com o usuário: **critério de nível** (topo da laje estrutural × piso acabado), unidade do projeto e se há padrão de nomes do escritório.
+4. Antes de alterar o RVT, descreva o lote (categoria, níveis, quantidade esperada, tipos, unidades e arquivo de destino), salve uma cópia ou ponto de recuperação e confirme operações destrutivas. Releia estatísticas, vista e IDs após cada lote; compare criado × esperado e examine avisos.
 
 ## 2. Lançar a estrutura a partir do cálculo
 Fonte dos dados: skill `concreto-armado-nbr6118` (seções) e a planta (posições). Monte o JSON no formato de `assets/lancamento.exemplo.json` (posições em m, seções em cm) e gere as chamadas:
@@ -23,6 +25,7 @@ O resultado traz:
 - `avisos`: níveis não declarados, pilar com topo abaixo da base, viga de comprimento zero. Resolva antes de executar.
 
 Depois de cada lote: leia os avisos do retorno do MCP ("Defaulted to…" = tipo errado), selecione os ids criados (`operate_element` `Select`) e confira em 3D. Para gravar a Marca (P1, V1…) com os ids devolvidos: `python3 scripts/lancamento.py --marcar ids.json --saida marcas.json` → `send_code_to_revit` com `marcas_csharp`.
+Salve o RVT pelo Revit e registre na ficha o caminho, revisão, IDs/quantidades criadas e pendências (ex.: tipo substituído, eixo incerto, interferência ou modelo analítico não conferido). Não declare concluído só porque o lote retornou sucesso.
 
 Fluxo completo de modelagem (vínculos, níveis, fundações, unir geometrias, modelo analítico): `references/modelagem-estrutural.md`. Tipos, parâmetros e classificação: `references/familias-e-parametros.md`.
 
@@ -55,3 +58,4 @@ Para o que não tem ferramenta própria (níveis, materiais, schedules, unir geo
 - `send_code_to_revit` e `delete_element` alteram o projeto: só com confirmação explícita. Recomende salvar (ou trabalhar numa cópia) antes de lotes grandes, já que o desfazer do Revit cobre a transação inteira.
 - Quantitativos dependem da modelagem (uniões, sobreposições). Informe o critério usado e confira com o critério de medição do SINAPI.
 - Requer Windows com Revit 2020–2026 e o add-in instalado pelo pack. Sem o Revit aberto, nenhuma ferramenta funciona.
+- A exportação IFC deve ser reaberta/inspecionada no destino; geometria, classes, unidades, coordenadas e quantitativos requerem conferência técnica independente.

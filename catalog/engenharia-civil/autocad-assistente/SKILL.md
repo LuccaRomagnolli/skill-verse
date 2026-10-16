@@ -8,12 +8,14 @@ description: Opera o AutoCAD/AutoCAD LT pelo chat via MCP. Cria e organiza layer
 Ferramentas do MCP `autocad`: `system`, `drawing`, `layer`, `entity`, `annotation`, `block`, `view` (e `pid`, raramente útil). Cada uma recebe `operation` + parâmetros. A tabela completa, com o que cada operação aceita e o que só funciona com o AutoCAD aberto, está em `references/mcp-operacoes.md`.
 
 ## 1. Antes de qualquer coisa
+0. Se existir `projeto-contexto.json`, leia `contexto-do-projeto` → `resumo` antes de operar; confira decisões, unidades, fontes vigentes e pendências. Sem ficha, proponha criá-la. Registre a origem de cada geometria (levantamento, arquitetura, cálculo ou hipótese) e não apresente seção preliminar como detalhe executivo.
 1. `system` → `status`. Veja o `backend`:
    - `file_ipc`: AutoCAD/LT 2024+ aberto no Windows. Tudo disponível.
    - `ezdxf`: modo sem AutoCAD (macOS/Linux ou AutoCAD fechado). O desenho fica em memória, só lê **DXF** (não DWG) e grava com `drawing` → `save_as_dxf` `{path}`. `offset`, `fillet`, `chamfer`, `plot_pdf` e `execute_lisp` não funcionam.
    - Erro de conexão no Windows: peça para abrir o AutoCAD e carregar o `mcp_dispatch.lsp` (APPLOAD; caminho no manual do pack). Depois `system` → `init`.
 2. Desenho existente: `drawing` → `info` e `get_variables` `{names:["INSUNITS","LTSCALE","DIMSCALE"]}`. Confirme a **unidade** medindo algo conhecido (porta ≈ 0,80 m). Desenho novo: padrão **cm** e layers de `references/padrao-layers.md`, a menos que o escritório tenha padrão próprio (pergunte uma vez).
 3. Trabalhe numa **cópia** quando for limpar ou alterar muito um arquivo recebido.
+4. Combine um plano de operações: arquivo-alvo, unidades, layers, objetos afetados, quantidade esperada, saída e como desfazer. Execute em lotes pequenos; após cada lote confira `drawing` → `info`, `entity` → `count` e captura visual (`view` → `get_screenshot` quando disponível). Divergência de contagem, escala ou layer suspende a sequência.
 
 ## 2. Detalhe de seção (viga ou pilar)
 O script `scripts/detalhe_secao.py` calcula a geometria (cobrimento, estribo, posição das barras, cotas, textos) e gera:
@@ -27,6 +29,7 @@ python3 scripts/detalhe_secao.py --b 20 --h 50 --c 3 --pilar 3 --phi 20 --estrib
 Use os dados da skill `concreto-armado-nbr6118` (barras e estribos sugeridos). Rodando na pasta do projeto, o script pega o **cobrimento pela classe de agressividade da ficha** (`projeto-contexto.json`, skill `contexto-do-projeto`). `--c` sobrescreve. Várias seções no mesmo desenho: desloque cada uma com `--origem x y` (ex.: 40 cm entre seções).
 
 Depois de executar as operações: `view` → `zoom_extents` e `view` → `get_screenshot` para mostrar o resultado ao usuário. Salve com `drawing` → `save` (AutoCAD) ou `save_as_dxf`.
+Registre o DWG/DXF salvo na ficha com `contexto.py artefato --tipo desenho --caminho ... --revisao ...`; registre a origem da geometria com `decisao` e, se faltar revisão dimensional, lance `pendencia`. No modo `ezdxf`, registre explicitamente que o DXF foi gerado sem validar a abertura/plotagem no AutoCAD.
 
 ## 3. Pranchas, carimbo e escala
 Nunca calcule escala, tamanho de folha ou altura de texto de cabeça. Use `scripts/prancha.py`:
@@ -68,3 +71,4 @@ Para desenhar canteiro de obras (áreas de vivência, acessos, central de armaç
 - `system` → `execute_lisp` executa código arbitrário no AutoCAD: só use com pedido explícito do usuário, mostre o código antes e envolva em `UNDO`.
 - Padrões de prancha e de desenho seguem as normas citadas por número e o padrão da prefeitura. Confirme a edição vigente. Nenhum texto de norma ABNT é reproduzido.
 - No modo headless, salve o DXF em pasta do usuário e diga o caminho; nada fica salvo automaticamente.
+- Antes de entregar, revise cotas, escala, unidades, layers, referências externas, carimbo e plotagem no aplicativo real; o MCP não certifica conformidade ou integridade do DWG.

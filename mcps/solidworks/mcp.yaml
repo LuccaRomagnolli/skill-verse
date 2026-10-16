@@ -24,6 +24,7 @@ servidor:
   env: {}
 teste:
   tool_esperada: solidworks_get_state
+  chamada_leitura: {name: solidworks_get_state, arguments: {}}
 pos_instalacao:
   windows:
     - "Abra o SOLIDWORKS antes de pedir qualquer modelagem; o agente se conecta à sessão aberta."

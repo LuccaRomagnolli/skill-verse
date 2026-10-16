@@ -9,10 +9,12 @@ O MCP `archicad` conversa com o ArchiCAD 29 **aberto com o projeto**. O add-on T
 
 > ⚠️ **Peça para salvar o projeto antes da auditoria.** A leitura de propriedades pode travar o ArchiCAD 29 (falha do próprio ArchiCAD). Não rode auditoria sem esse "ok".
 
+Antes da conexão, leia `contexto-do-projeto` → `resumo` quando existir. Identifique revisão do modelo, município, fontes e pendências. Sem ficha, proponha iniciar uma. A conexão só é operável se `get_project_info` retornar o projeto aberto; servidor MCP iniciado isoladamente não basta.
+
 ## Fluxo
-1. **Contexto**: `get_project_info` (versão, pavimentos, Tapir) e `get_model_summary` (contagem por tipo). Em modelos grandes, não use `include_layer_story`.
+1. **Contexto**: `get_project_info` (versão, pavimentos, Tapir) e `get_model_summary` (contagem por tipo). Em modelos grandes, não use `include_layer_story`. Anote contagens e arquivo/revisão de entrada.
 2. **Regras**: `list_rules`. Confira se as regras de `~/SkillVerse/archicad-regras/` carregaram sem erro (formato em `references/regras.md`). Se o sistema de classificação do escritório não for "ARCHICAD Classification", ajuste o YAML (use `search_definitions` para achar o nome exato) e peça para reiniciar o agente.
-3. **Auditoria**: `audit_delivery_readiness` com `ruleset`:
+3. **Plano e auditoria**: escolha regras, escopo, pavimentos, limite por lote e destino do relatório antes de executar. Rode `audit_delivery_readiness` com `ruleset`:
    - `entrega`: prancha/aprovação (ambientes numerados, classificação).
    - `ifc`: exportação para o calculista e projetistas (ou `verify_ifc_export_readiness`).
    - `padrao`: padrão interno de layers.
@@ -23,6 +25,7 @@ O MCP `archicad` conversa com o ArchiCAD 29 **aberto com o projeto**. O add-on T
    - `create_issues_from_failures` `{rule_id}`: cria issue com os elementos anexados.
    - `export_issues_bcf` `{bcf_path}`: exporta tudo em BCF (sobrescreve o arquivo; confirme o caminho).
 6. **Correção automática** (opcional): `set_element_data`/`edit_classifications` alteram o modelo. Só com pedido explícito, num conjunto pequeno de elementos, depois de mostrar exatamente o que vai mudar. Sugira salvar uma cópia antes.
+7. **Inspeção e registro**: depois de cada lote, releia a amostra dos elementos alterados e rode novamente as regras afetadas. Salve o PLN/PLA no ArchiCAD, confirme o BCF exportado por leitura/importação e registre relatório, modelo e BCF na ficha com `contexto.py artefato`. Falha de propriedade, regra indisponível, clash não verificado ou exigência municipal sem fonte vira `pendencia` com responsável.
 
 ## Conformidade com a legislação local
 Com a ficha do projeto (`projeto-contexto.json`, skill `contexto-do-projeto`), confira o modelo contra exigências **numéricas** do código de obras e do zoneamento do município:

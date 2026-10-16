@@ -6,7 +6,7 @@
 | 2. Dados gerais e normas | aba Gerais: norma de concreto, tipo de estrutura | lê/confere (`tqs_edificio.py ler/conferir`) |
 | 3. Modelo estrutural | aba Modelo: Modelo IV (pórtico + grelhas) ou VI (pórtico com lajes); γz ou P-Delta; ISE | explica as opções. Altera numa cópia, com pedido |
 | 4. Pavimentos | aba Pavimentos: nome, classe (fundação, térreo, tipo, cobertura…), altura, repetições | lê e compara com a arquitetura/Revit (mesmos nomes e cotas) |
-| 5. Materiais e cobrimentos | abas Materiais e Cobrimentos: CAA, fck por elemento, cobrimentos | `conferir` contra a NBR 6118:2023 (Tab. 7.1 e 7.2) e a ficha do projeto |
+| 5. Materiais e cobrimentos | abas Materiais e Cobrimentos: CAA, fck por elemento, cobrimentos | `conferir` faz triagem pela NBR 6118:2023 (tabelas 7.1 e 7.2); confronto com a referência NBR 6118:2026 permanece pendente |
 | 6. Cargas | aba Cargas: casos (PP, permanente, acidental, vento, desaprumo…), γf, ψ; vento pela NBR 6123 (V0, S1, S3, rugosidade, classe) | lê os coeficientes. Valores de carga e vento vêm da skill `cargas-combinacoes` |
 | 7. Lançamento | Modelador Estrutural: referência da arquitetura (DWG por planta), pilares, vigas, lajes, cargas, furos | prepara a base (skill `autocad-assistente`, "base para cálculo"). Lista o que foi lançado (`tqs_modelo.py listar`) |
 | 8. Processamento global | Gerenciador → Processamento → Global | `tqs_processar.py` (simula; executa com "sim") |
@@ -16,7 +16,7 @@
 | 12. BIM | exportação IFC / integração | ver `interoperabilidade.md` |
 
 ## Pontos de atenção que o agente sempre levanta
-- **Norma no edifício**: as constantes da API vão até `NORMA_NBR_6118_2014`. Se o TQS do usuário já tem opção para a edição de 2023, a constante pode ter outro nome (`--introspectar TQSBuild`). Registre qual edição o projeto adotou.
+- **Norma no edifício**: a versão de API usada como base expunha constantes até `NORMA_NBR_6118_2014`. Consulte a instalação local com `--introspectar TQSBuild`; registre a edição efetiva do TQS e compare com a referência declarada NBR 6118:2026. Uma opção anterior não prova conformidade 2026.
 - **γz** e estabilidade global: valores altos pedem P-Delta e revisão de rigidez. O agente aponta, e o engenheiro decide.
 - **CAA × fck × cobrimento** coerentes com a ficha do projeto (`contexto-do-projeto`).
 - **Repetição de pavimentos**: altera cargas acumuladas nos pilares. Confira com a arquitetura.

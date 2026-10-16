@@ -3,7 +3,7 @@ nome: Pack Engenharia Civil
 version: 1.3.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
-  Cálculo de concreto armado pela NBR 6118, cargas, vento e combinações, memorial de cálculo,
+  Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
   quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e o agente operando AutoCAD,
   Revit, SOLIDWORKS, ArchiCAD e TQS.
 skills:
@@ -31,11 +31,16 @@ mcps:
   - nome: solidworks
     opcional: true
 fluxos:
+  - titulo: Retomar um projeto em outra sessão
+    passos:
+      - "Abra o agente na pasta da obra e diga: 'Retome este projeto pela ficha projeto-contexto.json; mostre decisões, artefatos e pendências antes de avançar'."
+      - "Confirme a revisão do projeto e revalide fontes locais cuja vigência possa ter mudado."
+      - "Ao concluir cada etapa, registre o arquivo produzido, os alertas e quem fará a revisão técnica."
   - titulo: Começar um projeto pelo município
     passos:
       - "Abra o Claude Code/Codex na pasta do projeto e diga: \"Vamos começar um projeto de <uso> em <cidade>/<UF>\" (contexto-do-projeto)."
       - "Responda às perguntas da ficha: uso, pavimentos, área, ambiente e, se souber, o endereço do lote."
-      - "O agente pesquisa em fontes oficiais o código de obras, o zoneamento, os Bombeiros e as concessionárias, e registra cada fonte com link e data."
+      - "O agente pesquisa em fontes oficiais o código de obras, o zoneamento, os Bombeiros e as concessionárias, e registra edição, artigo, link, data de acesso e vigência."
       - "Revise a tabela de exigências que mudam o projeto e as pendências a confirmar com a prefeitura."
   - titulo: Do lançamento ao memorial (pavimento de concreto armado)
     passos:
@@ -57,7 +62,7 @@ fluxos:
   - titulo: Automatizar o TQS
     passos:
       - "No computador com o TQS, abra o Claude Code/Codex e diga: \"Confere os dados do edifício <nome> no TQS\" (tqs-assistente)."
-      - "O agente diagnostica o Python/TQS, lê pisos, CAA, fck e cobrimentos e aponta o que não bate com a NBR 6118."
+      - "O agente diagnostica o Python/TQS, lê pisos, CAA, fck e cobrimentos e faz triagem; a conformidade com a NBR 6118:2026 depende de revisão técnica independente."
       - "Peça variantes: \"Cria uma cópia com fck 30 e processa as duas para comparar o aço\". O processamento só roda depois do seu sim."
       - "Leve o modelo ao Revit pelo IFC do TQS ou peça \"Manda o modelo do TQS para o Revit\"."
   - titulo: Peça metálica no SOLIDWORKS

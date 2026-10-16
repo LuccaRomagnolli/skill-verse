@@ -37,6 +37,8 @@ def test_fonte_marca_checklist_e_md(tmp_path):
     ctx("iniciar", "--pasta", str(tmp_path), "--municipio", "Curitiba", "--uf", "PR", home=sv)
     assert ctx("fonte", "--pasta", str(tmp_path), "--checklist", "c99", "--esfera", "municipal", "--tipo", "x",
                "--titulo", "y", home=sv).returncode != 0
+    assert ctx("fonte", "--pasta", str(tmp_path), "--checklist", "c1", "--esfera", "municipal", "--tipo", "x",
+               "--titulo", "sem link", "--vigente", "sim", home=sv).returncode != 0
     ctx("fonte", "--pasta", str(tmp_path), "--checklist", "c1", "--esfera", "municipal", "--tipo", "Código de Obras",
         "--titulo", "Lei X — Código de Obras", "--url", "https://x.gov.br/l.pdf", "--vigente", "sim", home=sv)
     ctx("nao-aplica", "--pasta", str(tmp_path), "--checklist", "c5", "--motivo", "isento", home=sv)
@@ -48,6 +50,75 @@ def test_fonte_marca_checklist_e_md(tmp_path):
 
 def test_ficha_exige_municipio_valido(tmp_path):
     assert ctx("iniciar", "--pasta", str(tmp_path), "--municipio", "X", "--uf", "ZZ", home=tmp_path / "sv").returncode != 0
+
+
+def test_retomada_registra_requisitos_decisoes_artefatos_e_resolve_pendencia(tmp_path):
+    home = tmp_path / "sv"
+    assert ctx("iniciar", "--pasta", str(tmp_path), "--municipio", "Curitiba", "--uf", "PR", home=home).returncode == 0
+    fonte = ctx("fonte", "--pasta", str(tmp_path), "--checklist", "c1", "--esfera", "municipal",
+                "--tipo", "Código de Obras", "--titulo", "Lei municipal de exemplo",
+                "--url", "https://www.curitiba.pr.gov.br/", "--vigente", "sim", home=home)
+    fid = json.loads(fonte.stdout)["fonte_id"]
+    assert ctx("requisito", "--pasta", str(tmp_path), "--fonte", fid, "--item", "art. 10",
+               "--criterio", "afastamento frontal", "--valor", "5", "--unidade", "m",
+               "--impacto", "recuar implantação", home=home).returncode == 0
+    assert ctx("decisao", "--pasta", str(tmp_path), "--assunto", "implantação",
+               "--decisao", "conferir recuo no levantamento", "--origem", "hipotese",
+               "--fonte", fid, home=home).returncode == 0
+    pend = ctx("pendencia", "--pasta", str(tmp_path), "--texto", "Confirmar zoneamento do lote",
+               "--responsavel", "projetista", home=home)
+    pid = json.loads(pend.stdout)["id"]
+    (tmp_path / "V1.json").write_text('{"resultado": 1}', encoding="utf-8")
+    assert ctx("artefato", "--pasta", str(tmp_path), "--tipo", "calculo", "--caminho", "V1.json",
+               "--estado", "em-revisao", home=home).returncode == 0
+    resumo = json.loads(ctx("resumo", "--pasta", str(tmp_path), home=home).stdout)
+    assert resumo["requisitos"][0]["fonte_id"] == fid
+    assert resumo["decisoes"][0]["assunto"] == "implantação"
+    assert resumo["artefatos"][0]["caminho"] == "V1.json"
+    assert resumo["pendencias"][0]["id"] == pid
+    assert ctx("resolver-pendencia", "--pasta", str(tmp_path), "--id", pid,
+               "--solucao", "consultado com a prefeitura", home=home).returncode == 0
+    assert not json.loads(ctx("resumo", "--pasta", str(tmp_path), home=home).stdout)["pendencias"]
+    assert "afastamento frontal" in (tmp_path / "projeto-contexto.md").read_text(encoding="utf-8")
+
+
+def test_retomada_ficha_antiga_e_artefato_fora_da_pasta(tmp_path):
+    (tmp_path / "projeto-contexto.json").write_text(json.dumps({
+        "municipio": "Santos", "uf": "SP", "fontes": [], "pendencias": [{"texto": "antiga", "resolvida": False}],
+        "checklist": []}), encoding="utf-8")
+    home = tmp_path / "sv"
+    r = ctx("resumo", "--pasta", str(tmp_path), home=home)
+    assert r.returncode == 0 and json.loads(r.stdout)["pendencias"][0]["texto"] == "antiga"
+    r = ctx("artefato", "--pasta", str(tmp_path), "--tipo", "x", "--caminho", "../fora.txt", home=home)
+    assert r.returncode != 0
+    assert ctx("decisao", "--pasta", str(tmp_path), "--assunto", "teste", "--decisao", "ok",
+               "--origem", "usuario", home=home).returncode == 0
+
+
+def test_projeto_demo_com_fontes_municipais_oficiais(tmp_path):
+    home = tmp_path / "sv"
+    obra = tmp_path / "obra"
+    obra.mkdir()
+    assert ctx("iniciar", "--pasta", str(obra), "--projeto", "Residência demonstrativa",
+               "--municipio", "São Paulo", "--uf", "SP", "--uso", "residencial-unifamiliar",
+               "--pavimentos", "2", "--area", "180", "--ambiente", "urbano", home=home).returncode == 0
+    casos = [
+        ("c1", "Lei 16.642/2017", "https://legislacao.prefeitura.sp.gov.br/lei-16642-de-09-de-maio-de-2017/consolidado", "aplicar o COE"),
+        ("c2", "Lei 16.402/2016", "https://legislacao.prefeitura.sp.gov.br/lei-16402-de-22-de-marco-de-2016/consolidado", "identificar zoneamento"),
+    ]
+    for checklist, titulo, url, criterio in casos:
+        fonte = ctx("fonte", "--pasta", str(obra), "--checklist", checklist,
+                    "--esfera", "municipal", "--tipo", "lei", "--titulo", titulo,
+                    "--url", url, "--vigente", "sim", home=home)
+        assert fonte.returncode == 0, fonte.stderr
+        fid = json.loads(fonte.stdout)["fonte_id"]
+        assert ctx("requisito", "--pasta", str(obra), "--fonte", fid, "--item", "art. 1º",
+                   "--criterio", criterio, home=home).returncode == 0
+    ctx("pendencia", "--pasta", str(obra), "--texto", "Confirmar zoneamento do lote", home=home)
+    retomada = json.loads(ctx("resumo", "--pasta", str(obra), home=home).stdout)
+    assert len(retomada["fontes"]) == len(retomada["requisitos"]) == 2
+    assert any("zoneamento do lote" in p["texto"] for p in retomada["pendencias"])
+    assert any(c["id"] == "c5" for c in retomada["checklist_faltante"])
 
 
 # --------------------------------------------------------------- travas de importação web

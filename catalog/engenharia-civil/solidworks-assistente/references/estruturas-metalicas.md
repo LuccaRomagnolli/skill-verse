@@ -10,10 +10,10 @@
 ## Normas (citadas por número; o agente não reproduz texto)
 | Tema | Norma |
 |---|---|
-| Projeto de estruturas de aço e mistas de edifícios | NBR 8800:2008 |
-| Perfis formados a frio (dimensionamento) | NBR 14762:2010 |
-| Perfis formados a frio (padronização de seções) | NBR 6355:2012 |
-| Ações e segurança | NBR 8681:2003; cargas NBR 6120:2019; vento NBR 6123:1988 (skill `cargas-combinacoes`) |
+| Projeto de estruturas de aço e mistas de edifícios | NBR 8800:2024, corrigida em 2025; confirme no Catálogo ABNT |
+| Perfis formados a frio (dimensionamento) | NBR 14762 — confira a edição vigente no Catálogo ABNT |
+| Perfis formados a frio (padronização de seções) | NBR 6355 — confira a edição vigente no Catálogo ABNT |
+| Ações e segurança | NBR 8681, NBR 6120 e NBR 6123 — confira as edições vigentes; o script de vento do pack ainda implementa critérios de 1988 |
 | Soldagem / parafusos | especificações AWS/ASTM indicadas no projeto. Confirme com o projetista |
 
 Edição vigente: confira com a skill `consulta-normas`. **O SolidWorks não dimensiona** a peça pela NBR 8800. O dimensionamento é do engenheiro (o pack não tem, nesta versão, script de verificação de aço). O modelo só materializa a geometria definida.
