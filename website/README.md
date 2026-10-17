@@ -34,7 +34,7 @@ node --env-file=.env.local scripts/upload-release.mjs /caminho/para/pack-liberad
 
 O servidor aceita somente um ZIP de até 20 MB e não sobrescreve uma versão existente. O arquivo não é incluído nos assets públicos. O checkout só é habilitado se as credenciais, o webhook, a origem, o objeto privado e `PAYMENTS_ENABLED=true` estiverem configurados. Faça teste controlado de ponta a ponta com a conta SyncPay antes de usar com clientes e confirme a compatibilidade da lista de IPs.
 
-Pedidos são vinculados a um token aleatório guardado no navegador. Não há e-mail automático nem recuperação do acesso em outro navegador. As tentativas com resposta incerta são marcadas para verificação manual, sem uma segunda cobrança automática. Não recrie a cobrança até conferir o painel da SyncPay.
+Pedidos são vinculados a um token aleatório guardado no navegador. O comprador pode guardar um código de acesso pessoal e usá-lo no carrinho para consultar o pedido em outro navegador. Esse código permite acessar o pedido e o download: deve ser mantido em sigilo. Não há envio automático por e-mail nem recuperação automática caso o código e os dados do navegador sejam perdidos. As tentativas com resposta incerta são marcadas para verificação manual, sem uma segunda cobrança automática. Não recrie a cobrança até conferir o painel da SyncPay.
 
 ## Desenvolvimento e testes
 
