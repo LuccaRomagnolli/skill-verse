@@ -1,39 +1,64 @@
-# SkillVerse — loja de packs
+# SkillVerse — loja e pagamentos SyncPay
 
-Vitrine responsiva em português, implementada em HTML, CSS e JavaScript sem etapa de build. Os arquivos publicados ficam em `dist/`. O catálogo comercial original, scripts e ZIPs de skills permanecem fora do site.
+A loja usa Vinext em Cloudflare Workers, com D1 para pedidos e R2 privado para o arquivo do pack. A vitrine está em `server/store.html` e `public/`; os endpoints estão em `app/api/`. O preço é definido no servidor em `lib/payments.ts` (R$ 39,90). A configuração do navegador é apenas apresentação e não determina a cobrança.
 
-## Executar localmente
+## Estado atual
+
+O pagamento inicia desativado. O pack de Engenharia Civil 1.3.3 ainda é candidato, conforme o README principal do repositório: não disponibilize o ZIP até sua liberação técnica. A hospedagem do site está privada; visitantes e webhooks externos da SyncPay não podem alcançá-la nesse estado. Os testes automatizados usam respostas simuladas, sem efetuar cobranças reais.
+
+A SyncPay exige IP de origem autorizado. Confirme com a SyncPay e a hospedagem uma solução de saída compatível; este projeto não presume que o Worker tenha um IP fixo. A chave pública do cartão exige que a origem da loja esteja autorizada no painel SyncPay. O checkout mantém os dados do cartão no navegador apenas durante a tokenização direta na SyncPay: o servidor recebe somente o token. A página própria continua sujeita às obrigações de segurança aplicáveis a cartão; não pressupõe certificação PCI.
+
+## Configuração no ambiente seguro da hospedagem
+
+Não coloque credenciais em código, Git, arquivos públicos ou mensagens. Defina as variáveis no gerenciador de segredos de Sites:
+
+| Nome | Conteúdo |
+| --- | --- |
+| `SYNCPAY_CLIENT_ID` e `SYNCPAY_CLIENT_SECRET` | Credenciais do painel de desenvolvedor SyncPay; tratar como secretas. |
+| `SYNCPAY_PUBLIC_KEY` | Chave pública `pk_live_…` do cartão; habilite o domínio da loja no painel. |
+| `SYNCPAY_WEBHOOK_TOKEN` | Segredo retornado pela SyncPay ao criar o webhook de transações; não invente um valor para substituir o token do provedor. |
+| `RELEASE_UPLOAD_TOKEN` | Segredo aleatório com pelo menos 32 caracteres para upload do ZIP; gere um valor próprio. |
+| `SITE_ORIGIN` | Origem HTTPS da loja sem barra final; também usada para montar o webhook. |
+| `PACK_OBJECT_KEY` | Chave privada da versão liberada no R2, por exemplo `releases/engenharia-civil-v1.zip`. Não reutilize a mesma chave ao atualizar. |
+| `PAYMENTS_ENABLED` | `false` até as verificações e a liberação do pack; depois `true`. |
+
+Configure na SyncPay o evento `transaction` para `/api/webhooks/syncpay` quando o endpoint puder receber notificações. A SyncPay retorna o segredo de assinatura somente na criação; armazene-o com segurança como `SYNCPAY_WEBHOOK_TOKEN` na hospedagem. O novo contrato usa HMAC-SHA256 e janela de 5 minutos. O endpoint também aceita o Bearer do contrato legado. Os webhooks são gatilhos: o servidor consulta a API autenticada e confere identificador, moeda e valor antes de atualizar o pedido. Enquanto o site estiver privado, a consulta de status feita pelo navegador continua disponível ao proprietário, mas os webhooks externos não chegam.
+
+O endpoint administrativo `POST /api/admin/syncpay-check`, protegido pelo `RELEASE_UPLOAD_TOKEN`, testa a autenticação e uma consulta de parceiro a partir da hospedagem sem criar uma cobrança. Ele não retorna dados da conta, credenciais ou o token da API.
+
+Após revisão e liberação do ZIP, envie-o ao R2 privado pelo endpoint protegido. Para o script local, carregue `SITE_ORIGIN` e `RELEASE_UPLOAD_TOKEN` em um arquivo local não rastreado; para um site privado, inclua também `SITE_PRIVATE_BYPASS_TOKEN` obtido pela plataforma. Então execute:
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
+node --env-file=.env.local scripts/upload-release.mjs /caminho/para/pack-liberado.zip
 ```
 
-Abra http://127.0.0.1:4173.
+O servidor aceita somente um ZIP de até 20 MB e não sobrescreve uma versão existente. O arquivo não é incluído nos assets públicos. O checkout só é habilitado se as credenciais, o webhook, a origem, o objeto privado e `PAYMENTS_ENABLED=true` estiverem configurados. Faça teste controlado de ponta a ponta com a conta SyncPay antes de usar com clientes e confirme a compatibilidade da lista de IPs.
 
-## Pagamentos
+Pedidos são vinculados a um token aleatório guardado no navegador. Não há e-mail automático nem recuperação do acesso em outro navegador. As tentativas com resposta incerta são marcadas para verificação manual, sem uma segunda cobrança automática. Não recrie a cobrança até conferir o painel da SyncPay.
 
-O valor definido é R$ 39,90 por pack completo, em pagamento único. O carrinho guarda somente a seleção do produto no navegador. Não há cobrança, coleta de cartão, cadastro ou simulação de compra concluída.
+## Desenvolvimento e testes
 
-Após escolher um provedor, configure o produto e a entrega protegida do ZIP no checkout hospedado. Em `dist/config.js`, informe a URL HTTPS pública de checkout em `checkoutUrl`. Nunca coloque chaves secretas neste arquivo ou em qualquer outro arquivo de `dist/`.
+Node 24 é recomendado para o teste integrado, que usa `node:sqlite`. Dependências e build devem seguir o fluxo Sites:
 
-O link habilita o redirecionamento, mas não implementa confirmação de pagamento, entrega por webhook, autenticação ou controle de pedidos. Esses fluxos devem ser realizados pelo provedor escolhido ou por uma integração de servidor posterior. O preço exibido deve coincidir com o cadastrado no provedor.
+```sh
+node /caminho/para/sites/scripts/install-dependencies.mjs
+npm run db:generate # somente após mudanças no schema
+node /caminho/para/sites/scripts/build-site.mjs
+node tests/run-payments-tests.mjs
+npx tsc --noEmit
+```
 
-Antes de ativar vendas, conclua a liberação técnica do pack, revise os textos de disponibilidade no produto e FAQ, publique os termos comerciais, identifique o responsável pela loja e adapte a política de privacidade ao provedor real. O pack 1.3.3 continua identificado como candidato em validação, conforme o repositório.
+Para uma base local nova, após o build, aplique cada migração uma vez e em ordem antes de usar `npm run start`:
 
-## Conteúdo e interações
+```sh
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_hesitant_lake.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_pink_owl.sql
+```
 
-- `dist/index.html`: estrutura, catálogo de packs, preço, FAQ e detalhes comerciais.
-- `dist/styles.css`: paleta, layout, desenhos vetoriais, responsividade e movimento reduzido.
-- `dist/app.js`: catálogo de 12 skills, busca, filtros, exemplos interativos, diálogos nativos acessíveis e carrinho.
-- `dist/config.js`: preço e destino futuro de checkout.
-- `.openai/hosting.json`: identidade e configuração de hospedagem Sites.
-
-O pack Professores está explicitamente em desenvolvimento. As demonstrações são ilustrativas; não executam agentes nem cálculos. Nenhum arquivo proprietário do pack está exposto para download.
+A publicação aplica as migrações pendentes com o fluxo Sites. `.env.local`, `.dev.vars`, credenciais, cache e artefatos de build não devem ser versionados. O diretório `dist/` é somente saída gerada, não fonte.
 
 ## Referências
 
-- https://github.com/shadcn-ui/ui — referência de composição e padrões de interface. Nenhuma dependência React ou componente copiado foi necessário nesta implementação estática.
-- https://github.com/anthropics/skills — referência do formato Agent Skills e orientação de apresentação.
-- `../README.md` e `../packs/engenharia-civil/pack.yaml` — fonte do conteúdo factual do produto.
-
-As fontes Manrope e DM Sans são carregadas pelo Google Fonts; há fontes locais alternativas caso o serviço esteja indisponível.
+- [Documentação da SyncPay](https://syncpay.apidog.io/llms.txt)
+- [SyncPay Developers](https://syncpayments.com.br/desenvolvedores.html)
+- `public/qrcode.js`: QR Code Generator de Kazuhiko Arase, licença MIT (aviso no arquivo).

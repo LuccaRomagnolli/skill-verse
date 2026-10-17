@@ -1,0 +1,13 @@
+import { readFile } from 'node:fs/promises';
+const [filename] = process.argv.slice(2);
+const { SITE_ORIGIN, RELEASE_UPLOAD_TOKEN, SITE_PRIVATE_BYPASS_TOKEN } = process.env;
+if (!filename || !SITE_ORIGIN || !RELEASE_UPLOAD_TOKEN) throw new Error('Informe o arquivo e configure SITE_ORIGIN e RELEASE_UPLOAD_TOKEN no ambiente privado.');
+const origin = new URL(SITE_ORIGIN);
+if (origin.protocol !== 'https:' || origin.origin !== SITE_ORIGIN) throw new Error('SITE_ORIGIN deve ser uma origem HTTPS, sem barra final.');
+const bytes = await readFile(filename);
+if (bytes.length > 20*1024*1024) throw new Error('O ZIP excede 20 MB.');
+const headers = { 'Content-Type': 'application/zip', 'Content-Length': String(bytes.length), Authorization: `Bearer ${RELEASE_UPLOAD_TOKEN}` };
+if (SITE_PRIVATE_BYPASS_TOKEN) headers['OAI-Sites-Authorization'] = `Bearer ${SITE_PRIVATE_BYPASS_TOKEN}`;
+const response = await fetch(`${origin.origin}/api/admin/release`, { method: 'POST', headers, body: bytes });
+if (!response.ok) throw new Error(`Falha no upload: HTTP ${response.status}. Confirme acesso, token e versão.`);
+console.log('Pack enviado ao armazenamento privado.');
