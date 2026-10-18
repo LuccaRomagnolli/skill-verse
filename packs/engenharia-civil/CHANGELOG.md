@@ -1,5 +1,10 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.4.1 — 2026-10-17 (candidato)
+- Teste no AutoCAD para Mac 2027 Education: DXF de planta aberto; `INSUNITS=6` (metros), 4 pilares, 8 linhas de vigas, 4 linhas de laje e cotas geométricas de 4,000 × 5,000 m lidas por AutoLISP. DWG salvo e reaberto com as mesmas contagens e medidas. PDF da prancha gerado no próprio AutoCAD em A3 completo, 1:50, e inspecionado visualmente.
+- Corrigidos os escapes Unicode do DXF R12, a fonte TrueType, o espaçamento do carimbo e as posições de etiquetas/cota após inspeção da prancha real. A configuração de plotagem A3 usa mídia `ISO full bleed A3 (420.00 x 297.00 MM)` e escala `1=0.05` para desenho em metros a 1:50.
+- O AutoCAD para Mac aceita AutoLISP e scripts `.scr`; a conexão MCP fixada continua em `ezdxf` no macOS e ainda não controla o aplicativo. Licença usada no teste: Education (uso não comercial). Persistem as pendências SkyCiv real, revisão normativa independente, Revit, Archicad e validação da conexão AutoCAD no Windows.
+
 ## 1.4.0 — 2026-10-17 (candidato)
 - Modelo estrutural JSON v1 com unidades explícitas, revisão, níveis, eixos, barras, placas, materiais, apoios, ações e combinações. Conversão para SkyCiv e para a entrada Revit anterior, com IDs e SHA-256 rastreáveis. Conferência do mapa de ações por `mapa_ref`, unidade, módulo e fonte; o exemplo é didático.
 - MCP SkyCiv opcional com credenciais do cliente no ambiente, prévia sem cobrança, confirmação antes da análise linear, `validate_input`, malha de placas, inspeção de status, resultados, relatório e consumo de créditos. Falha de rede após envio é incerta e não gera repetição automática. Triagem conservadora gera argumentos para a rotina local de viga apenas após transcrição conferida de caso uniaxial suportado. Não executa `S3D.design.rc.check` como NBR 6118.

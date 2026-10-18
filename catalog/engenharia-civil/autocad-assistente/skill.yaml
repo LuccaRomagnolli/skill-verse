@@ -1,6 +1,6 @@
 titulo: Assistente AutoCAD
 categoria: engenharia-civil
-version: 1.4.0
+version: 1.4.1
 resumo: Opera o AutoCAD pelo chat (layers, desenho e edição, cotas, blocos, detalhes de seção, pranchas A0–A4 com carimbo e escala, base de arquitetura limpa para o TQS/Revit, PDF e AutoLISP com confirmação) e gera DXF quando não há AutoCAD.
 mcps: [autocad]
 exemplos:

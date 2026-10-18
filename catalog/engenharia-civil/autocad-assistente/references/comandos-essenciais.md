@@ -30,5 +30,5 @@ Para **orientar o usuário** quando a operação não existe no MCP, ou para mon
 
 ## Diferenças AutoCAD × AutoCAD LT × macOS
 - **LT 2024+** roda AutoLISP (base do modo IPC deste MCP). Versões LT anteriores não rodam.
-- **AutoCAD para Mac**: sem AutoLISP de automação externa nem `.NET`. O MCP fica em modo DXF (headless).
+- **AutoCAD para Mac**: aceita AutoLISP e scripts `.scr`; o AutoCAD 2027 abriu, mediu e salvou o DXF de referência em DWG/PDF no teste local. Este MCP fixado continua no backend DXF (`ezdxf`) no macOS e não controla o aplicativo aberto.
 - Comandos de verticais (Architecture, MEP, Civil 3D) não existem no LT. Não os sugira sem confirmar o produto.

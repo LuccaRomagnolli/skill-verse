@@ -103,17 +103,17 @@ def geometria(a) -> dict:
     x0, x1, y0 = w - m - lc, w - m, m
     linhas = [  # (rótulo, valor, altura da faixa mm)
         ("RESPONSÁVEL TÉCNICO", f"{a.rt}  {a.registro}".strip(), 10),
-        ("ART/RRT", a.art, 7),
-        ("DATA / ESCALA / FOLHA", f"{a.data}   1:{a.escala:g}   {a.folha}", 7),
+        ("ART/RRT", a.art, 9),
+        ("DATA / ESCALA / FOLHA", f"{a.data}   1:{a.escala:g}   {a.folha}", 9),
         ("CONTEÚDO", a.conteudo, 10),
-        ("CLIENTE", a.cliente, 7),
+        ("CLIENTE", a.cliente, 9),
         ("OBRA", f"{a.obra}" + (f" — {a.local}" if a.local else ""), 10),
     ]
     y = y0
     for rotulo, valor, alt in linhas:
         Ln(x0, y + alt, x1, y + alt)
-        T(x0 + 2, y + alt - 2.8, rotulo, 1.8)
-        T(x0 + 2, y + 1.6, dec(valor), 3.5 if alt >= 10 else 2.5)
+        T(x0 + 2, y + alt - 2.3, rotulo, 1.8)
+        T(x0 + 2, y + 1.5, dec(valor), 3.5 if alt >= 10 else 2.5)
         y += alt
     if a.revisao:
         Ln(x1 - 30, y0, x1 - 30, y0 + linhas[0][2])

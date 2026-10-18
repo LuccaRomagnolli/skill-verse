@@ -76,7 +76,13 @@ def planta(d: dict, nivel: str) -> dict:
         oy = (x2 - x1) / length * v["b_m"] / 2
         line(x1 + ox, y1 + oy, x2 + ox, y2 + oy, "EST-VIGA")
         line(x1 - ox, y1 - oy, x2 - ox, y2 - oy, "EST-VIGA")
-        label((x1 + x2) / 2 + ox, (y1 + y2) / 2 + oy, f"{v['id']} {v['b_m'] * 100:g}x{v['h_m'] * 100:g}")
+        if abs(y2 - y1) < 1e-9:
+            tx, ty = (x1 + x2) / 2, y1 + v["b_m"] / 2 + .08
+        elif abs(x2 - x1) < 1e-9:
+            tx, ty = x1 + v["b_m"] / 2 + .08, (y1 + y2) / 2
+        else:
+            tx, ty = (x1 + x2) / 2 + ox, (y1 + y2) / 2 + oy
+        label(tx, ty, f"{v['id']} {v['b_m'] * 100:g}x{v['h_m'] * 100:g}")
     for p in d.get("pilares", []):
         if not cotas[p["base"]] <= cotas[nivel] <= cotas[p["topo"]]:
             continue
@@ -94,7 +100,7 @@ def planta(d: dict, nivel: str) -> dict:
         line(xmin - .55, ymin, xmin - .55, ymax, "EST-COTA")
         line(xmin - .48, ymin, xmin - .62, ymin, "EST-COTA")
         line(xmin - .48, ymax, xmin - .62, ymax, "EST-COTA")
-        label(xmin - .95, (ymin + ymax) / 2, f"{ymax - ymin:.3f} m")
+        label(xmin - 1.4, (ymin + ymax) / 2, f"{ymax - ymin:.3f} m")
     label(xmin, ymax + .9, f"PLANTA DE FORMA {nivel} - REV {d['projeto']['revisao']}")
     return {"nome": nivel, "entidades": ent, "limites": [xmin, ymin, xmax, ymax]}
 

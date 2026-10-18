@@ -50,7 +50,7 @@ def test_cabe_prefere_maior_escala_e_menor_formato():
 def test_prancha_gera_moldura_carimbo_e_dxf(tmp_path):
     dxf, ops = tmp_path / "a1.dxf", tmp_path / "a1.json"
     r = run(EC / "autocad-assistente/scripts/prancha.py", "--formato", "A1", "--escala", "50", "--unidade", "cm",
-            "--obra", "Casa", "--rt", "Eng. X", "--registro", "CREA 1", "--folha", "1/2", "--revisao", "A",
+            "--obra", "Casa", "--conteudo", "Conteúdo", "--rt", "Eng. X", "--registro", "CREA 1", "--folha", "1/2", "--revisao", "A",
             "--dxf", str(dxf), "--ops", str(ops))
     info = json.loads(r.stdout)
     assert info["papel_mm"] == [841, 594] and info["moldura_desenho"] == [125.0, 50.0, 4155.0, 2920.0]
@@ -58,6 +58,8 @@ def test_prancha_gera_moldura_carimbo_e_dxf(tmp_path):
     txt = dxf.read_text(encoding="cp1252")
     assert txt.startswith("0\nSECTION") and txt.rstrip().endswith("EOF") and "PRA-CARIMBO" in txt
     assert "$INSUNITS\n70\n5" in txt
+    assert "Arial.ttf" in txt and "7\nSV-TEXT" in txt
+    assert "Conte\\U+00FAdo" in txt
     lista = json.loads(ops.read_text(encoding="utf-8"))
     assert {o["tool"] for o in lista} == {"layer", "entity", "annotation", "view"}
     assert any(o.get("operation") == "create_line" for o in lista)

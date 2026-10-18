@@ -37,7 +37,7 @@ pos_instalacao:
     - "Carregue o arquivo {MCP_DIR}/autocad-mcp/lisp-code/mcp_dispatch.lsp (adicione ao Startup Suite para carregar sempre)."
     - "A mensagem '=== MCP Dispatch ... loaded ===' confirma que está pronto."
   macos:
-    - "No macOS o AutoCAD não aceita AutoLISP: o MCP funciona em modo headless, gerando arquivos .dxf que você abre no AutoCAD/DWG viewer."
+    - "O AutoCAD para Mac aceita AutoLISP e scripts .scr, mas esta versão fixada do MCP usa apenas o backend ezdxf no macOS. Abra o DXF no AutoCAD para conferir medidas e gerar DWG/PDF."
   linux:
     - "Modo headless: gera arquivos .dxf."
 avisos:

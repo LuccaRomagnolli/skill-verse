@@ -30,7 +30,7 @@ Guarde `manifesto.json`, resultados, reações, esforços, deslocamentos, PDF e 
 Depois de instalar, rode `python3 instalador/scripts/install.py verificar` na pasta do pack. Um servidor MCP iniciado **não** prova que o aplicativo responde. Abra o projeto no software e faça uma leitura sem alterar nada: AutoCAD `system → status` e `drawing → info` (ou DXF headless), Revit `get_current_view_info`, SOLIDWORKS `solidworks_list_documents`, ArchiCAD `get_project_info`. SkyCiv `skyciv_status` confirma só credenciais no ambiente, sem testar a API; a chamada real usa créditos. Só depois, com sua confirmação, faça um objeto de teste numa cópia, inspecione-o no programa e salve. Para TQS, use `tqs_ambiente.py`, leia um edifício de teste e confira os dados na interface; TQS não usa MCP neste pack. Se uma conexão não estiver instalada, ignore esse teste e registre a pendência se precisar dela depois.
 
 ## Estado da versão {{VERSAO}}
-Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com critérios selecionados, não com todos os requisitos de um projeto. A NBR 6120:2019 corrigida orienta o mapa de ações; combinações têm perfil explícito 6118/8681; vento usa a base NBR 6123:2023, mas sua Errata 1:2025 ainda precisa ser conferida. Recalcule resultados antigos de vento/combinações e resultados com concreto C45–C90 anteriores à correção de `ηc`. Confirme as edições no Catálogo ABNT; PDFs licenciados não acompanham o ZIP. Análise SkyCiv real, revisão técnica independente e testes no AutoCAD, Revit e Archicad reais continuam pendentes.
+Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com critérios selecionados, não com todos os requisitos de um projeto. A NBR 6120:2019 corrigida orienta o mapa de ações; combinações têm perfil explícito 6118/8681; vento usa a base NBR 6123:2023, mas sua Errata 1:2025 ainda precisa ser conferida. Recalcule resultados antigos de vento/combinações e resultados com concreto C45–C90 anteriores à correção de `ηc`. Confirme as edições no Catálogo ABNT; PDFs licenciados não acompanham o ZIP. O AutoCAD para Mac 2027 abriu e mediu o DXF de referência e gerou DWG/PDF A3; ainda faltam o controle do aplicativo pelo MCP, uma análise SkyCiv real, revisão técnica independente e testes no Revit e Archicad reais.
 
 ## Suas skills
 {{SKILLS}}
@@ -43,7 +43,7 @@ Este ZIP é **candidato**, não certificação de conformidade. A referência de
 |---|---|
 | A skill não aparece | Reinicie o Claude Code/Codex. No Claude Code, `/plugin` mostra se o pack está ativo. |
 | "python3 não encontrado" | Instale o Python 3.10+ em python.org (no Windows, marque "Add to PATH"). |
-| AutoCAD não responde | Abra o AutoCAD LT e carregue o `mcp_dispatch.lsp` (APPLOAD). No Mac, o modo é headless: gera DXF. |
+| AutoCAD não responde | No Windows, abra o AutoCAD LT e carregue o `mcp_dispatch.lsp` (APPLOAD). No Mac, este MCP usa `ezdxf`; abra o DXF no AutoCAD para conferir e salvar DWG/PDF. |
 | SkyCiv sem credenciais | Configure `SKYCIV_USERNAME` e `SKYCIV_API_KEY` no ambiente que inicia o agente; reinicie o cliente. Não salve a chave no pack. |
 | ArchiCAD não responde | Abra o ArchiCAD 29 com o projeto. Instale o add-on Tapir para IFC, issues e BCF. |
 | Revit não responde | Abra o Revit e o projeto, ative o `Revit MCP Switch` e habilite os comandos nas configurações do add-in. Reexecute `verificar`. |

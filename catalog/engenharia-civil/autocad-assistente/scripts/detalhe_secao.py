@@ -144,8 +144,9 @@ def para_ops(g: dict, layers=LAYERS) -> list[dict]:
 # ------------------------------------------------------------------ DXF R12
 
 def dxf_txt(s: str) -> str:
-    """φ → %%c (símbolo de diâmetro do AutoCAD); demais caracteres em cp1252."""
-    return s.replace("φ", "%%c").replace("—", "-").replace("×", "x")
+    """Escapa Unicode em DXF R12 para preservar acentos no AutoCAD."""
+    s = s.replace("φ", "%%c").replace("—", "-").replace("×", "x")
+    return "".join(c if ord(c) < 128 else f"\\U+{ord(c):04X}" for c in s)
 
 
 def para_dxf(gs: list[dict], layers=LAYERS, insunits: int = 5) -> str:
@@ -155,7 +156,10 @@ def para_dxf(gs: list[dict], layers=LAYERS, insunits: int = 5) -> str:
          "0", "SECTION", "2", "TABLES", "0", "TABLE", "2", "LAYER", "70", str(len(layers))]
     for n, c in layers:
         L += ["0", "LAYER", "2", n, "70", "0", "62", str(c), "6", "CONTINUOUS"]
-    L += ["0", "ENDTAB", "0", "ENDSEC", "0", "SECTION", "2", "ENTITIES"]
+    L += ["0", "ENDTAB", "0", "TABLE", "2", "STYLE", "70", "1",
+          "0", "STYLE", "2", "SV-TEXT", "70", "0", "40", "0", "41", "1", "50", "0", "71", "0",
+          "42", "2.5", "3", "Arial.ttf", "4", "", "0", "ENDTAB", "0", "ENDSEC",
+          "0", "SECTION", "2", "ENTITIES"]
 
     def line(x1, y1, x2, y2, layer):
         return ["0", "LINE", "8", layer, "10", f"{x1}", "20", f"{y1}", "11", f"{x2}", "21", f"{y2}"]
@@ -189,10 +193,10 @@ def para_dxf(gs: list[dict], layers=LAYERS, insunits: int = 5) -> str:
                 else:
                     L += line(px, y1, px, y2, lay) + line(x1 + 1, y1, px + 1, y1, lay) + line(x2 + 1, y2, px + 1, y2, lay)
                     val, tx, ty, rot = abs(y2 - y1), px - 0.8, (y1 + y2) / 2, 90
-                L += ["0", "TEXT", "8", lay, "10", f"{tx}", "20", f"{ty}", "40", "2", "1", f"{val:g}".replace(".", ","),
+                L += ["0", "TEXT", "8", lay, "7", "SV-TEXT", "10", f"{tx}", "20", f"{ty}", "40", "2", "1", f"{val:g}".replace(".", ","),
                       "50", f"{rot}", "72", "1", "11", f"{tx}", "21", f"{ty}"]
             elif e["t"] == "text":
-                L += ["0", "TEXT", "8", lay, "10", f"{p[0]}", "20", f"{p[1]}", "40", f"{e['h']:.2f}", "1", dxf_txt(e["s"])]
+                L += ["0", "TEXT", "8", lay, "7", "SV-TEXT", "10", f"{p[0]}", "20", f"{p[1]}", "40", f"{e['h']:.2f}", "1", dxf_txt(e["s"])]
     L += ["0", "ENDSEC", "0", "EOF"]
     return "\n".join(L) + "\n"
 
