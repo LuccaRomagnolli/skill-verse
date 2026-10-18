@@ -8,7 +8,7 @@
   const error=(message)=>{ const p=cart.querySelector('[data-checkout-error]'); if(p){p.textContent=message;p.hidden=false;} };
   const newToken=()=>{const data=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...data)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
   async function config(){if(!options){try{let r=await fetch('/api/orders',{cache:'no-store'});if(!r.ok)throw Error();options=await r.json();}catch{options={enabled:false,methods:[]};}} return options;}
-  function row(){return `<div class="cart-item"><span class="skill-icon">${icon('layers')}</span><div><strong>Pack Engenharia Civil</strong><small>14 skills · pack completo · 1 unidade</small></div><button class="icon-button" id="remove-cart" aria-label="Remover Engenharia Civil do carrinho">${icon('trash')}</button></div><div class="cart-total"><span>Total · pagamento único</span><strong>${money.format(39.90)}</strong></div>`;}
+  function row(){return `<div class="cart-item"><span class="skill-icon">${icon('layers')}</span><div><strong>Pack Engenharia Civil</strong><small>9 skills · pack completo · 1 unidade</small></div><button class="icon-button" id="remove-cart" aria-label="Remover Engenharia Civil do carrinho">${icon('trash')}</button></div><div class="cart-total"><span>Total · pagamento único</span><strong>${money.format(39.90)}</strong></div>`;}
   function wireRemove(){cart.querySelector('#remove-cart')?.addEventListener('click',()=>{inCart=false;persistCart();render();});}
   const restoreLink=()=>'<button class="text-link access-link" type="button" id="restore-order">Já comprou? Acessar pedido</button>';
   function wireRestore(){cart.querySelector('#restore-order')?.addEventListener('click',showRestore);}

@@ -2,63 +2,27 @@
 
 Versão {{VERSAO}} · instalado em {{DATA}} · plataforma: {{PLATAFORMAS}}
 
-Para o passo a passo completo dos dois fluxos, consulte `MANUAL-COMPLETO.md` ou abra `MANUAL-COMPLETO.html` nesta pasta.
+Consulte `MANUAL-COMPLETO.md` ou `MANUAL-COMPLETO.html` para os fluxos de projeto, desenho, documentação e BIM.
 
 {{PARA_VOCE}}
 {{PERFIL}}
 
 ## Como usar
-Você não precisa decorar comandos. Abra o Claude Code ou o Codex na pasta do seu projeto e **descreva o que quer em português**. O agente escolhe a skill certa. Se quiser forçar uma skill, use a chamada direta indicada em cada uma.
+Abra o Claude Code ou Codex na pasta da obra e descreva sua tarefa em português. O agente escolhe a skill adequada; as chamadas diretas aparecem abaixo no manual personalizado.
 
-Quatro hábitos que dão resultado melhor:
-1. **Dê os dados de uma vez**: dimensões, materiais, cargas e normas que você usa.
-2. **Peça a memória**: o agente mostra cálculo, unidades, hipóteses, alertas e itens normativos. Scripts testados não equivalem a aprovação de engenharia.
-3. **Trabalhe numa pasta do projeto**: resultados, memorial e desenhos ficam organizados juntos.
-4. **Comece cada projeto pelo município**: diga "vamos começar um projeto em <cidade>". O agente monta a ficha do projeto e pesquisa as regras locais (código de obras, zoneamento, Corpo de Bombeiros, concessionárias) em fontes oficiais.
+1. Inicie a ficha: “Comece um projeto de <uso> em <município>/<UF> e registre fontes oficiais e pendências”.
+2. Para uma planta, informe arquivo, unidade e duas medidas conhecidas. Peça cortes DXF e um plano BIM; confira níveis, alturas e aberturas antes de modelar.
+3. Para desenhos, quantitativos ou relatórios, forneça os dados de origem e a revisão. Confira o resultado no aplicativo e com o responsável técnico.
+4. Para retomar, abra a mesma pasta e peça um resumo de `projeto-contexto.json`.
 
-## Seu primeiro projeto guiado
-1. Abra uma pasta exclusiva da obra e peça: **"Inicie a ficha de um projeto de <uso> em <município>/<UF>; pergunte o que faltar."** Confirme uso, pavimentos, área, ambiente/CAA e revisão. O município do perfil é só sugestão; a obra pode ser em outro local.
-2. Peça: **"Liste fontes oficiais vigentes e requisitos aplicáveis, com edição, artigo/item, link e data de acesso; registre as pendências."** Código de obras, zoneamento, Bombeiros, concessionárias e NRs dependem do local e do escopo.
-3. Peça um **mapa de ações por ambiente e elemento** (inclusive cargas concentradas, paredes, cobertura e garagem quando aplicáveis). Resolva os itens pendentes com o responsável técnico; depois peça um cálculo pequeno ou auditoria de modelo, fornecendo dimensões, unidades e fontes.
-4. Peça para salvar o entregável na pasta da obra e registrá-lo na ficha. Antes de usar em aprovação ou obra, solicite revisão ao responsável técnico.
-5. Em outra sessão, abra a mesma pasta e diga: **"Retome este projeto pelo projeto-contexto.json; resuma decisões, arquivos, fontes e pendências antes de continuar."**
-
-## Fluxo estrutural com SkyCiv, CAD e BIM
-Escolha **Revit ou Archicad** como destino BIM da obra. Prepare `modelo-estrutural.json` a partir da ficha, do mapa de ações e de combinações explícitas, com valores NBR conferidos no exemplar licenciado do cliente. Execute `modelo.py validar` e revise o objeto SkyCiv. Configure `SKYCIV_USERNAME` e `SKYCIV_API_KEY` no ambiente do agente; cada cliente usa sua conta. `skyciv_status` é diagnóstico local. Confirme cada análise antes de `skyciv_analisar(..., confirmar_envio=true)`: `S3D.model.solve` linear custa um crédito conforme a tabela SkyCiv; após falha incerta, verifique a atividade da conta antes de repetir.
-
-Guarde `manifesto.json`, resultados, reações, esforços, deslocamentos, PDF e créditos na ficha. Compare um caso de referência independente. Gere plantas e seções DXF da **mesma revisão**, confira cotas e escala no AutoCAD e salve DWG/PDF quando houver conexão real. Modele no Revit **ou** Archicad. No Archicad, compare os GUIDs e os detalhes lidos de volta com `verificar_lancamento.py`; a estrutura do favorito de laje pode prevalecer sobre a espessura pedida. Inspecione contagens, seções, coordenadas e IFC, e registre o arquivo salvo e as pendências. A análise SkyCiv não é verificação NBR 6118.
-
-## Planta baixa arquitetônica, cortes e BIM
-Peça **"Faça o corte A-A desta planta baixa e prepare o modelo arquitetônico para Revit/Archicad"**. Use `planta-arquitetonica` com DWG/DXF conferido ou PDF/imagem com pontos traçados e escala calibrada. Informe níveis, pé-direito, espessuras, peitoris e alturas de aberturas: a planta 2D sozinha não define esses dados. `planta.py` produz cortes DXF e planos de chamadas BIM; confira o desenho no CAD e resolva famílias, favoritos, níveis e IDs antes de confirmar cada lote no software. O corte não projeta elementos atrás da linha. TQS usa a planta como referência de lançamento estrutural; SOLIDWORKS é destino para componentes específicos.
-
-## Teste das conexões que você escolheu
-Depois de instalar, rode `python3 instalador/scripts/install.py verificar` na pasta do pack. Um servidor MCP iniciado **não** prova que o aplicativo responde. Abra o projeto no software e faça uma leitura sem alterar nada: AutoCAD `system → status` e `drawing → info` (ou DXF headless), Revit `get_current_view_info`, SOLIDWORKS `solidworks_list_documents`, ArchiCAD `get_project_info`. SkyCiv `skyciv_status` confirma só credenciais no ambiente, sem testar a API; a chamada real usa créditos. Só depois, com sua confirmação, faça um objeto de teste numa cópia, inspecione-o no programa e salve. Para TQS, use `tqs_ambiente.py`, leia um edifício de teste e confira os dados na interface; TQS não usa MCP neste pack. Se uma conexão não estiver instalada, ignore esse teste e registre a pendência se precisar dela depois.
+## Conexões escolhidas
+Depois da instalação, rode `python3 instalador/scripts/install.py verificar`. Um MCP iniciado não comprova que o aplicativo responde. Abra um arquivo de teste no software escolhido, faça uma leitura, simule qualquer gravação e confira o resultado em uma cópia antes de usar em projeto.
 
 ## Estado da versão {{VERSAO}}
-Este ZIP é **candidato**, não certificação de conformidade. A referência declarada é NBR 6118:2026. O texto-base 2023 e a Emenda 1 foram confrontados com critérios selecionados, não com todos os requisitos de um projeto. A NBR 6120:2019 corrigida orienta o mapa de ações; combinações têm perfil explícito 6118/8681; vento usa a base NBR 6123:2023, mas sua Errata 1:2025 ainda precisa ser conferida. Recalcule resultados antigos de vento/combinações e resultados com concreto C45–C90 anteriores à correção de `ηc`. Confirme as edições no Catálogo ABNT; PDFs licenciados não acompanham o ZIP. O AutoCAD para Mac 2027 abriu e mediu o DXF de referência e gerou DWG/PDF A3. No Archicad 30, bridge 0.8.0 e Tapir 1.7.1 criaram e releram quatro pilares, quatro vigas e uma laje; PLN, BCF e IFC foram salvos e reabertos. A geometria IFC permaneceu íntegra, mas o tradutor padrão reabriu pilares e vigas como objetos, e a auditoria apontou classificações, propriedades `LoadBearing` e layers pendentes. Também permanecem pendentes o controle do AutoCAD pelo MCP, uma análise SkyCiv real, revisão técnica independente, teste no Revit real e validação do tradutor IFC do escritório.
+Este ZIP é candidato. Os fluxos de planta, cortes e BIM ainda precisam de validação completa com projetos reais e revisão profissional. Normas ABNT licenciadas não acompanham o pacote. A versão para macOS testou operações limitadas no AutoCAD e Archicad; isso não demonstra funcionamento integral no Windows, Revit ou demais aplicativos. Consulte o changelog para os limites atuais.
 
-## Suas skills
+## Skills instaladas
 {{SKILLS}}
-## Softwares conectados
-{{MCPS}}
-## Fluxos de trabalho
-{{FLUXOS}}
-## Solução de problemas
-| Sintoma | O que fazer |
-|---|---|
-| A skill não aparece | Reinicie o Claude Code/Codex. No Claude Code, `/plugin` mostra se o pack está ativo. |
-| "python3 não encontrado" | Instale o Python 3.10+ em python.org (no Windows, marque "Add to PATH"). |
-| AutoCAD não responde | No Windows, abra o AutoCAD LT e carregue o `mcp_dispatch.lsp` (APPLOAD). No Mac, este MCP usa `ezdxf`; abra o DXF no AutoCAD para conferir e salvar DWG/PDF. |
-| SkyCiv sem credenciais | Configure `SKYCIV_USERNAME` e `SKYCIV_API_KEY` no ambiente que inicia o agente; reinicie o cliente. Não salve a chave no pack. |
-| Archicad não responde | Abra o Archicad 29 ou 30 com o projeto salvo. Rode `list_instances`, escolha a porta correta e instale o Tapir compatível para pavimentos, criação, IFC, issues e BCF. Um score agregado não vale quando o modelo está vazio, há regra ignorada ou alguma regra falhou. |
-| Revit não responde | Abra o Revit e o projeto, ative o `Revit MCP Switch` e habilite os comandos nas configurações do add-in. Reexecute `verificar`. |
-| SOLIDWORKS não responde | Abra o SOLIDWORKS e um documento; confirme versão/licença e repita a leitura de documentos. |
-| TQS não lê o edifício | Rode `tqs_ambiente.py` no Windows com o Python compatível; compare a API instalada com o diagnóstico da skill. |
-| MCP inicia, mas o software falha | O servidor e o aplicativo são testes distintos. Confira projeto aberto, add-in/serviço ativo e permissões; não use a integração até a leitura passar. |
-| Busca de normas sem resultado | Peça "baixe os documentos do DNIT/SINAPI sobre <assunto>" ou "atualize o catálogo de normas". Normas ABNT não estão no índice. |
-| Resultado estranho | Peça "mostre as hipóteses e a memória" e confira os dados de entrada. |
-| Atualizar o pack | Baixe a versão nova na área de membros, abra a pasta e diga "atualize o pack". |
-| Remover o pack | Abra a pasta do pack ({{PASTA}}) e diga "desinstale o pack". |
 
-## Responsabilidade técnica
-As skills são **ferramentas de apoio**. Projeto, laudo e orçamento continuam sob responsabilidade do profissional habilitado que os assina (ART/RRT). Confira hipóteses, dados de entrada, normas vigentes e resultados. Para projetos sujeitos à NBR 6118:2026, a ATP é a regra geral antes da construção; a eventual dispensa em CC1/CC2 exige acordo formal, e CC3 requer análise independente.
+## MCPs configurados
+{{MCPS}}

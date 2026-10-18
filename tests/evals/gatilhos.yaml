@@ -1,27 +1,3 @@
-# Casos de gatilho por skill: pedidos que DEVEM acionar a skill e pedidos parecidos que NÃO devem.
-# Use com a skill skill-creator (otimização de description) ou com `claude plugin eval` quando montar a suíte.
-concreto-armado-nbr6118:
-  deve:
-    - "Quanto de aço vai numa viga 15x40 com momento de 60 kN.m?"
-    - "Essa laje de 10 cm aguenta um vão de 4,5 m?"
-    - "Dimensiona o pilar P3 pra mim, 1200 kN, 3 m de pé-direito"
-    - "qual bitola de estribo usar nessa viga"
-  nao_deve:
-    - "Qual o traço de concreto para fck 25?"
-    - "Me explica a diferença entre CA-50 e CA-60 para uma prova"
-cargas-combinacoes:
-  deve:
-    - "Qual sobrecarga uso numa sala de escritório?"
-    - "Calcula o vento num galpão de 8 m de altura em Goiânia"
-    - "Monta as combinações ELU com peso próprio, uso e vento"
-  nao_deve:
-    - "Quanto pesa um saco de cimento?"
-memorial-de-calculo:
-  deve:
-    - "Gera o memorial de cálculo dessas peças"
-    - "Preciso documentar o dimensionamento pra prefeitura"
-  nao_deve:
-    - "Escreve o memorial descritivo de arquitetura da casa"
 quantitativos-sinapi:
   deve:
     - "Quantos m³ de concreto tem essa estrutura?"
@@ -35,7 +11,7 @@ autocad-assistente:
     - "Me gera um DXF com os pilares"
     - "Cria os layers do projeto estrutural"
     - "Monta uma prancha A1 em 1:50 com carimbo"
-    - "Limpa essa planta da arquitetura pra eu lançar no TQS"
+    - "Limpa essa planta de arquitetura para modelagem BIM"
     - "Qual atalho do AutoCAD pra fazer offset?"
   nao_deve:
     - "Qual a diferença entre DWG e IFC num processo BIM?"
@@ -68,16 +44,6 @@ solidworks-assistente:
   nao_deve:
     - "Dimensiona essa viga de aço pela NBR 8800"
     - "Desenha o detalhe da viga de concreto no AutoCAD"
-tqs-assistente:
-  deve:
-    - "Confere os dados do edifício no TQS"
-    - "Processa o edifício no TQS e gera a tabela de ferros"
-    - "Testa o edifício com fck 30 no TQS"
-    - "Lista os pilares que estão lançados no TQS"
-    - "Qual a diferença entre Modelo IV e Modelo VI no TQS?"
-  nao_deve:
-    - "Calcula a armadura dessa viga 15x40"
-    - "Como faço uma laje no Eberick?"
 archicad-assistente:
   deve:
     - "O modelo do ArchiCAD tá pronto pra mandar o IFC pro calculista?"
@@ -86,18 +52,6 @@ archicad-assistente:
     - "Modele os pilares, vigas e lajes dessa revisão no Archicad"
   nao_deve:
     - "Como faço uma escada no ArchiCAD?"
-modelo-estrutural:
-  deve:
-    - "Monte o modelo estrutural com apoios, cargas e combinações explícitas"
-    - "Valide a revisão do lançamento antes da análise"
-  nao_deve:
-    - "Abra o IFC no Archicad"
-skyciv-assistente:
-  deve:
-    - "Analise esta revisão estrutural na SkyCiv"
-    - "Leia as reações e os deslocamentos da SkyCiv"
-  nao_deve:
-    - "Dimensione a armadura pela NBR 6118 na SkyCiv"
 relatorio-tecnico:
   deve:
     - "Monta um laudo de vistoria com essas fotos"

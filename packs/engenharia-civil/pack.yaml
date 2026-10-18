@@ -1,31 +1,23 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.5.1
-publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
+version: 1.6.0
+publico: Engenheiros civis, profissionais de projeto e estudantes de Engenharia Civil
 descricao: >-
-  Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
-  quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e o agente operando AutoCAD,
-  Revit, SOLIDWORKS, ArchiCAD e TQS, com modelo estrutural versionado e análise linear SkyCiv opcional.
+  Organização persistente de projetos, planta arquitetônica com cortes CAD e planos BIM,
+  quantitativos e orçamento SINAPI, relatórios técnicos, consulta a fontes públicas e
+  assistência a AutoCAD, Revit, SOLIDWORKS e Archicad com conexões opcionais.
 skills:
   - engenharia-civil/contexto-do-projeto
-  - engenharia-civil/modelo-estrutural
   - engenharia-civil/planta-arquitetonica
-  - engenharia-civil/skyciv-assistente
-  - engenharia-civil/concreto-armado-nbr6118
-  - engenharia-civil/cargas-combinacoes
-  - engenharia-civil/memorial-de-calculo
   - engenharia-civil/quantitativos-sinapi
   - engenharia-civil/autocad-assistente
   - engenharia-civil/revit-assistente
   - engenharia-civil/solidworks-assistente
-  - engenharia-civil/tqs-assistente
   - engenharia-civil/archicad-assistente
   - engenharia-civil/consulta-normas
   - _comum/relatorio-tecnico
 mcps:
   - nome: normas-publicas
-    opcional: true
-  - nome: skyciv
     opcional: true
   - nome: autocad
     opcional: true
@@ -42,13 +34,6 @@ fluxos:
       - "Para PDF/imagem, calibre pontos em pixels com planta-arquitetonica/scripts/planta.py calibrar; registre níveis, pé-direito, espessuras, peitoris e alturas que a planta não informa."
       - "Valide o planta-arquitetonica.json e gere corte-<id>.dxf e planos-bim.json; confira os cortes no CAD contra a planta original."
       - "Escolha Revit ou Archicad, resolva famílias/favoritos e pavimentos, simule os lotes e confirme antes de modelar; confira IDs, GUIDs e geometria lida de volta no aplicativo."
-  - titulo: Do contexto ao cálculo, plantas e BIM
-    passos:
-      - "Escolha a obra, revisão e destino BIM: Revit ou Archicad. Pesquise somente fontes públicas; confira valores NBR no exemplar licenciado do cliente e registre item, edição e pendências."
-      - "Monte o mapa de ações e as combinações explícitas; prepare e valide modelo-estrutural.json com níveis, eixos, peças, materiais, vínculos e fontes."
-      - "Revise a prévia e autorize cada envio à SkyCiv. Salve entrada, resultados, consumo de créditos e relatório; confira reações e esforços com referência independente."
-      - "Gere plantas e seções de fôrma em DXF da mesma revisão. Abra, confira cotas e escala no AutoCAD; salve DWG e PDF quando houver conexão real."
-      - "Modele a mesma revisão no Revit ou no Archicad, confira contagens, seções e propriedades lidas de volta, salve RVT/PLN e audite o IFC no destino escolhido."
   - titulo: Retomar um projeto em outra sessão
     passos:
       - "Abra o agente na pasta da obra e diga: 'Retome este projeto pela ficha projeto-contexto.json; mostre decisões, artefatos e pendências antes de avançar'."
@@ -60,42 +45,29 @@ fluxos:
       - "Responda às perguntas da ficha: uso, pavimentos, área, ambiente e, se souber, o endereço do lote."
       - "O agente pesquisa em fontes oficiais o código de obras, o zoneamento, os Bombeiros e as concessionárias, e registra edição, artigo, link, data de acesso e vigência."
       - "Revise a tabela de exigências que mudam o projeto e as pendências a confirmar com a prefeitura."
-  - titulo: Do lançamento ao memorial (pavimento de concreto armado)
+  - titulo: Dos dados conferidos ao desenho
     passos:
-      - "Descreva o pavimento: \"Tenho 4 lajes, 6 vigas e 6 pilares; as lajes são…\" — o agente organiza o lançamento."
-      - "Peça um mapa de ações por ambiente/elemento, incluindo varanda, paredes, cargas concentradas, cobertura e garagem quando aplicável; resolva as pendências antes de dimensionar (cargas-combinacoes)."
-      - "Calcule as lajes uma a uma e anote as reações nas vigas (concreto-armado-nbr6118)."
-      - "Calcule as vigas com essas reações e depois os pilares com a carga acumulada."
-      - "Peça: \"Gere o memorial com tudo que calculamos\" (memorial-de-calculo) — sai em Word e PDF."
-  - titulo: Do cálculo ao desenho
-    passos:
-      - "Com uma viga ou pilar calculado, peça: \"Desenhe a seção da V1 no AutoCAD\" (autocad-assistente)."
-      - "Sem AutoCAD aberto, peça o DXF: \"Gere o DXF das seções de todos os pilares\"."
-  - titulo: Do cálculo ao modelo no Revit
+      - "Forneça geometria e medidas já conferidas por profissional habilitado; identifique a revisão de origem."
+      - "Peça um desenho ou prancha no AutoCAD; confira cotas e escala no aplicativo antes de entregar."
+  - titulo: Do desenho ao modelo no Revit
     passos:
       - "Abra o Revit com o projeto e ligue o 'Revit MCP Switch' (faixa Suplementos)."
-      - "Peça: \"Lança no Revit os pilares, vigas e lajes que calculamos, nos níveis Térreo e Pav 1\" (revit-assistente)."
+      - "Forneça posições, níveis e tipos definidos no projeto e peça uma prévia dos elementos a criar (revit-assistente)."
       - "Confirme a criação dos tipos de seção (código C# mostrado pelo agente) e confira o modelo em 3D."
       - "Peça: \"Quantos m³ de concreto tem por pavimento?\" e orce com o SINAPI (quantitativos-sinapi)."
-  - titulo: Automatizar o TQS
-    passos:
-      - "No computador com o TQS, abra o Claude Code/Codex e diga: \"Confere os dados do edifício <nome> no TQS\" (tqs-assistente)."
-      - "O agente diagnostica o Python/TQS, lê pisos, CAA, fck e cobrimentos e faz triagem; a conformidade com a NBR 6118:2026 depende de revisão técnica independente."
-      - "Peça variantes: \"Cria uma cópia com fck 30 e processa as duas para comparar o aço\". O processamento só roda depois do seu sim."
-      - "Leve o modelo ao Revit pelo IFC do TQS ou peça \"Manda o modelo do TQS para o Revit\"."
   - titulo: Peça metálica no SOLIDWORKS
     passos:
       - "Abra o SOLIDWORKS e peça: \"Modela uma chapa de base 300x300x16 com 4 furos de 22 mm e me diz o peso\" (solidworks-assistente)."
       - "Confira a captura de tela e a massa (o agente compara com o cálculo do perfil)."
       - "Peça a macro da folha de desenho e o DXF de corte, ou exporte em STEP para o Revit."
-  - titulo: Orçamento rápido da estrutura
+  - titulo: Orçamento com quantitativos conferidos
     passos:
       - "Baixe a planilha SINAPI do seu estado no site da Caixa."
       - "Peça: \"Levante os quantitativos da estrutura e orce com o SINAPI de <mês>, BDI 25%\" (quantitativos-sinapi)."
   - titulo: Modelo BIM pronto para entrega
     passos:
       - "Abra o projeto no Archicad 29 ou 30, salve uma cópia e confirme a porta/Tapir com list_instances."
-      - "Após lançar, compare cada GUID, seção, nível, material e espessura com GetDetailsOfElements e verificar_lancamento.py."
+      - "Após alterações confirmadas, releia GUIDs, níveis, materiais e dimensões no aplicativo."
       - "Peça: \"Audite o modelo para exportar IFC\" (archicad-assistente) e corrija o que for apontado."
       - "Exporte as pendências em BCF para a equipe de projeto."
   - titulo: Canteiro e segurança conforme as NRs

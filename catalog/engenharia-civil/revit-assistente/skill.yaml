@@ -7,5 +7,5 @@ exemplos:
   - "Lança no Revit os pilares, vigas e lajes que calculamos, nos níveis Térreo e Pav 1"
   - "Quantos m³ de concreto tem em cada pavimento deste modelo?"
   - "Pinta as vigas por seção para eu revisar e isola as que estão sem marca"
-  - "Exporta o IFC só da estrutura para eu mandar ao TQS"
+  - "Exporta o IFC só da estrutura para a equipe de projeto"
   - "Cria uma tabela com marca, tipo e volume de todos os pilares"

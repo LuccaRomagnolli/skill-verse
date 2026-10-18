@@ -1,11 +1,11 @@
 titulo: Assistente AutoCAD
 categoria: engenharia-civil
 version: 1.4.1
-resumo: Opera o AutoCAD pelo chat (layers, desenho e edição, cotas, blocos, detalhes de seção, pranchas A0–A4 com carimbo e escala, base de arquitetura limpa para o TQS/Revit, PDF e AutoLISP com confirmação) e gera DXF quando não há AutoCAD.
+resumo: Opera o AutoCAD pelo chat (layers, desenho e edição, cotas, blocos, detalhes de seção, pranchas A0–A4 com carimbo e escala, base de arquitetura limpa para CAD/BIM, PDF e AutoLISP com confirmação) e gera DXF quando não há AutoCAD.
 mcps: [autocad]
 exemplos:
   - "Desenhe no AutoCAD o detalhe da seção da viga V1 que calculamos"
   - "Monte uma prancha A1 em 1:50 com o carimbo da obra e coloque as seções dentro"
-  - "Limpe essa planta de arquitetura e salve uma base por pavimento para eu lançar no TQS"
+  - "Limpe essa planta de arquitetura e salve uma base por pavimento para modelagem BIM"
   - "Quantos blocos de pilar e qual o comprimento total de vigas tem nesse DWG?"
   - "Gere um DXF com as seções dos pilares P1 a P4 para eu mandar ao desenhista"

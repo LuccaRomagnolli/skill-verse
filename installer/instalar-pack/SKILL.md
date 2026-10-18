@@ -50,7 +50,7 @@ Resuma o que vai acontecer e peça confirmação. Então rode sem `--simular`.
 ```bash
 python3 scripts/install.py verificar
 ```
-A primeira verificação dos MCPs pode levar alguns minutos (baixa dependências). Leia separadamente `servidor`, `tools` e `aplicativo`: handshake não prova software operável. Se a leitura do aplicativo falhar, abra o software/projeto, ative o add-in e repita. AutoCAD `modo: headless` só prova o backend DXF. TQS não é MCP: rode o diagnóstico da skill TQS no Windows. Anote testes reais ainda não feitos como pendência, sem prometer que a conexão funciona.
+A primeira verificação dos MCPs pode levar alguns minutos (baixa dependências). Leia separadamente `servidor`, `tools` e `aplicativo`: handshake não prova software operável. Se a leitura do aplicativo falhar, abra o software/projeto, ative o add-in e repita. AutoCAD `modo: headless` só prova o backend DXF. Anote testes reais ainda não feitos como pendência, sem prometer que a conexão funciona.
 
 ## 6. Manual personalizado
 Escreva um arquivo temporário `para-voce.md` começando com `## Para você`, com 3–5 sugestões de uso ligadas ao que o usuário contou nos passos 2.3 e 2.4. Use os exemplos das skills, adaptados ao trabalho dele, e cite as skills pelo nome. Depois:

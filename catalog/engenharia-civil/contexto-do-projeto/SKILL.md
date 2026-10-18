@@ -36,7 +36,7 @@ Para cada item do checklist, siga `references/onde-buscar.md`:
    ```
    O comando devolve um ID (`f1`, `f2`…). Para cada valor que afeta o projeto, registre artigo/item, critério, valor, unidade e impacto com `contexto.py requisito --fonte f1 ...` (exemplo em `references/continuidade.md`). Uma fonte sem URL oficial e vigência confirmada não fundamenta um requisito. Item que não se aplica: `contexto.py nao-aplica --checklist c5 --motivo "..." --fonte f2`, citando a fonte da dispensa. O que não deu para confirmar vira `contexto.py pendencia --texto "..."`.
 4. **Documento público e longo** (código de obras, IT dos Bombeiros, norma da concessionária): se o MCP `normas-publicas` estiver conectado, importe com `importar_documento_publico` para consultar item a item depois (`buscar_normas`, `fonte='local'`).
-5. **NBR**: confirme número, edição e emendas no Catálogo ABNT e registre o link e a data. A referência atual do concreto é a NBR 6118:2026 (edição 2023 + Emenda 1:2026); os scripts do pack ainda têm validação integral pendente. Registre a data do protocolo de licenciamento e a decisão sobre a regra transitória do prefácio da emenda (180 dias). Não use PDFs de cópias na internet nem embuta o exemplar licenciado do usuário no pack. Antes de aplicar qualquer cálculo, confira o status normativo declarado pela skill e pelo resultado.
+5. **NBR**: confirme número, edição e emendas no Catálogo ABNT e registre o link e a data. A referência atual do concreto é a NBR 6118:2026 (edição 2023 + Emenda 1:2026); Registre a data do protocolo de licenciamento e a decisão sobre a regra transitória do prefácio da emenda (180 dias). Não use PDFs de cópias na internet nem embuta o exemplar licenciado do usuário no pack. Antes de aplicar um requisito, confira o item no exemplar licenciado e registre a decisão do responsável técnico.
 6. **ATP**: solicite ao projetista a classe de consequência, fundamento e situação da avaliação técnica. Use `contexto.py atp --classe CC3 --situacao pendente --fundamento "..."` e atualize quando houver parecer ou dispensa formal. A ATP é a regra geral; a dispensa só é prevista para CC1/CC2 mediante acordo formal entre projetista e contratante. Se a classe for duvidosa, trate como CC3 até definição profissional. Não declare independência do avaliador sem evidência.
 
 ## 3. Entrega ao usuário
@@ -46,12 +46,8 @@ Para cada item do checklist, siga `references/onde-buscar.md`:
 - Registre hipóteses e escolhas com `contexto.py decisao`, arquivos finais com `contexto.py artefato` e dúvidas com `contexto.py pendencia`. Ao encerrar, mostre o `resumo` e o próximo passo. O registro não transforma hipótese em conformidade.
 
 ## Como as outras skills usam a ficha
-- `concreto-armado-nbr6118`: classe de agressividade e cobrimento (`--caa`).
-- `cargas-combinacoes`: município para localizar V0 no mapa de isopletas da NBR 6123 (o valor é lido no mapa, com o usuário).
 - `quantitativos-sinapi`: UF da planilha SINAPI.
-- `memorial-de-calculo` e `relatorio-tecnico`: endereço, município e lista de normas/legislação aplicáveis.
-- `concreto-armado-nbr6118` e `autocad-assistente`: os **scripts** leem a CAA da ficha automaticamente (cobrimento e concreto mínimo) quando rodam na pasta do projeto.
-- `modelo-estrutural` e `skyciv-assistente`: registram a revisão, modelo, fontes de ações/combinações, resultados e créditos da análise. Use `artefato` para modelo, manifesto e resultados; `pendencia` para revisão normativa e comparação independente.
+- `relatorio-tecnico`: endereço, município e lista de normas/legislação aplicáveis.
 - `autocad-assistente`: registra plantas, seções e pranchas DXF/DWG/PDF da mesma revisão, com conferência no aplicativo.
 - `revit-assistente` ou `archicad-assistente`: destino BIM escolhido para a obra; registre RVT/PLN, IDs, IFC e BCF quando aplicável.
 - `consulta-normas`: NRs (canteiro, NR-18) e documentos locais importados no índice; para obra, combine as exigências locais com o checklist de segurança.

@@ -4,7 +4,7 @@ A loja usa Vinext em Cloudflare Workers, com D1 para pedidos e R2 privado para o
 
 ## Estado atual
 
-O pagamento inicia desativado. O pack de Engenharia Civil 1.4.1 ainda é candidato, conforme o README principal do repositório: não disponibilize o ZIP até sua liberação técnica. A hospedagem do site está privada; visitantes e webhooks externos da SyncPay não podem alcançá-la nesse estado. Os testes automatizados usam respostas simuladas, sem efetuar cobranças reais.
+O pagamento inicia desativado. O pack de Engenharia Civil 1.6.0 ainda é candidato, conforme o README principal do repositório: não disponibilize o ZIP até sua liberação técnica. A hospedagem do site está privada; visitantes e webhooks externos da SyncPay não podem alcançá-la nesse estado. Os testes automatizados usam respostas simuladas, sem efetuar cobranças reais.
 
 A SyncPay exige IP de origem autorizado. Confirme com a SyncPay e a hospedagem uma solução de saída compatível; este projeto não presume que o Worker tenha um IP fixo. A chave pública do cartão exige que a origem da loja esteja autorizada no painel SyncPay. O checkout mantém os dados do cartão no navegador apenas durante a tokenização direta na SyncPay: o servidor recebe somente o token. A página própria continua sujeita às obrigações de segurança aplicáveis a cartão; não pressupõe certificação PCI.
 

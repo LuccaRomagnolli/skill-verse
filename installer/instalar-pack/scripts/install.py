@@ -664,6 +664,30 @@ def cmd_instalar(args) -> int:
     if falhas:
         registro["falhas_mcp"] = falhas
 
+    # Uma atualização deve retirar apenas componentes registrados como pertencentes
+    # a este pack e ausentes da nova composição.
+    novos_caminhos = {c for info in registro["plataformas"].values() for c in info.get("caminhos", [])}
+    for info in anterior.get("plataformas", {}).values():
+        for caminho in info.get("caminhos", []):
+            if caminho not in novos_caminhos and owned_by(Path(caminho), pack["id"]):
+                log.passo(f"remover skill antiga {caminho}")
+                if not log.simular:
+                    shutil.rmtree(caminho)
+    for nome, antigo in anterior.get("mcps", {}).items():
+        if nome in registro["mcps"]:
+            continue
+        if "claude" in antigo.get("plataformas", []) and find_claude():
+            run([find_claude(), "mcp", "remove", nome, "--scope", "user"], log, check=False)
+        if "codex" in antigo.get("plataformas", []):
+            unregister_codex_mcp(nome, log)
+        remover_extraidos(antigo, log)
+        for caminho in antigo.get("pastas_mcp", []):
+            alvo, base = Path(caminho).resolve(), mcp_dir().resolve()
+            if alvo != base and base in alvo.parents and alvo.is_dir():
+                log.passo(f"remover MCP antigo {alvo}")
+                if not log.simular:
+                    shutil.rmtree(alvo)
+
     if not log.simular:
         state = load_state()
         state["packs"][pack["id"]] = registro
@@ -929,7 +953,7 @@ def cmd_atualizar(args) -> int:
         sys.exit("Pack não instalado — use 'instalar'.")
     plats = list(reg["plataformas"])
     args.plataforma = "ambas" if len(plats) == 2 else plats[0]
-    args.mcps = ",".join(reg["mcps"])
+    args.mcps = ",".join(n for n in reg["mcps"] if n in {m["nome"] for m in pack.get("mcps", [])})
     args.sem_plugin = reg["plataformas"].get("claude", {}).get("modo") == "copia"
     print(f"Atualizando de v{reg['version']} para v{pack['version']}")
     return cmd_instalar(args)

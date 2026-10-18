@@ -48,8 +48,8 @@ Não há ferramenta no MCP. Gere a macro de `references/api-vba.md` (3 vistas no
 
 ## 7. Peso → orçamento e outros softwares
 - Peso total e área de pintura (`get_mass_properties`) → skill `quantitativos-sinapi` (estrutura metálica em kg, pintura em m²). Some e converta por script, nunca de cabeça.
-- STEP → Revit (família genérica) ou compatibilização com o modelo estrutural (skills `revit-assistente`, `tqs-assistente`).
-- Cargas na peça (reação de apoio, vento) vêm do cálculo: skill `cargas-combinacoes`.
+- STEP → Revit (família genérica) ou compatibilização com outros modelos, usando `revit-assistente` quando disponível.
+- Esforços e critérios de dimensionamento devem ser fornecidos e revisados pelo responsável técnico.
 
 ## Limites e responsabilidade
 - O SOLIDWORKS **não dimensiona** a peça pela NBR 8800:2024 (corrigida em 2025) nem pela NBR 14762 (confirme a edição vigente no Catálogo ABNT): o modelo materializa a geometria definida pelo engenheiro. Espessuras, furos, soldas e parafusos são decisão do projetista, que assina como responsável técnico.

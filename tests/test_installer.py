@@ -50,25 +50,23 @@ def test_estrutura_do_zip(pacote):
     assert "planta-arquitetonica" in names
     assert (pacote / "plugin/skills/planta-arquitetonica/scripts/planta.py").is_file()
     assert (pacote / "mcps/normas-publicas/server.py").is_file()   # código do MCP próprio vai no zip
-    assert (pacote / "mcps/skyciv/server.py").is_file()
-    assert (pacote / "VALIDACAO-AUTOCAD-MAC-2027.md").is_file()
-    assert (pacote / "VALIDACAO-ARCHICAD-30-MAC.md").is_file()
+    assert len(pack["skills"]) == 9 and len(pack["mcps"]) == 5
     assert not list(pacote.rglob("*.db")) and not list(pacote.rglob("pdf/*.pdf"))  # documentos não vão
     mk = json.loads((pacote / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
     assert mk["plugins"][0]["name"] == json.loads((pacote / "plugin/.claude-plugin/plugin.json").read_text())["name"]
     assert not list(pacote.rglob("skill.yaml")), "metadados internos não devem ir no zip"
     assert "{{" not in (pacote / "INSTALAR.md").read_text(encoding="utf-8")
     completo = (pacote / "MANUAL-COMPLETO.md").read_text(encoding="utf-8")
-    assert "Versão 1.5.1" in completo and "{{" not in completo
-    assert "Fluxo 1 — planta baixa" in completo and "Fluxo 2 — estrutura" in completo
+    assert "Versão 1.6.0" in completo and "{{" not in completo
+    assert "Fluxo 1 — planta baixa" in completo
 
 
 def test_ciclo_codex(pacote, home):
     r = cli(pacote, "instalar", "--plataforma", "codex")
     assert r.returncode == 0, r.stderr
     skills = home / ".codex/skills"
-    assert (skills / "concreto-armado-nbr6118/SKILL.md").is_file()
-    assert json.loads((skills / "concreto-armado-nbr6118/.skillverse.json").read_text())["pack"] == "engenharia-civil"
+    assert (skills / "planta-arquitetonica/SKILL.md").is_file()
+    assert json.loads((skills / "planta-arquitetonica/.skillverse.json").read_text())["pack"] == "engenharia-civil"
     assert (home / "SkillVerse/packs/engenharia-civil/pack.json").is_file()
 
     r = cli(pacote, "verificar", "--sem-mcp")
@@ -77,10 +75,10 @@ def test_ciclo_codex(pacote, home):
     r = cli(pacote, "manual")
     assert r.returncode == 0, r.stderr
     md = (home / "SkillVerse/engenharia-civil/MANUAL.md").read_text(encoding="utf-8")
-    assert "Codex `$concreto-armado-nbr6118`" in md and "{{" not in md
-    assert "Seu primeiro projeto guiado" in md and "NBR 6118:2026" in md
+    assert "Codex `$planta-arquitetonica`" in md and "{{" not in md
+    assert "Como usar" in md and "planta" in md
     assert "MANUAL-COMPLETO.html" in md
-    assert "<table>" in (home / "SkillVerse/engenharia-civil/MANUAL.html").read_text(encoding="utf-8")
+    assert "<h2>Skills instaladas</h2>" in (home / "SkillVerse/engenharia-civil/MANUAL.html").read_text(encoding="utf-8")
     completo_md = (home / "SkillVerse/engenharia-civil/MANUAL-COMPLETO.md").read_text(encoding="utf-8")
     completo_html = (home / "SkillVerse/engenharia-civil/MANUAL-COMPLETO.html").read_text(encoding="utf-8")
     assert completo_md == (pacote / "MANUAL-COMPLETO.md").read_text(encoding="utf-8")
@@ -88,7 +86,7 @@ def test_ciclo_codex(pacote, home):
 
     r = cli(pacote, "desinstalar")
     assert r.returncode == 0
-    assert not (skills / "concreto-armado-nbr6118").exists()
+    assert not (skills / "planta-arquitetonica").exists()
     assert not (home / "SkillVerse/packs").exists()
 
 
@@ -107,6 +105,26 @@ def test_ciclo_ambas_plataformas_com_atualizacao(pacote, home):
     assert r.returncode == 0, r.stderr
     for pasta in (home / ".claude/skills", home / ".codex/skills"):
         assert not (pasta / "contexto-do-projeto").exists()
+
+
+def test_atualizar_remove_componentes_que_sairam_do_pack(pacote, home):
+    assert cli(pacote, "instalar", "--plataforma", "codex").returncode == 0
+    antiga = home / ".codex/skills/concreto-armado-nbr6118"
+    antiga.mkdir(parents=True)
+    (antiga / "SKILL.md").write_text("versão anterior", encoding="utf-8")
+    (antiga / ".skillverse.json").write_text(json.dumps({"pack": "engenharia-civil"}), encoding="utf-8")
+    install.register_codex_mcp("skyciv", {"command": "/usr/bin/true", "args": [], "env": {}}, install.Log(False))
+    state = install.load_state()
+    reg = state["packs"]["engenharia-civil"]
+    reg["plataformas"]["codex"]["caminhos"].append(str(antiga))
+    reg["mcps"]["skyciv"] = {"plataformas": ["codex"], "servidor": {"command": "/usr/bin/true", "args": [], "env": {}}}
+    install.save_state(state)
+
+    r = cli(pacote, "atualizar")
+    assert r.returncode == 0, r.stderr
+    assert not antiga.exists()
+    assert "skyciv" not in tomllib.loads((home / ".codex/config.toml").read_text()).get("mcp_servers", {})
+    assert "skyciv" not in install.load_state()["packs"]["engenharia-civil"]["mcps"]
 
 
 def test_nao_sobrescreve_skill_alheia(pacote, home):

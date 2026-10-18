@@ -26,7 +26,7 @@ Quando o documento tratar de segurança do trabalho, canteiro, trabalho em altur
 
 Se existir `projeto-contexto.json` (skill `contexto-do-projeto`), use o município/UF e a legislação local registrada na identificação e na fundamentação do documento.
 
-Se o laudo for de estrutura de concreto e o usuário quiser verificar uma peça, use a skill `concreto-armado-nbr6118` e cite o resultado no documento.
+Se o laudo exigir verificação de uma peça, registre a necessidade de cálculo e parecer do profissional responsável; cite somente resultados fornecidos e revisados.
 
 ## Limites e responsabilidade
 - O documento é redigido a partir das informações fornecidas pelo usuário. A vistoria, as medições e as conclusões técnicas são do profissional que assina.

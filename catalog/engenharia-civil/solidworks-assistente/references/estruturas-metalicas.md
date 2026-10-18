@@ -4,7 +4,7 @@
 - **Peças de ligação** de estruturas metálicas e mistas: chapas de base de pilar com chumbadores, chapas de ligação, cantoneiras de apoio, consoles, insertos metálicos em concreto (pré-moldado).
 - **Estruturas leves**: mezaninos, passarelas, coberturas de pequeno porte, suportes de reservatório e de equipamentos, guarda-corpos.
 - **Fôrmas e escoramentos especiais**: fôrma metálica de pilar circular, gabaritos, peças de içamento.
-- **Montagem e compatibilização**: conferir interferência entre peças e com o concreto (STEP do Revit/TQS como referência).
+- **Montagem e compatibilização**: conferir interferência entre peças e com o concreto (STEP do Revit como referência).
 - **Fabricação**: peso para orçamento, lista de peças, STEP/DXF para corte (plasma/laser) e dobra.
 
 ## Normas (citadas por número; o agente não reproduz texto)
@@ -36,5 +36,5 @@ Execute as ops em ordem. Troque `$ultima_extrusao` pelo nome devolvido por `crea
 - Orce com `quantitativos-sinapi` (composições de estrutura metálica em kg: fabricação + montagem; pintura em m², com a área de superfície devolvida por `get_mass_properties`).
 
 ## Saídas para outros softwares
-- **STEP** (`save_document` com `.STEP`): para Revit (família genérica), TQS/compatibilização e fabricante.
+- **STEP** (`save_document` com `.STEP`): para Revit (família genérica), compatibilização e fabricante.
 - **DXF de chapas para corte** e **folha de desenho**: macro de `api-vba.md`.

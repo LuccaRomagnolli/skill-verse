@@ -1,6 +1,6 @@
 ---
 name: autocad-assistente
-description: Opera o AutoCAD/AutoCAD LT pelo chat via MCP. Cria e organiza layers no padrão de projeto, desenha e edita entidades, cotas, textos, blocos e atributos, detalha seções de vigas e pilares a partir do cálculo, monta pranchas A0–A4 com carimbo e escala, limpa a planta de arquitetura para lançar no TQS/Revit, inspeciona DWG/DXF recebidos, plota PDF e roda AutoLISP com confirmação. Sem AutoCAD (ou no macOS), gera DXF. Use quando o usuário pedir para "desenhar no AutoCAD", "detalhar a seção", "criar layers", "gerar DXF", "montar a prancha", "carimbo", "plotar em PDF", "limpar a planta da arquitetura", "base para o TQS", "quantos pilares tem nesse DWG", "LISP", "escala do desenho", "planta de fôrma" ou mencionar AutoCAD, CAD, DWG ou DXF.
+description: Opera o AutoCAD/AutoCAD LT pelo chat via MCP. Cria e organiza layers no padrão de projeto, desenha e edita entidades, cotas, textos, blocos e atributos, detalha seções de vigas e pilares a partir do cálculo, monta pranchas A0–A4 com carimbo e escala, prepara a planta de arquitetura para modelagem no Revit ou Archicad, inspeciona DWG/DXF recebidos, plota PDF e roda AutoLISP com confirmação. Sem AutoCAD (ou no macOS), gera DXF. Use quando o usuário pedir para "desenhar no AutoCAD", "detalhar a seção", "criar layers", "gerar DXF", "montar a prancha", "carimbo", "plotar em PDF", "limpar a planta da arquitetura", "quantos pilares tem nesse DWG", "LISP", "escala do desenho", "planta de fôrma" ou mencionar AutoCAD, CAD, DWG ou DXF.
 ---
 
 # Assistente AutoCAD
@@ -18,8 +18,6 @@ Ferramentas do MCP `autocad`: `system`, `drawing`, `layer`, `entity`, `annotatio
 4. Combine um plano de operações: arquivo-alvo, unidades, layers, objetos afetados, quantidade esperada, saída e como desfazer. Execute em lotes pequenos; após cada lote confira `drawing` → `info`, `entity` → `count` e captura visual (`view` → `get_screenshot` quando disponível). Divergência de contagem, escala ou layer suspende a sequência.
 
 ## 2. Detalhe de seção (viga ou pilar)
-Para plantas e seções **de fôrma** por pavimento da revisão estrutural, use `python3 scripts/plantas.py modelo-estrutural.json --saida desenhos/ --formato A3 --escala 50`. O gerador cria DXF de cada nível, seções geométricas e pranchas, além de operações do MCP e `manifesto-cad.json` com revisão e hash. As cotas desenhadas são estáticas; confira e refaça as cotas associativas no AutoCAD. Compare o hash com o manifesto SkyCiv. Abra e meça os DXF no AutoCAD antes de salvar DWG/PDF pelo aplicativo real. Sem conexão, entregue apenas DXF e registre a pendência de verificação.
-
 O script `scripts/detalhe_secao.py` calcula a geometria (cobrimento, estribo, posição das barras, cotas, textos) e gera:
 - `--ops arquivo.json`: lista de chamadas do MCP em ordem. Execute cada item chamando a ferramenta `tool` com os demais campos como parâmetros. Onde aparecer `"entity_id": "$anterior"`, use o `handle` devolvido pela operação anterior (a polilinha da barra que recebe a hachura).
 - `--dxf arquivo.dxf`: desenho pronto (R12). Útil sem AutoCAD, para enviar a terceiros ou para abrir com `drawing` → `open`.
@@ -28,7 +26,7 @@ O script `scripts/detalhe_secao.py` calcula a geometria (cobrimento, estribo, po
 python3 scripts/detalhe_secao.py --b 15 --h 45 --c 3 --inf 3x12.5 --sup 2x8 --estribo 5 --s 13 --nome V1 --ops V1.json --dxf V1.dxf
 python3 scripts/detalhe_secao.py --b 20 --h 50 --c 3 --pilar 3 --phi 20 --estribo 5 --s 20 --nome P1 --origem 40 0 --ops P1.json
 ```
-Use os dados da skill `concreto-armado-nbr6118` (barras e estribos sugeridos). Rodando na pasta do projeto, o script pega o **cobrimento pela classe de agressividade da ficha** (`projeto-contexto.json`, skill `contexto-do-projeto`). `--c` sobrescreve. Várias seções no mesmo desenho: desloque cada uma com `--origem x y` (ex.: 40 cm entre seções).
+Use apenas dados de detalhamento fornecidos e conferidos por profissional habilitado. Rodando na pasta do projeto, o script pega o **cobrimento pela classe de agressividade da ficha** (`projeto-contexto.json`, skill `contexto-do-projeto`). `--c` sobrescreve. Várias seções no mesmo desenho: desloque cada uma com `--origem x y` (ex.: 40 cm entre seções).
 
 Depois de executar as operações: `view` → `zoom_extents` e `view` → `get_screenshot` para mostrar o resultado ao usuário. Salve com `drawing` → `save` (AutoCAD) ou `save_as_dxf`.
 Registre o DWG/DXF salvo na ficha com `contexto.py artefato --tipo desenho --caminho ... --revisao ...`; registre a origem da geometria com `decisao` e, se faltar revisão dimensional, lance `pendencia`. No modo `ezdxf`, registre explicitamente que o DXF foi gerado sem validar a abertura/plotagem no AutoCAD.
@@ -44,8 +42,8 @@ O JSON de saída traz a moldura, a área livre e as **alturas de texto já conve
 
 **Pranchas para aprovação**: prefeituras costumam ter padrão próprio (formato, carimbo, quadro de áreas, escalas). Com a ficha do projeto, procure esse padrão com a skill `contexto-do-projeto` (consulta: `padrão de apresentação de projetos <município>`), registre a fonte e siga-o. Ele prevalece sobre o padrão genérico. Preencha o carimbo com os dados da ficha e do responsável técnico informados pelo usuário. **Nunca invente** registro profissional nem número de ART.
 
-## 4. Base de arquitetura para o cálculo (TQS, Revit)
-Roteiro em `references/base-para-calculo.md`: diagnóstico de layers/unidade, proposta de limpeza (com confirmação), congelar o que não é estrutural, levar o cruzamento de eixos para 0,0 e salvar `BASE-ESTRUTURA-<pavimento>.dxf`, um por pavimento.
+## 4. Base de arquitetura para CAD e BIM
+Roteiro em `references/base-para-calculo.md`: diagnóstico de layers/unidade, proposta de limpeza (com confirmação), origem e eixos, e uma cópia DXF por pavimento para conferência e modelagem.
 
 ## 5. Ler e auditar um DWG/DXF recebido
 - `drawing` → `info`, `layer` → `list`, `entity` → `count` por layer e `block` → `list`. Resuma o que há no arquivo.
@@ -65,8 +63,8 @@ Roteiro em `references/base-para-calculo.md`: diagnóstico de layers/unidade, pr
 Para desenhar canteiro de obras (áreas de vivência, acessos, central de armação/fôrmas, baias, proteção de periferia), levante antes as exigências com a skill `consulta-normas` (NR-18, NR-24, NR-10) e anote o item da norma em cada elemento do desenho (layer `EST-TEXTO`).
 
 ## 8. Integração com as outras skills
-- Cálculo → desenho: `concreto-armado-nbr6118` (armaduras) → seção §2 → prancha §3 → `memorial-de-calculo`.
-- Revit: DWG vinculado e exportação de vistas (skill `revit-assistente`). TQS: base §4 e plantas DXF exportadas pelo TQS (skill `tqs-assistente`). SolidWorks: peças metálicas exportadas em STEP/DXF (skill `solidworks-assistente`).
+- Dados de desenho conferidos → seção §2 → prancha §3 → inspeção e registro da revisão.
+- Revit: DWG vinculado e exportação de vistas (skill `revit-assistente`). Archicad: planta e elementos conferidos (skill `archicad-assistente`). SOLIDWORKS: peças exportadas em STEP/DXF (skill `solidworks-assistente`).
 
 ## Limites e responsabilidade
 - Gera desenhos de apoio (seções, pranchas, layers, elementos simples, limpeza de base). Não substitui o detalhamento completo (armação longitudinal com comprimentos, ancoragens, dobras, tabela de aço) nem a revisão do projetista. O responsável técnico assina e responde pelo projeto.

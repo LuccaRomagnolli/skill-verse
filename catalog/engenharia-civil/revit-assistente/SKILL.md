@@ -1,6 +1,6 @@
 ---
 name: revit-assistente
-description: Opera o Autodesk Revit pelo chat via MCP. Lê a vista, a seleção e os elementos do modelo; cria níveis, eixos, pilares, vigas, lajes, paredes, ambientes, cotas e tags; lança a estrutura a partir do cálculo (seções de pilares e vigas, espessuras de lajes) com os tipos certos; extrai quantitativos de concreto por nível e material para orçamento; colore e isola elementos para revisão; exporta IFC para o calculista e roda C# da Revit API com confirmação. Use quando o usuário mencionar Revit, RVT, família, tipo, nível, modelo BIM estrutural ou disser "lança a estrutura no Revit", "modela esses pilares", "cria os níveis e eixos", "quantos m³ de concreto tem no modelo", "pinta as vigas por seção", "exporta o IFC para o TQS", "cria uma tabela de pilares" ou "faz isso na Revit API".
+description: Opera o Autodesk Revit pelo chat via MCP. Lê a vista, a seleção e os elementos do modelo; cria níveis, eixos, pilares, vigas, lajes, paredes, ambientes, cotas e tags; lança a estrutura a partir do cálculo (seções de pilares e vigas, espessuras de lajes) com os tipos certos; extrai quantitativos de concreto por nível e material para orçamento; colore e isola elementos para revisão; exporta IFC para o calculista e roda C# da Revit API com confirmação. Use quando o usuário mencionar Revit, RVT, família, tipo, nível, modelo BIM estrutural ou disser "lança a estrutura no Revit", "modela esses pilares", "cria os níveis e eixos", "quantos m³ de concreto tem no modelo", "pinta as vigas por seção", "exporta o IFC para a equipe de projeto", "cria uma tabela de pilares" ou "faz isso na Revit API".
 ---
 
 # Assistente Revit
@@ -14,14 +14,10 @@ MCP `revit` (mcp-servers-for-revit). As ferramentas recebem **milímetros e grau
 3. Confirme com o usuário: **critério de nível** (topo da laje estrutural × piso acabado), unidade do projeto e se há padrão de nomes do escritório.
 4. Antes de alterar o RVT, descreva o lote (categoria, níveis, quantidade esperada, tipos, unidades e arquivo de destino), salve uma cópia ou ponto de recuperação e confirme operações destrutivas. Releia estatísticas, vista e IDs após cada lote; compare criado × esperado e examine avisos.
 
-## 2. Lançar a estrutura a partir do cálculo
-Quando houver `modelo-estrutural.json`, confira que sua revisão e SHA-256 coincidem com o manifesto SkyCiv e gere a entrada legada sem alterar projetos antigos:
-```bash
-python3 ../modelo-estrutural/scripts/modelo.py revit modelo-estrutural.json --saida lancamento.json
-```
-Registre o hash e os IDs das peças de entrada para comparar com os `elementId` reais após a criação. A geometria BIM não transfere apoios, cargas ou critérios de análise.
+## 2. Modelar a partir de dados conferidos
+Obtenha posições, níveis, seções e materiais de um projeto revisado pelo profissional. Registre origem, revisão e IDs das peças para comparar com os `elementId` reais após a criação. A geometria BIM não valida decisões de projeto.
 
-Fonte dos dados: skill `concreto-armado-nbr6118` (seções) e a planta (posições). Monte o JSON no formato de `assets/lancamento.exemplo.json` (posições em m, seções em cm) e gere as chamadas:
+ Monte o JSON no formato de `assets/lancamento.exemplo.json` (posições em m, seções em cm) e gere as chamadas:
 ```bash
 python3 scripts/lancamento.py lancamento.json --saida lancamento-ops.json
 ```
@@ -39,7 +35,7 @@ Fluxo completo de modelagem (vínculos, níveis, fundações, unir geometrias, m
 - "Esse pilar aqui": `get_selected_elements`.
 - Busca: `ai_element_filter` (categoria, tipo, caixa em mm, até 50 por chamada) e `get_current_view_elements`.
 - Revisão visual: `color_elements` por `Tipo`/`Material`/`Marca` (ex.: seções diferentes destacadas), `operate_element` `Isolate`/`Highlight`/`ResetIsolate`.
-- Ambientes: `export_room_data` (áreas para quadro de áreas e cargas por uso na skill `cargas-combinacoes`).
+- Ambientes: `export_room_data` para quadro de áreas e revisão dos cômodos.
 
 ## 4. Quantitativos para orçamento
 1. Visão rápida: `get_material_quantities` com `categoryFilters` estruturais.
@@ -53,13 +49,13 @@ Fluxo completo de modelagem (vínculos, níveis, fundações, unir geometrias, m
 - Pranchas finais em CAD: exportar DWG pelo Revit e montar com `autocad-assistente`, se o escritório trabalhar assim.
 
 ## 6. IFC e outros softwares
-IFC para o calculista/TQS, vínculo do IFC do TQS, troca com ArchiCAD, AutoCAD e SolidWorks: `references/ifc-interoperabilidade.md`. A exportação pelo agente é a receita "Exportar IFC" (pasta informada pelo usuário).
+IFC para a equipe de projeto, troca com Archicad, AutoCAD e SOLIDWORKS: `references/ifc-interoperabilidade.md`. A exportação pelo agente é a receita "Exportar IFC" (pasta informada pelo usuário).
 
 ## 7. Código C# (Revit API)
 Para o que não tem ferramenta própria (níveis, materiais, schedules, unir geometrias, IFC, parâmetros): `send_code_to_revit`. Regras do template (variável `document`, `return` obrigatório, sem `Transaction` própria, unidades em pés) e receitas: `references/revit-api-csharp.md`. **Sempre mostre o código e peça "sim"**. Para alterações em massa, rode antes uma versão que só conta o que seria afetado.
 
 ## Limites e responsabilidade
-- O modelo gerado é de **apoio** (geometria e quantitativos). Dimensionamento e detalhamento oficiais vêm do cálculo estrutural (skill `concreto-armado-nbr6118`, TQS etc.) e da revisão do engenheiro, que assina como responsável técnico.
+- O modelo gerado é de **apoio** (geometria e quantitativos). Critérios de projeto e detalhamento devem vir de documentos revisados pelo profissional responsável.
 - Resultados do modelo analítico do Revit não substituem o software de cálculo.
 - `send_code_to_revit` e `delete_element` alteram o projeto: só com confirmação explícita. Recomende salvar (ou trabalhar numa cópia) antes de lotes grandes, já que o desfazer do Revit cobre a transação inteira.
 - Quantitativos dependem da modelagem (uniões, sobreposições). Informe o critério usado e confira com o critério de medição do SINAPI.

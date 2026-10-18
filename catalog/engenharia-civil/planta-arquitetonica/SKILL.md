@@ -46,7 +46,7 @@ Use `archicad-assistente` para escolher a instância e confirmar Tapir, PLN e pa
 
 ## 5. Outros softwares
 
-TQS usa a planta arquitetônica limpa como **referência** para o lançamento estrutural; não converta automaticamente estas paredes em elementos resistentes. SOLIDWORKS modela componentes e conjuntos específicos, não substitui o modelo arquitetônico da obra. Para troca entre programas, exporte IFC do BIM revisado, reabra no destino e confira classes, unidades, coordenadas e aberturas. O DXF do corte é um desenho 2D.
+Não converta automaticamente paredes arquitetônicas em elementos resistentes. SOLIDWORKS modela componentes e conjuntos específicos, não substitui o modelo arquitetônico da obra. Para troca entre programas, exporte IFC do BIM revisado, reabra no destino e confira classes, unidades, coordenadas e aberturas. O DXF do corte é um desenho 2D.
 
 ## Limites e responsabilidade
 
