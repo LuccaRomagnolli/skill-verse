@@ -69,13 +69,26 @@ tqs-assistente:
   nao_deve:
     - "Calcula a armadura dessa viga 15x40"
     - "Como faço uma laje no Eberick?"
-archicad-bim-check:
+archicad-assistente:
   deve:
     - "O modelo do ArchiCAD tá pronto pra mandar o IFC pro calculista?"
     - "Quais paredes estão sem classificação?"
     - "Gera um BCF com as pendências do modelo"
+    - "Modele os pilares, vigas e lajes dessa revisão no Archicad"
   nao_deve:
     - "Como faço uma escada no ArchiCAD?"
+modelo-estrutural:
+  deve:
+    - "Monte o modelo estrutural com apoios, cargas e combinações explícitas"
+    - "Valide a revisão do lançamento antes da análise"
+  nao_deve:
+    - "Abra o IFC no Archicad"
+skyciv-assistente:
+  deve:
+    - "Analise esta revisão estrutural na SkyCiv"
+    - "Leia as reações e os deslocamentos da SkyCiv"
+  nao_deve:
+    - "Dimensione a armadura pela NBR 6118 na SkyCiv"
 relatorio-tecnico:
   deve:
     - "Monta um laudo de vistoria com essas fotos"

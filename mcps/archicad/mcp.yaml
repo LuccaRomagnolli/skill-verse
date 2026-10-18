@@ -16,8 +16,8 @@ deteccao:
   windows: ["C:/Program Files/Graphisoft/Archicad 29*", "C:/Program Files/GRAPHISOFT/Archicad 29*"]
 util_sem_software: false
 preparo:
-  # regras de entrega em PT-BR que acompanham a skill archicad-bim-check (não sobrescreve arquivos já existentes)
-  - copiar_do_pack: plugin/skills/archicad-bim-check/assets/regras
+  # regras de entrega em PT-BR que acompanham archicad-assistente
+  - copiar_do_pack: plugin/skills/archicad-assistente/assets/regras
     destino: "{SKILLVERSE_HOME}/archicad-regras"
 servidor:
   command: uvx

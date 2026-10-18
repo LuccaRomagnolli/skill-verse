@@ -1,0 +1,9 @@
+titulo: Modelagem e auditoria Archicad
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Modela pilares, vigas e lajes no Archicad 29 a partir da revisão estrutural e audita propriedades, IFC e issues.
+mcps: [archicad]
+exemplos:
+  - "Modele esta revisão estrutural no Archicad e confira as seções"
+  - "Audite o PLN antes de exportar IFC"
+  - "Liste as peças estruturais e gere issues BCF das pendências"

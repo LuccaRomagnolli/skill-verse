@@ -18,6 +18,8 @@ Ferramentas do MCP `autocad`: `system`, `drawing`, `layer`, `entity`, `annotatio
 4. Combine um plano de operações: arquivo-alvo, unidades, layers, objetos afetados, quantidade esperada, saída e como desfazer. Execute em lotes pequenos; após cada lote confira `drawing` → `info`, `entity` → `count` e captura visual (`view` → `get_screenshot` quando disponível). Divergência de contagem, escala ou layer suspende a sequência.
 
 ## 2. Detalhe de seção (viga ou pilar)
+Para plantas e seções **de fôrma** por pavimento da revisão estrutural, use `python3 scripts/plantas.py modelo-estrutural.json --saida desenhos/ --formato A3 --escala 50`. O gerador cria DXF de cada nível, seções geométricas e pranchas, além de operações do MCP e `manifesto-cad.json` com revisão e hash. As cotas desenhadas são estáticas; confira e refaça as cotas associativas no AutoCAD. Compare o hash com o manifesto SkyCiv. Abra e meça os DXF no AutoCAD antes de salvar DWG/PDF pelo aplicativo real. Sem conexão, entregue apenas DXF e registre a pendência de verificação.
+
 O script `scripts/detalhe_secao.py` calcula a geometria (cobrimento, estribo, posição das barras, cotas, textos) e gera:
 - `--ops arquivo.json`: lista de chamadas do MCP em ordem. Execute cada item chamando a ferramenta `tool` com os demais campos como parâmetros. Onde aparecer `"entity_id": "$anterior"`, use o `handle` devolvido pela operação anterior (a polilinha da barra que recebe a hachura).
 - `--dxf arquivo.dxf`: desenho pronto (R12). Útil sem AutoCAD, para enviar a terceiros ou para abrir com `drawing` → `open`.

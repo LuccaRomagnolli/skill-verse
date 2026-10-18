@@ -1,0 +1,25 @@
+{
+  "projeto": "EXEMPLO-DIDATICO",
+  "zonas": [
+    {
+      "id": "L1-didatica",
+      "pavimento": "Pav 1",
+      "elemento": "L1",
+      "uso_especifico": "exemplo didático sem destinação de obra",
+      "area_m2": 20,
+      "checagens": {
+        "concentrada": {"estado": "pendente", "justificativa": "Confirmar no exemplar licenciado"},
+        "paredes_divisorias": {"estado": "pendente", "justificativa": "Confirmar na arquitetura"},
+        "cobertura": {"estado": "nao_se_aplica", "justificativa": "Exemplo sem cobertura"},
+        "garagem": {"estado": "nao_se_aplica", "justificativa": "Exemplo sem garagem"},
+        "equipamentos": {"estado": "pendente", "justificativa": "Confirmar no projeto"},
+        "construcao": {"estado": "pendente", "justificativa": "Confirmar na execução"}
+      },
+      "acoes": [{
+        "id": "Q-L1", "natureza": "variavel", "forma": "distribuida", "valor": 2,
+        "unidade": "kN/m²",
+        "origem": {"tipo": "hipotese", "documento": "Hipótese didática, conferir exemplar NBR licenciado", "item": "Uso da laje", "data": "2026-10-17"}
+      }]
+    }
+  ]
+}

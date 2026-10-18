@@ -1,13 +1,15 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.3.3
+version: 1.4.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
   quantitativos com orçamento SINAPI, laudos técnicos, consulta a NRs/DNIT/SINAPI e o agente operando AutoCAD,
-  Revit, SOLIDWORKS, ArchiCAD e TQS.
+  Revit, SOLIDWORKS, ArchiCAD e TQS, com modelo estrutural versionado e análise linear SkyCiv opcional.
 skills:
   - engenharia-civil/contexto-do-projeto
+  - engenharia-civil/modelo-estrutural
+  - engenharia-civil/skyciv-assistente
   - engenharia-civil/concreto-armado-nbr6118
   - engenharia-civil/cargas-combinacoes
   - engenharia-civil/memorial-de-calculo
@@ -16,11 +18,13 @@ skills:
   - engenharia-civil/revit-assistente
   - engenharia-civil/solidworks-assistente
   - engenharia-civil/tqs-assistente
-  - engenharia-civil/archicad-bim-check
+  - engenharia-civil/archicad-assistente
   - engenharia-civil/consulta-normas
   - _comum/relatorio-tecnico
 mcps:
   - nome: normas-publicas
+    opcional: true
+  - nome: skyciv
     opcional: true
   - nome: autocad
     opcional: true
@@ -31,6 +35,13 @@ mcps:
   - nome: solidworks
     opcional: true
 fluxos:
+  - titulo: Do contexto ao cálculo, plantas e BIM
+    passos:
+      - "Escolha a obra, revisão e destino BIM: Revit ou Archicad. Pesquise somente fontes públicas; confira valores NBR no exemplar licenciado do cliente e registre item, edição e pendências."
+      - "Monte o mapa de ações e as combinações explícitas; prepare e valide modelo-estrutural.json com níveis, eixos, peças, materiais, vínculos e fontes."
+      - "Revise a prévia e autorize cada envio à SkyCiv. Salve entrada, resultados, consumo de créditos e relatório; confira reações e esforços com referência independente."
+      - "Gere plantas e seções de fôrma em DXF da mesma revisão. Abra, confira cotas e escala no AutoCAD; salve DWG e PDF quando houver conexão real."
+      - "Modele a mesma revisão no Revit ou no Archicad, confira contagens e seções, salve RVT/PLN e audite o IFC no destino escolhido."
   - titulo: Retomar um projeto em outra sessão
     passos:
       - "Abra o agente na pasta da obra e diga: 'Retome este projeto pela ficha projeto-contexto.json; mostre decisões, artefatos e pendências antes de avançar'."
@@ -77,7 +88,7 @@ fluxos:
   - titulo: Modelo BIM pronto para entrega
     passos:
       - "Abra o projeto no ArchiCAD 29 e salve."
-      - "Peça: \"Audite o modelo para exportar IFC\" (archicad-bim-check) e corrija o que for apontado."
+      - "Peça: \"Audite o modelo para exportar IFC\" (archicad-assistente) e corrija o que for apontado."
       - "Exporte as pendências em BCF para a equipe de projeto."
   - titulo: Canteiro e segurança conforme as NRs
     passos:

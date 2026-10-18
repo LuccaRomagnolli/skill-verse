@@ -1,5 +1,22 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.4.0 — 2026-10-17 (candidato)
+- Modelo estrutural JSON v1 com unidades explícitas, revisão, níveis, eixos, barras, placas, materiais, apoios, ações e combinações. Conversão para SkyCiv e para a entrada Revit anterior, com IDs e SHA-256 rastreáveis. Conferência do mapa de ações por `mapa_ref`, unidade, módulo e fonte; o exemplo é didático.
+- MCP SkyCiv opcional com credenciais do cliente no ambiente, prévia sem cobrança, confirmação antes da análise linear, `validate_input`, malha de placas, inspeção de status, resultados, relatório e consumo de créditos. Falha de rede após envio é incerta e não gera repetição automática. Triagem conservadora gera argumentos para a rotina local de viga apenas após transcrição conferida de caso uniaxial suportado. Não executa `S3D.design.rc.check` como NBR 6118.
+- DXF de planta de fôrma por nível, seções geométricas e pranchas da mesma revisão; AutoCAD real ainda é necessário para conferir medidas e salvar DWG/PDF. Skill Archicad substituída por `archicad-assistente`, com plano de criação de pilares, vigas e lajes via MCP/Tapir, simulação antes de gravar, auditoria, IFC e BCF. As exclusões locais da skill anterior foram preservadas.
+- Fluxos, manual, gatilhos e testes atualizados; 14 skills e 6 MCPs opcionais.
+
+### Pendências para liberação
+| Verificação | Responsável | Evidência exigida | Estado |
+|---|---|---|---|
+| Conta SkyCiv real e créditos | Cliente com conta API + responsável técnico | Manifesto, consumo, relatório e resposta da análise de referência | Pendente |
+| Reações, esforços, deslocamentos e malha | Engenheiro estrutural independente | Comparação assinada com caso analítico/software independente, tolerâncias e capturas do modelo | Pendente |
+| Valores, edições e combinações NBR | Responsável técnico com exemplar licenciado | Mapa de ações, itens/edições conferidos, fatores e parecer; Errata 1:2025 da NBR 6123 | Pendente |
+| Plantas AutoCAD | Projetista CAD em Windows com AutoCAD | DWG/PDF salvos, cotas e escala medidas, seções e coordenadas conferidas | Pendente |
+| Modelo Revit | Projetista BIM em Windows com Revit | RVT, contagens, tipos, níveis, cotas, IFC reaberto e checklist | Pendente |
+| Modelo Archicad | Projetista BIM com Archicad 29 e Tapir | PLN, simulação e criação conferidas, GUIDs, seções, coordenadas, IFC/BCF reabertos | Pendente |
+| Instalação no cliente | Equipe Skill-Verse | Handshake, verificação e remoção no Claude Code e Codex nas plataformas de entrega | Pendente para Windows; macOS local verificado |
+
 ## 1.3.3 — 2026-10-15 (candidato)
 - `cargas-combinacoes` 1.3.0: mapa de ações por zona/elemento com unidade, origem, item e checagens explícitas de carga concentrada, paredes, cobertura, garagem, equipamentos e construção. Uso genérico deixa de ser aceito como critério de carga; ações concentradas/lineares não são diluídas na área.
 - Combinações normais com perfil obrigatório na CLI: NBR 6118:2023 + Emenda 1:2026 para concreto ou hipótese geral agrupada da NBR 8681:2025. Corrigida a ponderação por tipo de variável e a exclusão de variáveis favoráveis no ELU; `--gamma-g` isolado não gera mais combinação especial. A diferença entre normas específicas e gerais depende de decisão documentada do projetista.

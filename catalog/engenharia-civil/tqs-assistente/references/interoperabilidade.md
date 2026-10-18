@@ -6,7 +6,7 @@
 - Use os mesmos nomes de planta e as mesmas cotas da arquitetura (lista do Revit: receita "Listar níveis" da skill `revit-assistente`; do TQS: `tqs_edificio.py ler`).
 
 ## Saída: estrutura para os outros projetistas
-- **IFC do TQS** (caminho recomendado para o modelo completo, com lajes e fundações): exportado pelo próprio TQS. No Revit, vincular (`Inserir → Vincular IFC`). No ArchiCAD, mesclar/vincular IFC e auditar com `archicad-bim-check`.
+- **IFC do TQS** (caminho recomendado para o modelo completo, com lajes e fundações): exportado pelo próprio TQS. No Revit, vincular (`Inserir → Vincular IFC`). No ArchiCAD, mesclar/vincular IFC e auditar com `archicad-assistente`.
 - **Lançamento para o Revit pelo agente** (alternativa quando o IFC não serve, por exemplo para obter elementos nativos editáveis):
   ```bash
   python scripts/tqs_edificio.py ler --edificio "<nome>" --saida ed.json

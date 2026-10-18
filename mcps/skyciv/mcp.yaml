@@ -1,0 +1,24 @@
+nome: skyciv
+titulo: SkyCiv Structural 3D API v3
+descricao: Analisa modelos estruturais explícitos na nuvem, salva esforços, deslocamentos e relatório por revisão.
+licenca: "Código MCP proprietário Skill-Verse; API e créditos fornecidos pela SkyCiv ao cliente"
+upstream: interno
+versao_fixada: 1.0.0
+requisitos:
+  so: [windows, macos, linux]
+  software: "conta SkyCiv API v3 com créditos próprios; internet"
+  ferramentas: [uv]
+util_sem_software: true
+servidor:
+  command: uv
+  args: ["run", "-q", "--no-project", "--with", "mcp[cli]>=1.2,<2", "python", "{PACK_DIR}/mcps/skyciv/server.py"]
+  env: {}
+teste:
+  tool_esperada: skyciv_status
+pos_instalacao:
+  todos:
+    - "Crie uma conta SkyCiv API e configure SKYCIV_USERNAME e SKYCIV_API_KEY no ambiente que inicia o Claude Code/Codex. Nunca escreva a chave no projeto ou no config.toml."
+    - "O teste skyciv_status confirma somente a presença das credenciais; a conexão real requer uma análise confirmada e pode consumir créditos."
+avisos:
+  - "S3D.model.solve consome créditos da conta do cliente. Falha de rede após envio pode ter consumido crédito; confira a atividade antes de repetir."
+  - "Resultados são de análise estrutural, não dimensionamento conforme NBR."

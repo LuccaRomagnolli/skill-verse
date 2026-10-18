@@ -51,7 +51,9 @@ Para cada item do checklist, siga `references/onde-buscar.md`:
 - `quantitativos-sinapi`: UF da planilha SINAPI.
 - `memorial-de-calculo` e `relatorio-tecnico`: endereço, município e lista de normas/legislação aplicáveis.
 - `concreto-armado-nbr6118` e `autocad-assistente`: os **scripts** leem a CAA da ficha automaticamente (cobrimento e concreto mínimo) quando rodam na pasta do projeto.
-- `archicad-bim-check`: confere no modelo os parâmetros numéricos do código de obras/zoneamento levantados aqui.
+- `modelo-estrutural` e `skyciv-assistente`: registram a revisão, modelo, fontes de ações/combinações, resultados e créditos da análise. Use `artefato` para modelo, manifesto e resultados; `pendencia` para revisão normativa e comparação independente.
+- `autocad-assistente`: registra plantas, seções e pranchas DXF/DWG/PDF da mesma revisão, com conferência no aplicativo.
+- `revit-assistente` ou `archicad-assistente`: destino BIM escolhido para a obra; registre RVT/PLN, IDs, IFC e BCF quando aplicável.
 - `consulta-normas`: NRs (canteiro, NR-18) e documentos locais importados no índice; para obra, combine as exigências locais com o checklist de segurança.
 
 ## Limites e responsabilidade

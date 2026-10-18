@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "projeto": {"id": "EXEMPLO-DIDATICO", "revisao": "A"},
+  "unidades": {"comprimento": "m", "secao": "m", "forca": "kN", "momento": "kN.m", "pressao": "kPa", "modulo": "MPa", "densidade": "kg/m3"},
+  "eixo_vertical": "Z",
+  "mapa_acoes": "mapa-acoes.exemplo.json",
+  "niveis": [{"id": "Base", "cota_m": 0}, {"id": "Pav 1", "cota_m": 3}],
+  "eixos": {"x": [{"nome": "1", "pos_m": 0}, {"nome": "2", "pos_m": 4}], "y": [{"nome": "A", "pos_m": 0}, {"nome": "B", "pos_m": 5}]},
+  "materiais": [{"id": "Concreto-exemplo", "classe": "concrete", "E_MPa": 30000, "nu": 0.2, "densidade_kg_m3": 2500}],
+  "pilares": [
+    {"id": "P1", "x_m": 0, "y_m": 0, "b_m": 0.2, "h_m": 0.4, "base": "Base", "topo": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "P2", "x_m": 4, "y_m": 0, "b_m": 0.2, "h_m": 0.4, "base": "Base", "topo": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "P3", "x_m": 4, "y_m": 5, "b_m": 0.2, "h_m": 0.4, "base": "Base", "topo": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "P4", "x_m": 0, "y_m": 5, "b_m": 0.2, "h_m": 0.4, "base": "Base", "topo": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"}
+  ],
+  "vigas": [
+    {"id": "V1", "de": [0, 0], "ate": [4, 0], "b_m": 0.15, "h_m": 0.45, "nivel": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "V2", "de": [4, 0], "ate": [4, 5], "b_m": 0.15, "h_m": 0.45, "nivel": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "V3", "de": [4, 5], "ate": [0, 5], "b_m": 0.15, "h_m": 0.45, "nivel": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"},
+    {"id": "V4", "de": [0, 5], "ate": [0, 0], "b_m": 0.15, "h_m": 0.45, "nivel": "Pav 1", "material": "Concreto-exemplo", "fixity_A": "FFFFFF", "fixity_B": "FFFFFF"}
+  ],
+  "lajes": [{"id": "L1", "contorno": [[0, 0], [4, 0], [4, 5], [0, 5]], "espessura_m": 0.12, "nivel": "Pav 1", "material": "Concreto-exemplo"}],
+  "apoios": [
+    {"id": "A1", "ponto": [0, 0, 0], "restricao": "FFFFFF"},
+    {"id": "A2", "ponto": [4, 0, 0], "restricao": "FFFFFF"},
+    {"id": "A3", "ponto": [4, 5, 0], "restricao": "FFFFFF"},
+    {"id": "A4", "ponto": [0, 5, 0], "restricao": "FFFFFF"}
+  ],
+  "peso_proprio": true,
+  "acoes": [{"id": "Q-L1", "tipo": "pressao", "alvo": "L1", "grupo": "Q", "valor": -2, "direcao": "Z", "mapa_ref": "L1-didatica/Q-L1", "origem": {"documento": "Hipótese didática, conferir exemplar NBR licenciado", "item": "Uso da laje", "data": "2026-10-17"}}],
+  "combinacoes": [{"id": "EXEMPLO-ELU", "criterio": "strength", "fatores": {"SW1": 1.4, "Q": 1.4}, "origem": {"documento": "Hipótese didática, substituir por combinações conferidas", "item": "ELU", "data": "2026-10-17"}}]
+}

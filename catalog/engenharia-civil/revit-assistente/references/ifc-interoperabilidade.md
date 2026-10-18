@@ -13,7 +13,7 @@
 - Divergência de níveis é o erro mais comum: compare a lista de níveis do Revit (receita "Listar níveis") com os pisos do TQS (`tqs_edificio.py`).
 
 ## Com o ArchiCAD
-- Troca por IFC nos dois sentidos. A auditoria de entrega do lado ArchiCAD é a skill `archicad-bim-check` (BCF para pendências).
+- Troca por IFC nos dois sentidos. A auditoria de entrega do lado ArchiCAD é a skill `archicad-assistente` (BCF para pendências).
 
 ## Com o AutoCAD
 - Plantas/cortes do Revit → DWG: `Arquivo → Exportar → CAD` (configuração de layers por categoria). A prancha final pode ser montada com `autocad-assistente`.

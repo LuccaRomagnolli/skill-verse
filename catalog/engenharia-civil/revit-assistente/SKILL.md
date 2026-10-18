@@ -15,6 +15,12 @@ MCP `revit` (mcp-servers-for-revit). As ferramentas recebem **milímetros e grau
 4. Antes de alterar o RVT, descreva o lote (categoria, níveis, quantidade esperada, tipos, unidades e arquivo de destino), salve uma cópia ou ponto de recuperação e confirme operações destrutivas. Releia estatísticas, vista e IDs após cada lote; compare criado × esperado e examine avisos.
 
 ## 2. Lançar a estrutura a partir do cálculo
+Quando houver `modelo-estrutural.json`, confira que sua revisão e SHA-256 coincidem com o manifesto SkyCiv e gere a entrada legada sem alterar projetos antigos:
+```bash
+python3 ../modelo-estrutural/scripts/modelo.py revit modelo-estrutural.json --saida lancamento.json
+```
+Registre o hash e os IDs das peças de entrada para comparar com os `elementId` reais após a criação. A geometria BIM não transfere apoios, cargas ou critérios de análise.
+
 Fonte dos dados: skill `concreto-armado-nbr6118` (seções) e a planta (posições). Monte o JSON no formato de `assets/lancamento.exemplo.json` (posições em m, seções em cm) e gere as chamadas:
 ```bash
 python3 scripts/lancamento.py lancamento.json --saida lancamento-ops.json
