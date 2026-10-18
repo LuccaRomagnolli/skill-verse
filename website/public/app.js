@@ -57,7 +57,7 @@ const boxHover = matchMedia('(any-hover: hover)');
 function setBoxOpen(open) {
   skillBox.classList.toggle('is-open', open);
   boxToggle.setAttribute('aria-expanded', String(open));
-  boxToggle.setAttribute('aria-label', `${open ? 'Fechar' : 'Abrir'} a caixa de ferramentas SkillVerse`);
+  boxToggle.setAttribute('aria-label', `${open ? 'Fechar' : 'Abrir'} a caixa de possibilidades SkillVerse`);
   boxBenefits.setAttribute('aria-hidden', String(!open));
   skillBox.querySelector('[data-box-label]').textContent = open
     ? (boxHover.matches ? 'Novas skills. Novas possibilidades.' : 'Toque para fechar sua caixa')
