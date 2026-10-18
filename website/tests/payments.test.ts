@@ -7,6 +7,21 @@ import { GET as getOrder } from '../app/api/orders/[id]/route';
 import { GET as download } from '../app/api/orders/[id]/download/route';
 import { POST as webhook } from '../app/api/webhooks/syncpay/route';
 import { POST as checkSyncpay } from '../app/api/admin/syncpay-check/route';
+import { publicOrigin, secureResponse } from '../lib/security';
+
+assert.equal(publicOrigin('https://skillverse.example'), 'https://skillverse.example');
+for (const value of ['http://skillverse.example', 'https://skillverse.example/path', 'https://skillverse.example/\" onclick=\"x', 'https://user:pass@skillverse.example']) {
+  assert.equal(publicOrigin(value), null, 'canonical requires a plain HTTPS origin');
+}
+const protectedPage = secureResponse(new Request('https://skillverse.example/'), new Response('<h1>SkillVerse</h1>', { headers: { 'content-type': 'text/html' } }));
+assert.match(protectedPage.headers.get('content-security-policy') ?? '', /script-src 'self'/);
+assert.match(protectedPage.headers.get('content-security-policy') ?? '', /connect-src 'self' https:\/\/api\.syncpayments\.com\.br/);
+assert.equal(protectedPage.headers.get('strict-transport-security'), 'max-age=31536000');
+assert.equal(protectedPage.headers.get('x-frame-options'), 'DENY');
+const protectedApi = secureResponse(new Request('https://skillverse.example/api/orders'), Response.json({ ok: true }));
+assert.equal(protectedApi.headers.get('cache-control'), 'no-store');
+assert.equal(protectedApi.headers.get('content-security-policy'), null);
+assert.equal(secureResponse(new Request('http://127.0.0.1/'), new Response()).headers.get('strict-transport-security'), null);
 
 const db = new DatabaseSync(':memory:');
 for(const p of ['drizzle/0000_hesitant_lake.sql','drizzle/0001_pink_owl.sql']) db.exec(readFileSync(p,'utf8').replace(/--> statement-breakpoint/g,''));

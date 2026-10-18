@@ -48,6 +48,25 @@ node tests/run-payments-tests.mjs
 npx tsc --noEmit
 ```
 
+## Segurança e qualidade do site
+
+O Worker aplica CSP restrita às respostas HTML e headers de proteção às rotas dinâmicas. `public/_headers` cobre os assets servidos diretamente pela Cloudflare. A CSP libera somente os scripts do próprio site, as fontes do Google usadas pelo CSS e a conexão do navegador com a API de tokenização da SyncPay. Revise essa lista ao acrescentar qualquer serviço externo. `SITE_ORIGIN` deve ser a origem HTTPS definitiva, sem barra final: a página usa esse valor para a tag canonical e para o `og:url`. Se faltar ou for inválido, essas tags não são emitidas.
+
+O workflow `Website quality` executa instalação limpa, auditoria das dependências de produção, testes de pagamento, tipos, build e Lighthouse CI em três execuções. Os limites são 80 para desempenho e 95 para acessibilidade, boas práticas e SEO. Rode o mesmo conjunto localmente com:
+
+```sh
+npm run install:ci
+npm audit --omit=dev --audit-level=moderate
+node tests/run-payments-tests.mjs
+npx tsc --noEmit
+npm run build
+npm exec --yes --package=@lhci/cli@0.15.1 -- lhci autorun
+```
+
+O Lighthouse local mede o Worker em HTTP. Confirme no domínio publicado o HTTPS, o certificado, o redirecionamento HTTP para HTTPS, o HSTS e a tag canonical antes de abrir o acesso público. Não ative `includeSubDomains` ou `preload` no HSTS sem validar todos os subdomínios. Refaça a checagem da CSP e do fluxo completo de pagamento com a conta real antes de habilitar cobranças.
+
+Referências: [OWASP HTTP Security Response Headers](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html), [OWASP Content Security Policy](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html), [OWASP Authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), [OWASP TLS](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html) e [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci).
+
 Para uma base local nova, após o build, aplique cada migração uma vez e em ordem antes de usar `npm run start`:
 
 ```sh

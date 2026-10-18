@@ -1,0 +1,11 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  X-XSS-Protection: 0
+  Strict-Transport-Security: max-age=31536000
+
+# Keep Vinext's cache policy for fingerprinted bundles.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable

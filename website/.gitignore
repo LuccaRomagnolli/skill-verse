@@ -55,5 +55,6 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+/.lighthouseci/
 .dev.vars*
 !.env.example
