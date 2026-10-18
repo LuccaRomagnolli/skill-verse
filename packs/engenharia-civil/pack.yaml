@@ -1,6 +1,6 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.4.3
+version: 1.5.0
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
@@ -9,6 +9,7 @@ descricao: >-
 skills:
   - engenharia-civil/contexto-do-projeto
   - engenharia-civil/modelo-estrutural
+  - engenharia-civil/planta-arquitetonica
   - engenharia-civil/skyciv-assistente
   - engenharia-civil/concreto-armado-nbr6118
   - engenharia-civil/cargas-combinacoes
@@ -35,6 +36,12 @@ mcps:
   - nome: solidworks
     opcional: true
 fluxos:
+  - titulo: Da planta baixa aos cortes CAD e ao modelo arquitetônico BIM
+    passos:
+      - "Abra o DWG/DXF no AutoCAD ou forneça PDF/imagem; confirme unidade, origem e duas medidas conhecidas antes de transcrever paredes, aberturas, pisos e linhas de corte."
+      - "Para PDF/imagem, calibre pontos em pixels com planta-arquitetonica/scripts/planta.py calibrar; registre níveis, pé-direito, espessuras, peitoris e alturas que a planta não informa."
+      - "Valide o planta-arquitetonica.json e gere corte-<id>.dxf e planos-bim.json; confira os cortes no CAD contra a planta original."
+      - "Escolha Revit ou Archicad, resolva famílias/favoritos e pavimentos, simule os lotes e confirme antes de modelar; confira IDs, GUIDs e geometria lida de volta no aplicativo."
   - titulo: Do contexto ao cálculo, plantas e BIM
     passos:
       - "Escolha a obra, revisão e destino BIM: Revit ou Archicad. Pesquise somente fontes públicas; confira valores NBR no exemplar licenciado do cliente e registre item, edição e pendências."

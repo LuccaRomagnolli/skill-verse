@@ -1,0 +1,15 @@
+{
+  "projeto": {"id": "EXEMPLO-DIDATICO-PIXELS", "revisao": "A"},
+  "fonte": {"tipo": "imagem", "arquivo": "SUBSTITUIR-PELA-IMAGEM-DA-PLANTA.png"},
+  "unidade": "px",
+  "niveis": [{"id": "Terreo", "cota_m": 0, "altura_m": 3}],
+  "paredes": [
+    {"id": "PA-1", "nivel": "Terreo", "de": [100, 100], "ate": [500, 100], "espessura_m": 0.15, "altura_m": 3},
+    {"id": "PA-2", "nivel": "Terreo", "de": [500, 100], "ate": [500, 400], "espessura_m": 0.15, "altura_m": 3}
+  ],
+  "aberturas": [
+    {"id": "J1", "tipo": "janela", "parede": "PA-1", "centro_px": 200, "largura_px": 120, "altura_m": 1.2, "peitoril_m": 0.9}
+  ],
+  "pisos": [{"id": "L1", "nivel": "Terreo", "contorno": [[100, 100], [500, 100], [500, 400], [100, 400]], "espessura_m": 0.12}],
+  "cortes": [{"id": "A-A", "de": [300, 50], "ate": [300, 450]}]
+}

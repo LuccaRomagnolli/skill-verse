@@ -1,0 +1,24 @@
+{
+  "projeto": {"id": "EXEMPLO-DIDATICO", "revisao": "A"},
+  "fonte": {"tipo": "manual", "observacao": "Geometria fictícia; substitua pela planta conferida da obra"},
+  "unidade": "m",
+  "niveis": [
+    {"id": "Terreo", "cota_m": 0, "altura_m": 3},
+    {"id": "Cobertura", "cota_m": 3, "altura_m": 3}
+  ],
+  "paredes": [
+    {"id": "PA-S", "nivel": "Terreo", "de": [0, 0], "ate": [4, 0], "espessura_m": 0.15, "altura_m": 3},
+    {"id": "PA-N", "nivel": "Terreo", "de": [0, 3], "ate": [4, 3], "espessura_m": 0.15, "altura_m": 3},
+    {"id": "PA-O", "nivel": "Terreo", "de": [0, 0], "ate": [0, 3], "espessura_m": 0.15, "altura_m": 3},
+    {"id": "PA-L", "nivel": "Terreo", "de": [4, 0], "ate": [4, 3], "espessura_m": 0.15, "altura_m": 3}
+  ],
+  "aberturas": [
+    {"id": "J1", "tipo": "janela", "parede": "PA-S", "centro_m": 2, "largura_m": 1.2, "altura_m": 1.2, "peitoril_m": 0.9},
+    {"id": "P1", "tipo": "porta", "parede": "PA-N", "centro_m": 2, "largura_m": 0.8, "altura_m": 2.1, "peitoril_m": 0}
+  ],
+  "pisos": [
+    {"id": "L-T", "nivel": "Terreo", "contorno": [[0, 0], [4, 0], [4, 3], [0, 3]], "espessura_m": 0.12},
+    {"id": "L-C", "nivel": "Cobertura", "contorno": [[0, 0], [4, 0], [4, 3], [0, 3]], "espessura_m": 0.12}
+  ],
+  "cortes": [{"id": "A-A", "de": [2, -1], "ate": [2, 4]}]
+}

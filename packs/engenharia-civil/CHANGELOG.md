@@ -1,5 +1,9 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.5.0 — 2026-10-18 (candidato)
+- Nova skill `planta-arquitetonica` para estruturar coordenadas de planta DWG/DXF ou pontos traçados de PDF/imagem calibrada. O script valida níveis, paredes, aberturas, pisos e linhas de corte; gera cortes verticais DXF com manifestos e planos de criação de paredes, pisos, portas e janelas para Revit/Archicad.
+- Os planos BIM exigem correspondência de níveis, famílias/favoritos e IDs/GUIDs do projeto aberto; não gravam automaticamente. O corte mostra apenas elementos interceptados pelo plano e precisa de conferência no CAD. Ainda faltam teste com planta de cliente, validação dos lotes arquitetônicos nos softwares reais e extensão para coberturas/escadas/projeções.
+
 ## 1.4.3 — 2026-10-18 (candidato)
 - Tapir 1.7.1 instalado e testado no Archicad 30 INT build 3001 para macOS. Em cópia PLN salva, o bridge 0.8.0 criou quatro pilares, quatro vigas e uma laje, retornou nove GUIDs e releu pavimentos, posições, seções, material e contorno. O novo `verificar_lancamento.py` aprovou 9/9 elementos contra a revisão de entrada.
 - Corrigida uma falha detectada no ensaio: `CreateSlabs` com padrão Composite criou 0,30 m apesar de pedir 0,15 m. O plano agora exige favorito Basic e `slabStructureType=Basic`, verifica estrutura/espessura/material após criar e fornece dados para correção confirmada com `ModifySlabs`.
@@ -32,7 +36,7 @@
 | Valores, edições e combinações NBR | Responsável técnico com exemplar licenciado | Mapa de ações, itens/edições conferidos, fatores e parecer; Errata 1:2025 da NBR 6123 | Pendente |
 | Plantas AutoCAD | Projetista CAD em Windows com AutoCAD | DWG/PDF salvos, cotas e escala medidas, seções e coordenadas conferidas | Pendente |
 | Modelo Revit | Projetista BIM em Windows com Revit | RVT, contagens, tipos, níveis, cotas, IFC reaberto e checklist | Pendente |
-| Modelo Archicad | Projetista BIM com Archicad 29 ou 30 e Tapir | PLN, simulação e criação conferidas, GUIDs, seções, coordenadas, IFC/BCF reabertos | Parcial: conexão/leitura/prévia no AC30; escrita e troca pendentes |
+| Modelo Archicad | Projetista BIM com Archicad 29 ou 30 e Tapir | PLN, simulação e criação conferidas, GUIDs, seções, coordenadas, IFC/BCF reabertos | Parcial: estrutura verificada no AC30 macOS; template/tradutor IFC e Windows pendentes |
 | Instalação no cliente | Equipe Skill-Verse | Handshake, verificação e remoção no Claude Code e Codex nas plataformas de entrega | Pendente para Windows; macOS local verificado |
 
 ## 1.3.3 — 2026-10-15 (candidato)

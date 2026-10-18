@@ -1,0 +1,10 @@
+titulo: Planta arquitetônica, cortes e BIM
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Gera cortes verticais DXF de uma planta conferida e prepara paredes, pisos e aberturas para Revit ou Archicad, com entrada DWG/DXF ou PDF/imagem calibrada.
+mcps: [autocad, revit, archicad]
+exemplos:
+  - "Faça os cortes A-A e B-B desta planta baixa no CAD"
+  - "Calibre esta planta em PDF e gere um corte vertical"
+  - "Modele as paredes, portas e janelas desta planta no Revit"
+  - "Prepare a mesma planta para modelagem no Archicad"

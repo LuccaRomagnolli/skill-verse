@@ -40,6 +40,15 @@ autocad-assistente:
   nao_deve:
     - "Qual a diferença entre DWG e IFC num processo BIM?"
     - "Modela essa viga no Revit"
+planta-arquitetonica:
+  deve:
+    - "Faça o corte A-A desta planta baixa no CAD"
+    - "Tenho uma planta em PDF; calibre e gere os cortes verticais"
+    - "Modele as paredes, portas e janelas desta planta no Archicad"
+    - "Transforme este DWG de arquitetura em um plano de modelagem para o Revit"
+  nao_deve:
+    - "Desenhe a seção armada da viga V1"
+    - "Calcule os esforços desta estrutura"
 revit-assistente:
   deve:
     - "Lança esses pilares e vigas no Revit"
