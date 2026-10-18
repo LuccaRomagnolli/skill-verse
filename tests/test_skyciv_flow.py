@@ -150,7 +150,81 @@ def test_cad_e_archicad_usam_mesma_revisao(exemplo, tmp_path):
     assert desenhos["sha256_entrada"] == bim["sha256_entrada"] == modelo.digest(exemplo)
     assert len(desenhos["plantas"]) == 2
     assert [op["tool"] for op in bim["operacoes"]] == ["create_elements", "describe_api_command", "execute_write_api_command", "create_elements"]
+    assert bim["verificacao_pos_criacao"]["ids_na_ordem"] == ["P1", "P2", "P3", "P4", "V1", "V2", "V3", "V4", "L1"]
+    assert bim["verificacao_pos_criacao"]["esperado"][-1]["detalhes"]["structureType"] == "Basic"
     assert "4.000 m" in (tmp_path / "desenhos/planta-Pav-1.dxf").read_text(encoding="cp1252")
+
+
+def test_archicad_fixa_porta_e_bloqueia_auditoria_incompleta(exemplo):
+    arch = module("archicad_fluxo_porta", "catalog/engenharia-civil/archicad-assistente/scripts/lancamento.py")
+    auditoria = module("archicad_auditoria", "catalog/engenharia-civil/archicad-assistente/scripts/validar_auditoria.py")
+    cfg = json.loads((ROOT / "catalog/engenharia-civil/archicad-assistente/assets/config.exemplo.json").read_text())
+    cfg["port"] = 19723
+    cfg["materiais"]["Concreto-exemplo"]["buildingMaterialId"]["guid"] = "00000000-0000-0000-0000-000000000001"
+    cfg["materiais"]["Concreto-exemplo"]["slabFavorite"] = "Laje Concreto Teste"
+    plano = arch.gerar(exemplo, cfg)
+    assert plano["backend"] == {"mcp": "archicad-mcp-server", "version": "0.8.0", "port": 19723}
+    assert all(op["args"].get("port") == 19723 for op in plano["operacoes"] if op["tool"] != "describe_api_command")
+
+    evidencia = {
+        "port": 19723,
+        "instancias": {"instances": [{"port": 19723, "project_open": True, "tapir_available": False}]},
+        "resumo": {"element_count": 0},
+        "auditoria": {"pass": True, "results": [{"rule": "r1", "pass": True}]},
+        "ifc": {"pass": True, "results": [{"rule": "ifc", "pass": False, "skipped": True}]},
+    }
+    estado = auditoria.avaliar(evidencia)
+    assert not estado["pronto_para_entrega"]
+    assert any("Tapir ausente" in x for x in estado["bloqueios"])
+    assert any("modelo vazio" in x for x in estado["bloqueios"])
+    assert estado["regras_ignoradas"][0]["rule"] == "ifc"
+
+
+def test_archicad_auditoria_completa_pode_passar():
+    auditoria = module("archicad_auditoria_ok", "catalog/engenharia-civil/archicad-assistente/scripts/validar_auditoria.py")
+    evidencia = {
+        "port": 19724,
+        "instancias": {"instances": [{"port": 19724, "project_open": True, "tapir_available": True}]},
+        "resumo": {"element_count": 12},
+        "auditoria": {"pass": True, "results": [{"rule": "entrega", "pass": True}]},
+        "ifc": {"pass": True, "results": [{"rule": "ifc", "pass": True}]},
+    }
+    assert auditoria.avaliar(evidencia)["pronto_para_entrega"]
+
+
+def test_archicad_verifica_geometria_e_detecta_laje_composta(exemplo):
+    arch = module("archicad_fluxo_verificacao", "catalog/engenharia-civil/archicad-assistente/scripts/lancamento.py")
+    verificar = module("archicad_verificar_lancamento", "catalog/engenharia-civil/archicad-assistente/scripts/verificar_lancamento.py")
+    cfg = json.loads((ROOT / "catalog/engenharia-civil/archicad-assistente/assets/config.exemplo.json").read_text())
+    cfg["materiais"]["Concreto-exemplo"]["buildingMaterialId"]["guid"] = "00000000-0000-0000-0000-000000000001"
+    cfg["materiais"]["Concreto-exemplo"]["slabFavorite"] = "Laje básica de teste"
+    plano = arch.gerar(exemplo, cfg)
+    ids = plano["verificacao_pos_criacao"]["ids_na_ordem"]
+    mapeamento = {ident: f"00000000-0000-0000-0000-{i:012d}" for i, ident in enumerate(ids, 1)}
+    rows = []
+    for exp in plano["verificacao_pos_criacao"]["esperado"]:
+        detalhes = copy.deepcopy(exp["detalhes"])
+        if "polygonOutline" in detalhes:
+            detalhes["polygonOutline"].append(copy.deepcopy(detalhes["polygonOutline"][0]))
+        rows.append({"type": exp["tipo"], "floorIndex": exp["floorIndex"], "details": detalhes})
+    evidencia = {"structuredContent": {"detailsOfElements": rows}}
+    assert verificar.avaliar(plano, mapeamento, evidencia)["aprovado"]
+    rows[-1]["details"]["structureType"] = "Composite"
+    resultado = verificar.avaliar(plano, mapeamento, evidencia)
+    assert not resultado["aprovado"]
+    assert any(f["campo"] == "details.structureType" for f in resultado["falhas"])
+
+
+def test_archicad_auditoria_aceita_resposta_mcp_bruta():
+    auditoria = module("archicad_auditoria_bruta", "catalog/engenharia-civil/archicad-assistente/scripts/validar_auditoria.py")
+    evidencia = {
+        "list_instances": {"structuredContent": {"instances": [{"port": 19723, "project_open": True, "tapir_available": True}]}},
+        "get_model_summary": {"structuredContent": {"element_count": 9}},
+        "audit_delivery_readiness": {"structuredContent": {"pass": True, "results": [{"rule": "r", "pass": True}]}},
+        "verify_ifc_export_readiness": {"structuredContent": {"pass": True, "results": [{"rule": "i", "pass": True}]}},
+    }
+    estado = auditoria.avaliar(evidencia)
+    assert estado["pronto_para_entrega"] and estado["port"] == 19723
 
 
 def test_triagem_dimensionamento_so_em_caso_suportado(exemplo):

@@ -48,6 +48,8 @@ def test_estrutura_do_zip(pacote):
     assert len(pack["skills"]) == 14
     assert (pacote / "mcps/normas-publicas/server.py").is_file()   # código do MCP próprio vai no zip
     assert (pacote / "mcps/skyciv/server.py").is_file()
+    assert (pacote / "VALIDACAO-AUTOCAD-MAC-2027.md").is_file()
+    assert (pacote / "VALIDACAO-ARCHICAD-30-MAC.md").is_file()
     assert not list(pacote.rglob("*.db")) and not list(pacote.rglob("pdf/*.pdf"))  # documentos não vão
     mk = json.loads((pacote / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
     assert mk["plugins"][0]["name"] == json.loads((pacote / "plugin/.claude-plugin/plugin.json").read_text())["name"]

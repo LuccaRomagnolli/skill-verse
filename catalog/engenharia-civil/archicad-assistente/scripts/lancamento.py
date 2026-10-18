@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Modelo estrutural v1 -> plano de chamadas Archicad MCP 0.7.1/Tapir.
+"""Modelo estrutural v1 -> plano de chamadas Archicad MCP 0.8.0/Tapir.
 
 Não executa comandos no Archicad. O plano começa com dry-run, e a execução
 exige confirmação e conferência no projeto aberto.
@@ -24,22 +24,39 @@ def gerar(d: dict, config: dict) -> dict:
     m = _modelo()
     m.validar(d)
     mat_cfg = config.get("materiais") or {}
+    port = config.get("port")
+    if port is not None and (not isinstance(port, int) or isinstance(port, bool) or not 19723 <= port <= 19743):
+        raise ValueError("port: use a porta 19723–19743 retornada por list_instances, ou null para autodetecção")
+
+    def com_port(args: dict) -> dict:
+        if port is not None:
+            args["port"] = port
+        return args
+
     cotas = {n["id"]: n["cota_m"] for n in d["niveis"]}
     stories = config.get("pavimentos") or {}
     for n in d["niveis"]:
         item = stories.get(n["id"])
         if not isinstance(item, dict) or not isinstance(item.get("floorIndex"), int) or abs(item.get("cota_m", 1e20) - n["cota_m"]) > 1e-4:
             raise ValueError(f"pavimento {n['id']}: consulte GetStories e informe floorIndex e cota_m correspondentes")
+    materiais_laje = {l["material"] for l in d.get("lajes", [])}
     for material in d["materiais"]:
         item = mat_cfg.get(material["id"])
         material_id = item.get("buildingMaterialId") if isinstance(item, dict) else None
         guid = material_id.get("guid") if isinstance(material_id, dict) else None
         favorite = item.get("slabFavorite") if isinstance(item, dict) else None
-        if (not isinstance(guid, str) or not guid.strip() or "SUBSTITUIR" in guid.upper() or
-                not isinstance(favorite, str) or not favorite.strip() or "SUBSTITUIR" in favorite.upper()):
-            raise ValueError(f"material {material['id']}: associe buildingMaterialId.guid e slabFavorite do template aberto")
+        if not isinstance(guid, str) or not guid.strip() or "SUBSTITUIR" in guid.upper():
+            raise ValueError(f"material {material['id']}: associe buildingMaterialId.guid do template aberto")
+        if material["id"] in materiais_laje:
+            structure = item.get("slabStructureType") if isinstance(item, dict) else None
+            if (not isinstance(favorite, str) or not favorite.strip() or "SUBSTITUIR" in favorite.upper() or
+                    structure != "Basic"):
+                raise ValueError(
+                    f"material {material['id']}: associe slabFavorite básico e slabStructureType='Basic'"
+                )
     cols, beams, slabs = [], [], []
     ids = {"pilares": [], "vigas": [], "lajes": []}
+    esperado = []
     for p in d.get("pilares", []):
         cols.append({"coordinates": {"x": p["x_m"], "y": p["y_m"], "z": cotas[p["base"]]},
                      "height": cotas[p["topo"]] - cotas[p["base"]], "width": p["b_m"], "depth": p["h_m"],
@@ -47,6 +64,12 @@ def gerar(d: dict, config: dict) -> dict:
                      "buildingMaterialId": mat_cfg[p["material"]]["buildingMaterialId"],
                      "floorIndex": stories[p["base"]]["floorIndex"]})
         ids["pilares"].append(p["id"])
+        esperado.append({"id": p["id"], "tipo": "Column", "floorIndex": stories[p["base"]]["floorIndex"],
+                         "detalhes": {"origin": {"x": p["x_m"], "y": p["y_m"]},
+                                      "zCoordinate": cotas[p["base"]],
+                                      "height": cotas[p["topo"]] - cotas[p["base"]],
+                                      "width": p["b_m"], "depth": p["h_m"],
+                                      "buildingMaterialId": mat_cfg[p["material"]]["buildingMaterialId"]}})
     for v in d.get("vigas", []):
         beams.append({"begCoordinate": {"x": v["de"][0], "y": v["de"][1]},
                       "endCoordinate": {"x": v["ate"][0], "y": v["ate"][1]},
@@ -54,25 +77,55 @@ def gerar(d: dict, config: dict) -> dict:
                       "width": v["b_m"], "height": v["h_m"], "isWidthAndHeightLinked": False,
                       "buildingMaterialId": mat_cfg[v["material"]]["buildingMaterialId"]})
         ids["vigas"].append(v["id"])
+        esperado.append({"id": v["id"], "tipo": "Beam", "floorIndex": stories[v["nivel"]]["floorIndex"],
+                         "detalhes": {"begCoordinate": {"x": v["de"][0], "y": v["de"][1]},
+                                      "endCoordinate": {"x": v["ate"][0], "y": v["ate"][1]},
+                                      "zCoordinate": cotas[v["nivel"]], "width": v["b_m"], "height": v["h_m"],
+                                      "buildingMaterialId": mat_cfg[v["material"]]["buildingMaterialId"]}})
     for l in d.get("lajes", []):
         slabs.append({"favoriteName": mat_cfg[l["material"]]["slabFavorite"],
                       "level": cotas[l["nivel"]], "floorIndex": stories[l["nivel"]]["floorIndex"],
                       "thickness": l["espessura_m"], "referencePlaneLocation": "Top",
                       "polygonCoordinates": [{"x": x, "y": y} for x, y in l["contorno"]]})
         ids["lajes"].append(l["id"])
+        esperado.append({"id": l["id"], "tipo": "Slab", "floorIndex": stories[l["nivel"]]["floorIndex"],
+                         "detalhes": {"structureType": "Basic", "thickness": l["espessura_m"],
+                                      "zCoordinate": cotas[l["nivel"]], "referencePlaneLocation": "Top",
+                                      "buildingMaterialId": mat_cfg[l["material"]]["buildingMaterialId"],
+                                      "polygonOutline": [{"x": x, "y": y} for x, y in l["contorno"]]}})
     ops = []
     if cols:
-        ops.append({"tool": "create_elements", "args": {"element_type": "column", "items": cols, "dry_run": True},
+        ops.append({"tool": "create_elements", "args": com_port({"element_type": "column", "items": cols, "dry_run": True}),
                     "executar_apos_confirmacao": {"dry_run": False}, "ids_esperados": ids["pilares"]})
     if beams:
         ops.append({"tool": "describe_api_command", "args": {"name": "CreateBeams"}})
-        ops.append({"tool": "execute_write_api_command", "args": {"name": "CreateBeams", "params": {"beamsData": beams}, "confirm": False},
+        ops.append({"tool": "execute_write_api_command", "args": com_port({"name": "CreateBeams", "params": {"beamsData": beams}, "confirm": False}),
                     "executar_apos_confirmacao": {"confirm": True}, "ids_esperados": ids["vigas"]})
     if slabs:
-        ops.append({"tool": "create_elements", "args": {"element_type": "slab", "items": slabs, "dry_run": True},
+        ops.append({"tool": "create_elements", "args": com_port({"element_type": "slab", "items": slabs, "dry_run": True}),
                     "executar_apos_confirmacao": {"dry_run": False}, "ids_esperados": ids["lajes"]})
-    return {"projeto": d["projeto"], "sha256_entrada": m.digest(d), "operacoes": ops,
-            "aviso": "Salve cópia do PLN antes de ler propriedades ou gravar. Compare cada GUID retornado com ids_esperados e confirme geometria, material, pavimento e IFC no Archicad. Sem resultado real, nada está modelado."}
+    correcoes_laje = []
+    for l in d.get("lajes", []):
+        correcoes_laje.append({
+            "id": l["id"],
+            "preencher_elementId_com_guid_retornado": {
+                "structureType": "Basic", "thickness": l["espessura_m"],
+                "buildingMaterialId": mat_cfg[l["material"]]["buildingMaterialId"],
+                "referencePlaneLocation": "Top",
+            },
+        })
+    verificacao = {
+        "comando": "GetDetailsOfElements",
+        "campos": ["type", "id", "floorIndex", "details"],
+        "ids_na_ordem": [e["id"] for e in esperado],
+        "esperado": esperado,
+        "validar_com": "python3 scripts/verificar_lancamento.py archicad-ops.json mapeamento.json detalhes.json",
+        "correcao_lajes_se_divergirem": {"comando": "ModifySlabs", "itens": correcoes_laje},
+    }
+    return {"projeto": d["projeto"], "sha256_entrada": m.digest(d),
+            "backend": {"mcp": "archicad-mcp-server", "version": "0.8.0", "port": port}, "operacoes": ops,
+            "verificacao_pos_criacao": verificacao,
+            "aviso": "Salve cópia do PLN antes de gravar. Mapeie cada ID ao GUID retornado e execute GetDetailsOfElements na ordem indicada. A espessura solicitada pode ser ignorada se o favorito da laje não for básico; valide estrutura, espessura e material e, se necessário, corrija com ModifySlabs após nova confirmação."}
 
 
 def main():

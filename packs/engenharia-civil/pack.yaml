@@ -1,6 +1,6 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.4.1
+version: 1.4.3
 publico: Engenheiros civis, projetistas estruturais e estudantes de Engenharia Civil
 descricao: >-
   Apoio ao cálculo de concreto armado com referência declarada NBR 6118:2026 e validação integral pendente, cargas, vento e combinações, memorial de cálculo,
@@ -41,7 +41,7 @@ fluxos:
       - "Monte o mapa de ações e as combinações explícitas; prepare e valide modelo-estrutural.json com níveis, eixos, peças, materiais, vínculos e fontes."
       - "Revise a prévia e autorize cada envio à SkyCiv. Salve entrada, resultados, consumo de créditos e relatório; confira reações e esforços com referência independente."
       - "Gere plantas e seções de fôrma em DXF da mesma revisão. Abra, confira cotas e escala no AutoCAD; salve DWG e PDF quando houver conexão real."
-      - "Modele a mesma revisão no Revit ou no Archicad, confira contagens e seções, salve RVT/PLN e audite o IFC no destino escolhido."
+      - "Modele a mesma revisão no Revit ou no Archicad, confira contagens, seções e propriedades lidas de volta, salve RVT/PLN e audite o IFC no destino escolhido."
   - titulo: Retomar um projeto em outra sessão
     passos:
       - "Abra o agente na pasta da obra e diga: 'Retome este projeto pela ficha projeto-contexto.json; mostre decisões, artefatos e pendências antes de avançar'."
@@ -87,7 +87,8 @@ fluxos:
       - "Peça: \"Levante os quantitativos da estrutura e orce com o SINAPI de <mês>, BDI 25%\" (quantitativos-sinapi)."
   - titulo: Modelo BIM pronto para entrega
     passos:
-      - "Abra o projeto no ArchiCAD 29 e salve."
+      - "Abra o projeto no Archicad 29 ou 30, salve uma cópia e confirme a porta/Tapir com list_instances."
+      - "Após lançar, compare cada GUID, seção, nível, material e espessura com GetDetailsOfElements e verificar_lancamento.py."
       - "Peça: \"Audite o modelo para exportar IFC\" (archicad-assistente) e corrija o que for apontado."
       - "Exporte as pendências em BCF para a equipe de projeto."
   - titulo: Canteiro e segurança conforme as NRs

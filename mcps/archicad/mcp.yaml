@@ -1,19 +1,19 @@
 # MCP de terceiros — NÃO embutimos o código; o instalador usa o pacote PyPI na versão fixada.
 nome: archicad
-titulo: ArchiCAD 29
+titulo: Archicad 29–30
 descricao: >-
-  Conecta ao ArchiCAD 29 aberto: auditoria de entrega (regras de escritório em YAML),
+  Conecta ao Archicad 29 ou 30 aberto: auditoria de entrega (regras de escritório em YAML),
   consulta e edição de elementos, classificações, issues/BCF e prontidão para IFC.
 licenca: MIT
 upstream: https://github.com/alesdev88/Archicad-MCP
-versao_fixada: 0.7.1
+versao_fixada: 0.8.0
 requisitos:
   so: [macos, windows]
-  software: "ArchiCAD 29 aberto com um projeto. Add-on Tapir recomendado."
+  software: "Archicad 29 ou 30 aberto com um projeto. Tapir obrigatório para criar elementos, consultar pavimentos e conferir IFC/BCF."
   ferramentas: [uv]
 deteccao:
-  macos: ["/Applications/Graphisoft/Archicad 29*", "/Applications/GRAPHISOFT/Archicad 29*"]
-  windows: ["C:/Program Files/Graphisoft/Archicad 29*", "C:/Program Files/GRAPHISOFT/Archicad 29*"]
+  macos: ["/Applications/Graphisoft/Archicad 30*", "/Applications/Graphisoft/Archicad 29*", "/Applications/GRAPHISOFT/Archicad 30*", "/Applications/GRAPHISOFT/Archicad 29*"]
+  windows: ["C:/Program Files/Graphisoft/Archicad 30*", "C:/Program Files/Graphisoft/Archicad 29*", "C:/Program Files/GRAPHISOFT/Archicad 30*", "C:/Program Files/GRAPHISOFT/Archicad 29*"]
 util_sem_software: false
 preparo:
   # regras de entrega em PT-BR que acompanham archicad-assistente
@@ -21,7 +21,7 @@ preparo:
     destino: "{SKILLVERSE_HOME}/archicad-regras"
 servidor:
   command: uvx
-  args: ["--from", "archicad-mcp-server==0.7.1", "archicad-mcp", "--mode", "full",
+  args: ["--from", "archicad-mcp-server==0.8.0", "archicad-mcp", "--mode", "full",
          "--rules-dir", "{SKILLVERSE_HOME}/archicad-regras"]
   env: {}
 teste:
@@ -29,8 +29,11 @@ teste:
   chamada_leitura: {name: get_project_info, arguments: {}}
 pos_instalacao:
   todos:
-    - "Instale o add-on Tapir (https://github.com/ENZYME-APD/tapir-archicad-automation/releases) para criar elementos, issues e checar IFC."
-    - "Deixe o ArchiCAD 29 aberto com o projeto antes de usar as skills de BIM."
+    - "Instale o add-on Tapir compatível (https://github.com/ENZYME-APD/tapir-archicad-automation/releases) para criar elementos, consultar pavimentos, trabalhar com issues/BCF e checar IFC. Tapir 1.7.1 foi verificado com Archicad 30 INT build 3001 no macOS."
+    - "Deixe o Archicad 29 ou 30 aberto com um projeto salvo antes de usar as skills de BIM."
 avisos:
-  - "SALVE o projeto antes de auditorias: a leitura de propriedades pode travar o ArchiCAD 29 (falha do próprio ArchiCAD)."
+  - "SALVE uma cópia antes de auditorias e alterações. Faça o primeiro teste em modelo pequeno e não sensível."
+  - "Um score 100 não basta: bloqueie a entrega se o modelo estiver vazio ou se qualquer regra vier com skipped=true."
+  - "Se houver mais de uma instância aberta, use a porta retornada por list_instances em cada chamada."
+  - "Após criar lajes, leia structureType, thickness e buildingMaterialId: o favorito controla a estrutura e pode ignorar a espessura solicitada quando não é Basic."
   - "Mac Intel: a primeira execução compila dependências e pode demorar alguns minutos."

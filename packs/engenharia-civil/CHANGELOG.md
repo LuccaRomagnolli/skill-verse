@@ -1,5 +1,18 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.4.3 — 2026-10-18 (candidato)
+- Tapir 1.7.1 instalado e testado no Archicad 30 INT build 3001 para macOS. Em cópia PLN salva, o bridge 0.8.0 criou quatro pilares, quatro vigas e uma laje, retornou nove GUIDs e releu pavimentos, posições, seções, material e contorno. O novo `verificar_lancamento.py` aprovou 9/9 elementos contra a revisão de entrada.
+- Corrigida uma falha detectada no ensaio: `CreateSlabs` com padrão Composite criou 0,30 m apesar de pedir 0,15 m. O plano agora exige favorito Basic e `slabStructureType=Basic`, verifica estrutura/espessura/material após criar e fornece dados para correção confirmada com `ModifySlabs`.
+- PLN salvo; issue BCF criada, comentada, associada à laje, exportada e reimportada. IFC2X3 exportado com 4 `IFCCOLUMN`, 4 `IFCBEAM`, 1 `IFCSLAB` e 2 pavimentos; a geometria foi reaberta. O tradutor padrão importou as oito barras como `Object`, portanto a preservação semântica do tradutor continua pendente.
+- Auditoria real em modelo preenchido, sem regras ignoradas. O interpretador conservador bloqueou a entrega por classificações, propriedades `LoadBearing` e layers pendentes, apesar de o upstream retornar `pass=true` para warnings. `validar_auditoria.py` agora aceita também o JSON bruto das chamadas MCP.
+- Evidência e limites atualizados em `VALIDACAO-ARCHICAD-30-MAC.md`. O teste usou licença Education; o pack segue candidato por causa das pendências de template/IFC, SkyCiv real, revisão normativa independente e Revit real.
+
+## 1.4.2 — 2026-10-18 (candidato)
+- Teste real no Archicad 30 INT build 3001 para macOS, com projeto `Untitled` aberto na porta 19723. O bridge `archicad-mcp-server` 0.8.0 iniciou, expôs 41 tools, reconheceu versão/build, carregou 13 regras do pack, contou o modelo vazio e gerou a prévia `CreateColumns` sem gravar. O ciclo temporário detectar → instalar no Codex → verificar ao vivo → remover também passou sem alterar a configuração existente do usuário.
+- A instalação atual não tem Tapir. `GetStories` e as propriedades IFC foram recusados corretamente; criação real, pavimentos, IFC, issues e BCF continuam pendentes. A auditoria upstream retornou `score=100` e `pass=true` no modelo vazio, apesar de cinco regras IFC com `skipped=true`; o pack agora bloqueia esse falso positivo com `validar_auditoria.py`.
+- MCP comunitário atualizado de 0.7.1 para 0.8.0, detecção ampliada para Archicad 29–30 e porta opcional propagada ao plano de lançamento. O Public MCP nativo do Archicad 30 também iniciou nesta máquina, mas expôs somente `GetArchicadInstances` nesta sessão; permanece alternativa separada, dependente do plano Collaborate/Max e da configuração fornecida pelo próprio Archicad.
+- Evidência e limites do teste: `VALIDACAO-ARCHICAD-30-MAC.md`. O pacote segue candidato até instalar Tapir, reiniciar o Archicad e validar criação, GUIDs, salvamento PLN, IFC e BCF em um modelo de teste.
+
 ## 1.4.1 — 2026-10-17 (candidato)
 - Teste no AutoCAD para Mac 2027 Education: DXF de planta aberto; `INSUNITS=6` (metros), 4 pilares, 8 linhas de vigas, 4 linhas de laje e cotas geométricas de 4,000 × 5,000 m lidas por AutoLISP. DWG salvo e reaberto com as mesmas contagens e medidas. PDF da prancha gerado no próprio AutoCAD em A3 completo, 1:50, e inspecionado visualmente.
 - Corrigidos os escapes Unicode do DXF R12, a fonte TrueType, o espaçamento do carimbo e as posições de etiquetas/cota após inspeção da prancha real. A configuração de plotagem A3 usa mídia `ISO full bleed A3 (420.00 x 297.00 MM)` e escala `1=0.05` para desenho em metros a 1:50.
@@ -19,7 +32,7 @@
 | Valores, edições e combinações NBR | Responsável técnico com exemplar licenciado | Mapa de ações, itens/edições conferidos, fatores e parecer; Errata 1:2025 da NBR 6123 | Pendente |
 | Plantas AutoCAD | Projetista CAD em Windows com AutoCAD | DWG/PDF salvos, cotas e escala medidas, seções e coordenadas conferidas | Pendente |
 | Modelo Revit | Projetista BIM em Windows com Revit | RVT, contagens, tipos, níveis, cotas, IFC reaberto e checklist | Pendente |
-| Modelo Archicad | Projetista BIM com Archicad 29 e Tapir | PLN, simulação e criação conferidas, GUIDs, seções, coordenadas, IFC/BCF reabertos | Pendente |
+| Modelo Archicad | Projetista BIM com Archicad 29 ou 30 e Tapir | PLN, simulação e criação conferidas, GUIDs, seções, coordenadas, IFC/BCF reabertos | Parcial: conexão/leitura/prévia no AC30; escrita e troca pendentes |
 | Instalação no cliente | Equipe Skill-Verse | Handshake, verificação e remoção no Claude Code e Codex nas plataformas de entrega | Pendente para Windows; macOS local verificado |
 
 ## 1.3.3 — 2026-10-15 (candidato)
@@ -68,7 +81,8 @@
 - [ ] TQS: `tqs_ambiente.py` (32/64 bits) em V23/V24/V25; `tqs_edificio.py ler/conferir/aplicar` no
       "Mod-Padrão"; `tqs_processar.py --executar`; `tqs_modelo.py listar/para-revit`; `tqs_dwg.py ler/exportar`.
 - [ ] AutoCAD: `prancha.py` em modo IPC (Windows) e headless; `plot_pdf`.
-- [ ] ArchiCAD 29: conexão, auditoria sem travamento de propriedades, destaque, issues e BCF reimportável.
+- [x] Archicad 30: bridge 0.8.0 conectado, leitura básica, regras e dry-run em projeto vazio.
+- [ ] Archicad 29/30 com Tapir: lançamento real, auditoria em modelo preenchido, destaque, issues, salvamento PLN e BCF/IFC reabertos.
 
 ## 1.2.0 — 2026-10-15
 - Nova skill **contexto-do-projeto**: ficha do projeto (município, UF, uso, porte, ambiente → classe de agressividade)
@@ -93,4 +107,4 @@
 ## 1.0.0 — 2026-10-14
 - Primeira versão: concreto armado (vigas, lajes, pilares), cargas/vento/combinações, memorial de cálculo,
   quantitativos + SINAPI, assistente AutoCAD, auditoria BIM ArchiCAD e relatórios técnicos.
-- Conexões: AutoCAD LT (puran-water/autocad-mcp @ 95476a3, v3.1) e ArchiCAD 29 (archicad-mcp-server 0.7.1).
+- Conexões: AutoCAD LT (puran-water/autocad-mcp @ 95476a3, v3.1) e Archicad 29–30 (archicad-mcp-server 0.8.0).

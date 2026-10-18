@@ -102,6 +102,8 @@ def build(pack_id: str, keep: bool) -> Path:
     pdir = PACKS / pack_id
     shutil.copy2(pdir / "manual.template.md", stage / "manual.template.md")
     shutil.copy2(pdir / "CHANGELOG.md", stage / "CHANGELOG.md")
+    for evidencia in sorted(pdir.glob("VALIDACAO-*.md")):
+        shutil.copy2(evidencia, stage / evidencia.name)
     shutil.copy2(ROOT / "LICENSE-COMERCIAL.md", stage / "LICENCA.md")
     for f in sorted(BUNDLE.iterdir()):
         (stage / f.name).write_text(render(f.read_text(encoding="utf-8"), pack), encoding="utf-8")
