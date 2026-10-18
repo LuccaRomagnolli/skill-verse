@@ -21,3 +21,5 @@ Requisitos: Python 3.10 ou mais novo (python.org) e Claude Code ou Codex instala
 Depois de instalado, pode apagar esta pasta: o pack fica guardado em ~/SkillVerse.
 
 Problemas? Abra o arquivo INSTALAR.md — ele tem o passo a passo manual.
+Para usar o pack, leia MANUAL-COMPLETO.md nesta pasta; após instalar,
+abra MANUAL-COMPLETO.html em ~/SkillVerse/{{PACK_ID}}/.

@@ -6,7 +6,7 @@ Banco de skills para agentes de IA (Claude Code e Codex), organizado por categor
 
 | Pack | Versão | Skills | Conexões |
 |---|---|---|---|
-| Engenharia Civil | 1.5.0 (candidato) | 15 skills: ficha persistente, planta arquitetônica/cortes/BIM, modelo estrutural, análise SkyCiv, normas locais, cálculo e documentação, AutoCAD, Revit, SOLIDWORKS, TQS e ArchiCAD | 6 MCPs opcionais: normas-publicas, SkyCiv, AutoCAD, Revit, SOLIDWORKS, ArchiCAD; TQS via API Python |
+| Engenharia Civil | 1.5.1 (candidato) | 15 skills: ficha persistente, planta arquitetônica/cortes/BIM, modelo estrutural, análise SkyCiv, normas locais, cálculo e documentação, AutoCAD, Revit, SOLIDWORKS, TQS e ArchiCAD | 6 MCPs opcionais: normas-publicas, SkyCiv, AutoCAD, Revit, SOLIDWORKS, ArchiCAD; TQS via API Python |
 | Professores | — | (próximo) | — |
 
 ## Estrutura
@@ -14,7 +14,7 @@ Banco de skills para agentes de IA (Claude Code e Codex), organizado por categor
 catalog/<categoria>/<skill>/   fonte única de cada skill (SKILL.md + skill.yaml + scripts/ + references/ + assets/)
 catalog/_comum/                skills usadas por mais de um pack
 mcps/<nome>/mcp.yaml           como baixar/registrar cada MCP (terceiros: versão fixada; próprio: upstream interno + servidor/)
-packs/<pack>/                  pack.yaml (composição), manual.template.md, CHANGELOG.md
+packs/<pack>/                  pack.yaml (composição), manual.template.md, MANUAL-COMPLETO.md, CHANGELOG.md
 installer/instalar-pack/       skill + install.py (stdlib) que vão dentro de todo pack
 installer/bundle/              COMECE-AQUI, INSTALAR, CLAUDE.md/AGENTS.md do zip
 tools/validate.py · build.py   lint do catálogo e geração do .zip
@@ -26,7 +26,7 @@ tests/                         pytest (cálculos, instalador, build) + evals/gat
 pip install -r requirements-dev.txt
 python3 tools/validate.py                  # lint (frontmatter, "Use quando", limites, scripts, packs, MCPs)
 python3 -m pytest -q                       # testes
-python3 tools/build.py engenharia-civil    # → dist/skillverse-engenharia-civil-v1.5.0.zip
+python3 tools/build.py engenharia-civil    # → dist/skillverse-engenharia-civil-v1.5.1.zip
 ```
 Regras de autoria em [CLAUDE.md](CLAUDE.md).
 
@@ -36,7 +36,7 @@ Regras de autoria em [CLAUDE.md](CLAUDE.md).
 - **MCPs**: baixados do upstream na versão fixada (nunca embutidos), só para os softwares compatíveis escolhidos pelo usuário. `verificar` distingue servidor iniciado de leitura do aplicativo; AutoCAD headless é identificado como geração DXF, não como AutoCAD operável.
 - `desinstalar` remove componentes registrados do pack; preserva manuais, regras personalizadas, documentos locais e arquivos do usuário. Cada skill copiada leva um marcador `.skillverse.json`.
 
-O ZIP 1.5.0 é **candidato**, não liberação técnica para clientes. O fluxo arquitetônico aceita medidas conferidas de DWG/DXF ou pontos traçados de PDF/imagem calibrada, gera cortes geométricos DXF e planos de modelagem no Revit/Archicad; ainda precisa de ensaio no software real e não interpreta automaticamente desenhos arbitrários. O fluxo estrutural usa modelo explícito, análise linear SkyCiv com créditos do cliente, plantas DXF e um destino BIM escolhido por obra. A referência declarada é NBR 6118:2026; a base de 2023 e a Emenda 1 foram confrontadas com critérios selecionados. A skill de ações exige mapa por ambiente, perfil explícito de combinações e usa a base NBR 6123:2023 para vento. Recalcule saídas antigas de vento/combinações e resultados de concreto C45–C90 anteriores à correção de `ηc`. O AutoCAD para Mac 2027 abriu e mediu a planta estrutural de exemplo e gerou DWG/PDF; ainda faltam a Errata 1:2025 da NBR 6123, validação independente, uma análise real SkyCiv, controle do AutoCAD pelo MCP e teste real no Revit. Veja as pendências no [changelog](packs/engenharia-civil/CHANGELOG.md).
+O ZIP 1.5.1 é **candidato**, não liberação técnica para clientes. O [manual completo](packs/engenharia-civil/MANUAL-COMPLETO.md) acompanha o pacote e orienta instalação, uso das 15 skills e os dois fluxos principais. O fluxo arquitetônico aceita medidas conferidas de DWG/DXF ou pontos traçados de PDF/imagem calibrada, gera cortes geométricos DXF e planos de modelagem no Revit/Archicad; ainda precisa de ensaio no software real e não interpreta automaticamente desenhos arbitrários. O fluxo estrutural usa modelo explícito, análise linear SkyCiv com créditos do cliente, plantas DXF e um destino BIM escolhido por obra. A referência declarada é NBR 6118:2026; a base de 2023 e a Emenda 1 foram confrontadas com critérios selecionados. A skill de ações exige mapa por ambiente, perfil explícito de combinações e usa a base NBR 6123:2023 para vento. Recalcule saídas antigas de vento/combinações e resultados de concreto C45–C90 anteriores à correção de `ηc`. O AutoCAD para Mac 2027 abriu e mediu a planta estrutural de exemplo e gerou DWG/PDF; ainda faltam a Errata 1:2025 da NBR 6123, validação independente, uma análise real SkyCiv, controle do AutoCAD pelo MCP e teste real no Revit. Veja as pendências no [changelog](packs/engenharia-civil/CHANGELOG.md).
 
 ## Novo pack
 1. Escreva as skills em `catalog/<categoria>/` seguindo o CLAUDE.md (reaproveite `_comum/`).

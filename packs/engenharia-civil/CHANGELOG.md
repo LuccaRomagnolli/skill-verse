@@ -1,5 +1,9 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.5.1 — 2026-10-18 (candidato)
+- Adicionado `MANUAL-COMPLETO.md` ao ZIP com instalação, 15 skills, fluxos de planta baixa/cortes/BIM e estrutura/SkyCiv/CAD/BIM, exemplos de pedidos, conferência de resultados e solução de problemas.
+- O comando `manual` agora copia o guia completo para `~/SkillVerse/engenharia-civil/` e gera `MANUAL-COMPLETO.html`, junto ao manual personalizado. O escopo técnico e as pendências de validação da versão 1.5.0 permanecem.
+
 ## 1.5.0 — 2026-10-18 (candidato)
 - Nova skill `planta-arquitetonica` para estruturar coordenadas de planta DWG/DXF ou pontos traçados de PDF/imagem calibrada. O script valida níveis, paredes, aberturas, pisos e linhas de corte; gera cortes verticais DXF com manifestos e planos de criação de paredes, pisos, portas e janelas para Revit/Archicad.
 - Os planos BIM exigem correspondência de níveis, famílias/favoritos e IDs/GUIDs do projeto aberto; não gravam automaticamente. O corte mostra apenas elementos interceptados pelo plano e precisa de conferência no CAD. Ainda faltam teste com planta de cliente, validação dos lotes arquitetônicos nos softwares reais e extensão para coberturas/escadas/projeções.

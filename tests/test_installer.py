@@ -41,7 +41,7 @@ def cli(pacote, *args):
 
 
 def test_estrutura_do_zip(pacote):
-    for f in ("COMECE-AQUI.txt", "INSTALAR.md", "CLAUDE.md", "AGENTS.md", "LICENCA.md", "pack.json",
+    for f in ("COMECE-AQUI.txt", "INSTALAR.md", "MANUAL-COMPLETO.md", "CLAUDE.md", "AGENTS.md", "LICENCA.md", "pack.json",
               ".claude-plugin/marketplace.json", "plugin/.claude-plugin/plugin.json", "instalador/SKILL.md"):
         assert (pacote / f).is_file(), f
     pack = json.loads((pacote / "pack.json").read_text(encoding="utf-8"))
@@ -58,6 +58,9 @@ def test_estrutura_do_zip(pacote):
     assert mk["plugins"][0]["name"] == json.loads((pacote / "plugin/.claude-plugin/plugin.json").read_text())["name"]
     assert not list(pacote.rglob("skill.yaml")), "metadados internos não devem ir no zip"
     assert "{{" not in (pacote / "INSTALAR.md").read_text(encoding="utf-8")
+    completo = (pacote / "MANUAL-COMPLETO.md").read_text(encoding="utf-8")
+    assert "Versão 1.5.1" in completo and "{{" not in completo
+    assert "Fluxo 1 — planta baixa" in completo and "Fluxo 2 — estrutura" in completo
 
 
 def test_ciclo_codex(pacote, home):
@@ -76,7 +79,12 @@ def test_ciclo_codex(pacote, home):
     md = (home / "SkillVerse/engenharia-civil/MANUAL.md").read_text(encoding="utf-8")
     assert "Codex `$concreto-armado-nbr6118`" in md and "{{" not in md
     assert "Seu primeiro projeto guiado" in md and "NBR 6118:2026" in md
+    assert "MANUAL-COMPLETO.html" in md
     assert "<table>" in (home / "SkillVerse/engenharia-civil/MANUAL.html").read_text(encoding="utf-8")
+    completo_md = (home / "SkillVerse/engenharia-civil/MANUAL-COMPLETO.md").read_text(encoding="utf-8")
+    completo_html = (home / "SkillVerse/engenharia-civil/MANUAL-COMPLETO.html").read_text(encoding="utf-8")
+    assert completo_md == (pacote / "MANUAL-COMPLETO.md").read_text(encoding="utf-8")
+    assert "<table>" in completo_html and "Fluxo 1" in completo_html
 
     r = cli(pacote, "desinstalar")
     assert r.returncode == 0

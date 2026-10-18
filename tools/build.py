@@ -101,6 +101,9 @@ def build(pack_id: str, keep: bool) -> Path:
     (stage / "pack.json").write_text(json.dumps(pack, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     pdir = PACKS / pack_id
     shutil.copy2(pdir / "manual.template.md", stage / "manual.template.md")
+    manual_completo = pdir / "MANUAL-COMPLETO.md"
+    if manual_completo.is_file():
+        (stage / manual_completo.name).write_text(render(manual_completo.read_text(encoding="utf-8"), pack), encoding="utf-8")
     shutil.copy2(pdir / "CHANGELOG.md", stage / "CHANGELOG.md")
     for evidencia in sorted(pdir.glob("VALIDACAO-*.md")):
         shutil.copy2(evidencia, stage / evidencia.name)

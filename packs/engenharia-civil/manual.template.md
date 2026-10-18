@@ -2,6 +2,8 @@
 
 Versão {{VERSAO}} · instalado em {{DATA}} · plataforma: {{PLATAFORMAS}}
 
+Para o passo a passo completo dos dois fluxos, consulte `MANUAL-COMPLETO.md` ou abra `MANUAL-COMPLETO.html` nesta pasta.
+
 {{PARA_VOCE}}
 {{PERFIL}}
 

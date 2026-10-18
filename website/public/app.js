@@ -1,4 +1,5 @@
 const icons = {
+ clock:'M12 8v5l3 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',
  'arrow-right':'M4 12h16m-6-6 6 6-6 6','arrow-up-right':'M6 18 18 6M6 6h12v12',check:'m5 12 4 4L19 6',bag:'M5 7h14l1 14H4L5 7Zm3 0V5a4 4 0 0 1 8 0v2',menu:'M4 6h16M4 12h16M4 18h16',x:'m6 6 12 12M6 18 18 6',layers:'m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5',file:'M14 2H5v20h14V7l-5-5Zm0 0v5h5M8 12h8M8 16h6',box:'m12 2 9 5v10l-9 5-9-5V7l9-5ZM3 7l9 5 9-5M12 12v10M7 4.8l10 5.5',terminal:'m5 7 4 5-4 5m8 0h6',puzzle:'M8 3H3v6a3 3 0 1 1 0 6v6h6a3 3 0 1 1 6 0h6v-6a3 3 0 1 0 0-6V3h-6a3 3 0 1 0-6 0H8Z',grid:'M3 3h7v7H3V3Zm11 0h7v7h-7V3ZM3 14h7v7H3v-7Zm11 0h7v7h-7v-7Z',sparkles:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM20 2v4M18 4h4',download:'M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6',panel:'M3 4h18v16H3V4Zm6 0v16',search:'M20 20l-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z',info:'M12 11v6m0-10v1M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z',plus:'M12 5v14M5 12h14',trash:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7',ruler:'m3 16 13-13 5 5L8 21l-5-5Zm4-4 3 3m1-7 3 3m1-7 3 3',book:'M12 5c-3-2-7-2-10-1v15c3-1 7-1 10 1m0-15c3-2 7-2 10-1v15c-3-1-7-1-10 1V5Z',calculator:'M5 2h14v20H5V2Zm3 3h8v4H8V5Zm0 8h1m3 0h1m3 0h1m-9 4h1m3 0h1m3 0h1',lock:'M5 10h14v12H5V10Zm3 0V6a4 4 0 0 1 8 0v4M12 14v4'
 };
 const icon = name => `<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="${icons[name] || icons.sparkles}"/></svg>`;
@@ -47,3 +48,34 @@ function renderDemo(key){const d=demoScenarios[key];document.querySelector('#dem
 document.querySelectorAll('[data-demo]').forEach(button=>button.addEventListener('click',()=>{setActive('[data-demo]',button);renderDemo(button.dataset.demo);}));
 const menuButton=document.querySelector('.menu-trigger');const mobileNav=document.querySelector('.mobile-nav');menuButton.addEventListener('click',()=>{mobileNav.hidden=!mobileNav.hidden;menuButton.setAttribute('aria-expanded',String(!mobileNav.hidden));menuButton.setAttribute('aria-label',mobileNav.hidden?'Abrir menu':'Fechar menu');});mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mobileNav.hidden=true;menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Abrir menu');}));
 hydrateIcons();renderSkills();renderDemo('context');persistCart();
+
+// Keep pointer, touch and keyboard interaction in the same accessible state.
+const skillBox = document.querySelector('[data-skill-box]');
+const boxToggle = skillBox.querySelector('.box-toggle');
+const boxBenefits = document.querySelector('#box-benefits');
+const boxHover = matchMedia('(any-hover: hover)');
+function setBoxOpen(open) {
+  skillBox.classList.toggle('is-open', open);
+  boxToggle.setAttribute('aria-expanded', String(open));
+  boxToggle.setAttribute('aria-label', `${open ? 'Fechar' : 'Abrir'} a caixa de ferramentas SkillVerse`);
+  boxBenefits.setAttribute('aria-hidden', String(!open));
+  skillBox.querySelector('[data-box-label]').textContent = open
+    ? (boxHover.matches ? 'Novas skills. Novas possibilidades.' : 'Toque para fechar sua caixa')
+    : (boxHover.matches ? 'Passe o mouse e abra possibilidades' : 'Toque e abra novas possibilidades');
+}
+skillBox.addEventListener('pointerenter', event => {
+  if (event.pointerType === 'mouse' && boxHover.matches) setBoxOpen(true);
+});
+skillBox.addEventListener('pointerleave', event => {
+  if (event.pointerType === 'mouse' && !boxToggle.matches(':focus-visible')) setBoxOpen(false);
+});
+boxToggle.addEventListener('focus', () => {
+  if (boxToggle.matches(':focus-visible')) setBoxOpen(true);
+});
+boxToggle.addEventListener('blur', () => setBoxOpen(false));
+boxToggle.addEventListener('click', () => setBoxOpen(boxToggle.getAttribute('aria-expanded') !== 'true'));
+boxToggle.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setBoxOpen(false);
+});
+boxHover.addEventListener('change', () => setBoxOpen(false));
+setBoxOpen(false);

@@ -857,7 +857,16 @@ def cmd_manual(args) -> int:
     md = render_manual(pack, root, reg, extra)
     (out_dir / "MANUAL.md").write_text(md, encoding="utf-8")
     (out_dir / "MANUAL.html").write_text(md_to_html(md, f"Manual — {pack['nome']}"), encoding="utf-8")
-    print(json.dumps({"md": str(out_dir / "MANUAL.md"), "html": str(out_dir / "MANUAL.html")}, ensure_ascii=False))
+    result = {"md": str(out_dir / "MANUAL.md"), "html": str(out_dir / "MANUAL.html")}
+    manual_completo = root / "MANUAL-COMPLETO.md"
+    if manual_completo.is_file():
+        completo = manual_completo.read_text(encoding="utf-8")
+        (out_dir / "MANUAL-COMPLETO.md").write_text(completo, encoding="utf-8")
+        (out_dir / "MANUAL-COMPLETO.html").write_text(
+            md_to_html(completo, f"Manual completo — {pack['nome']}"), encoding="utf-8")
+        result.update({"completo_md": str(out_dir / "MANUAL-COMPLETO.md"),
+                       "completo_html": str(out_dir / "MANUAL-COMPLETO.html")})
+    print(json.dumps(result, ensure_ascii=False))
     return 0
 
 
