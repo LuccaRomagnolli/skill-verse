@@ -1,9 +1,0 @@
-titulo: Modelo estrutural do projeto
-categoria: engenharia-civil
-version: 1.0.0
-resumo: Mantém geometria, ações, vínculos, fontes e revisão em um modelo estrutural único para SkyCiv, CAD e BIM.
-mcps: []
-exemplos:
-  - "Organize meu lançamento em um modelo estrutural para análise na SkyCiv"
-  - "Valide vínculos, cargas, combinações e unidades antes de enviar à nuvem"
-  - "Gere a entrada do Revit a partir da revisão aprovada"

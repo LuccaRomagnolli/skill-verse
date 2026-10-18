@@ -1,9 +1,0 @@
-titulo: Análise estrutural SkyCiv
-categoria: engenharia-civil
-version: 1.0.0
-resumo: Valida e envia um modelo explícito para análise linear SkyCiv, preservando resultados, custos e rastreabilidade.
-mcps: [skyciv]
-exemplos:
-  - "Valide esta revisão estrutural para análise SkyCiv"
-  - "Analise meu modelo na SkyCiv após eu confirmar o envio"
-  - "Leia os esforços, deslocamentos e reações da análise anterior"
