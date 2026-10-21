@@ -20,12 +20,13 @@ Use `--list` para listar IDs, `--target claude|codex|both` e `--scope user|proje
 - `engcode/cli.mjs`: instalador modular sem dependências npm de execução.
 - `website/`: catálogo público em desenvolvimento, com busca, páginas individuais e lista de instalação.
 
-A fonte atual tem 10 skills e 5 MCPs. Ao alterar uma skill ou MCP, atualize `engcode/catalog.json` e `website/public/catalog.json` juntos. Confirme a operação em software real para qualquer promessa de automação CAD/BIM. Textos integrais de normas ABNT não estão incluídos.
+A fonte atual tem 10 skills e 5 MCPs. Ao alterar uma skill ou MCP, atualize `engcode/catalog.json` e execute `node engcode/sync-site.mjs` para sincronizar a vitrine. Confirme a operação em software real para qualquer promessa de automação CAD/BIM. Textos integrais de normas ABNT não estão incluídos.
 
 ## Verificação
 
 ```sh
 node --check engcode/cli.mjs
+node engcode/sync-site.mjs --check
 node engcode/cli.mjs --list
 node engcode/cli.mjs --skills contexto-do-projeto --target codex --scope project --dry-run
 cd website && npm run build
