@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint das skills, MCPs e do catálogo modular Engcode.
+"""Lint das skills, MCPs e do catálogo modular MCPcad.
 
 Uso: python3 tools/validate.py [--strict]
 Sai com código 1 se houver erro (ou aviso, com --strict).
@@ -17,7 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog"
 MCPS = ROOT / "mcps"
-MANIFEST = ROOT / "engcode" / "catalog.json"
+MANIFEST = ROOT / "mcpcad" / "catalog.json"
 SITE_MANIFEST = ROOT / "website" / "public" / "catalog.json"
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -178,8 +178,8 @@ def check_mcps(rep: Report) -> set[str]:
                     compile(py.read_text(encoding="utf-8"), str(py), "exec")
                 except SyntaxError as e:
                     rep.err(py, f"não compila: {e}")
-            if "{ENGCODE_MCP_DIR}" not in str(data.get("servidor")):
-                rep.err(f, "MCP interno deve referenciar o código via {ENGCODE_MCP_DIR}")
+            if "{MCPCAD_MCP_DIR}" not in str(data.get("servidor")):
+                rep.err(f, "MCP interno deve referenciar o código via {MCPCAD_MCP_DIR}")
         if str(data.get("licenca", "")).upper() in ("", "DESCONHECIDA", "?"):
             rep.err(f, "licença do upstream não verificada — não pode ser vendido")
         for t in (data.get("requisitos") or {}).get("ferramentas") or []:
@@ -205,7 +205,7 @@ def check_manifest(rep: Report, skills: dict[str, Path], known_mcps: set[str]) -
         rep.err(MANIFEST, f"catálogo JSON inválido: {exc}")
         return
     if items != site_items:
-        rep.err(SITE_MANIFEST, "catálogo do site diverge de engcode/catalog.json")
+        rep.err(SITE_MANIFEST, "catálogo do site diverge de mcpcad/catalog.json")
     ids: set[str] = set()
     for item in items:
         id_ = item.get("id")

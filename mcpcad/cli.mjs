@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const catalog=JSON.parse(fs.readFileSync(path.join(root,'engcode/catalog.json'),'utf8'));
+const catalog=JSON.parse(fs.readFileSync(path.join(root,'mcpcad/catalog.json'),'utf8'));
 const byId=new Map(catalog.map(x=>[x.id,x]));
 const args=process.argv.slice(2);
 const opt=(key,defaultValue='')=>{const i=args.indexOf('--'+key);return i<0?defaultValue:args[i+1]||''};
@@ -18,7 +18,7 @@ const scope=opt('scope','user');
 const dry=flag('dry-run');
 const home=os.homedir();
 const project=process.cwd();
-const data=path.join(home,'.engcode');
+const data=path.join(home,'.mcpcad');
 const system=process.platform;
 function command(binary,argv,options={}){
   if(dry){console.log('  $',binary,...argv);return}
@@ -28,26 +28,26 @@ function command(binary,argv,options={}){
 function available(binary){return spawnSync(binary,['--version'],{stdio:'ignore',shell:false}).status===0}
 function copyTree(src,dst,id){
   if(fs.existsSync(dst)){
-    const marker=path.join(dst,'.engcode.json');
+    const marker=path.join(dst,'.mcpcad.json');
     if(fs.existsSync(marker)&&JSON.parse(fs.readFileSync(marker,'utf8')).id===id){console.log(`  • ${id}: já instalado em ${dst}`);return}
     throw new Error(`Destino já existe e foi preservado: ${dst}`);
   }
   console.log(`  • ${id} → ${dst}`);
-  if(!dry){fs.mkdirSync(path.dirname(dst),{recursive:true});fs.cpSync(src,dst,{recursive:true});fs.writeFileSync(path.join(dst,'.engcode.json'),JSON.stringify({id,installedAt:new Date().toISOString()})+'\n')}
+  if(!dry){fs.mkdirSync(path.dirname(dst),{recursive:true});fs.cpSync(src,dst,{recursive:true});fs.writeFileSync(path.join(dst,'.mcpcad.json'),JSON.stringify({id,installedAt:new Date().toISOString()})+'\n')}
 }
 function addCodex(id,srv){
   const cfg=path.join(scope==='project'?path.join(project,'.codex'):(process.env.CODEX_HOME||path.join(home,'.codex')),'config.toml');
-  const name='engcode-'+id;
+  const name='mcpcad-'+id;
   const old=fs.existsSync(cfg)?fs.readFileSync(cfg,'utf8'):'';
   if(old.includes(`[mcp_servers.${name}]`)){console.log(`  • ${name}: já registrado em ${cfg}`);return}
   const q=x=>JSON.stringify(String(x));
-  let block=`\n# Engcode: ${id}\n[mcp_servers.${name}]\ncommand = ${q(srv.command)}\nargs = [${srv.args.map(q).join(', ')}]\nstartup_timeout_sec = 120\n`;
+  let block=`\n# MCPcad: ${id}\n[mcp_servers.${name}]\ncommand = ${q(srv.command)}\nargs = [${srv.args.map(q).join(', ')}]\nstartup_timeout_sec = 120\n`;
   if(Object.keys(srv.env).length){block+=`[mcp_servers.${name}.env]\n`;for(const [k,v] of Object.entries(srv.env))block+=`${k} = ${q(v)}\n`}
   console.log(`  • ${name} → ${cfg}`);
   if(!dry){fs.mkdirSync(path.dirname(cfg),{recursive:true});fs.writeFileSync(cfg,old.replace(/\s*$/,'')+'\n'+block)}
 }
 function addClaude(id,srv){
-  const name='engcode-'+id;
+  const name='mcpcad-'+id;
   const s=scope==='project'?'local':'user';
   if(!dry&&!available('claude'))throw new Error('Claude Code CLI não encontrado. Instale Claude Code antes de registrar MCPs.');
   if(!dry&&spawnSync('claude',['mcp','get',name],{stdio:'ignore'}).status===0){console.log(`  • ${name}: já registrado no Claude Code`);return}
@@ -58,7 +58,7 @@ function addClaude(id,srv){
 function gitSource(id,url,sha){
   if(!dry&&!available('git'))throw new Error('Git é necessário para este MCP.');
   const dest=path.join(data,'mcps',id);
-  const marker=path.join(dest,'.engcode-source.json');
+  const marker=path.join(dest,'.mcpcad-source.json');
   if(fs.existsSync(dest)){
     if(fs.existsSync(marker)&&JSON.parse(fs.readFileSync(marker,'utf8')).sha===sha){console.log(`  • ${id}: fonte fixada já presente`);return dest}
     throw new Error(`Fonte existente preservada: ${dest}`);
@@ -100,13 +100,13 @@ function installMcp(id){
   const steps=[...(item.post.todos||[]),...(item.post[system==='win32'?'windows':system==='darwin'?'macos':'linux']||[])];
   for(const step of steps)console.log('  ↳ '+step);
 }
-if(flag('help')||args.length===0){console.log('Engcode — instalação individual de skills e MCPs\n\nUso: engcode --skills id1,id2 --mcps id3 --target claude|codex|both --scope user|project [--dry-run]\n       engcode --list\n\nNenhum pack é necessário. --scope project usa a pasta atual.');process.exit(0)}
+if(flag('help')||args.length===0){console.log('MCPcad — instalação individual de skills e MCPs\n\nUso: mcpcad --skills id1,id2 --mcps id3 --target claude|codex|both --scope user|project [--dry-run]\n       mcpcad --list\n\nNenhum pack é necessário. --scope project usa a pasta atual.');process.exit(0)}
 if(flag('list')){for(const x of catalog)console.log(`${x.type.padEnd(6)} ${x.id.padEnd(25)} ${x.name}`);process.exit(0)}
 if(!['claude','codex','both'].includes(target))exit('--target deve ser claude, codex ou both');
 if(!['user','project'].includes(scope))exit('--scope deve ser user ou project');
 if(!selected.skill.length&&!selected.mcp.length)exit('Escolha pelo menos uma skill ou um MCP. Use --list para ver os IDs.');
 for(const [type,ids] of Object.entries(selected))for(const id of ids){if(!byId.has(id)||byId.get(id).type!==type)exit(`ID ${type} inválido: ${id}`)}
-console.log(`Engcode · ${scope==='user'?'todos os projetos':project} · ${target}${dry?' · simulação':''}`);
+console.log(`MCPcad · ${scope==='user'?'todos os projetos':project} · ${target}${dry?' · simulação':''}`);
 try{
   for(const id of new Set(selected.skill)){
     const item=byId.get(id);

@@ -4,7 +4,7 @@
 
 O MCP `archicad` fixa `archicad-mcp-server==0.8.0` em modo `full`. Ele fornece as regras YAML do escritório e o gateway para comandos Tapir. Em mais de uma instância aberta, execute `list_instances`, escolha conscientemente o projeto e passe a porta retornada (19723–19743) em todas as leituras e gravações.
 
-O Public MCP incluído no Archicad 30 é uma conexão separada. Ele depende de uma assinatura Archicad Collaborate ou Max. Use o comando e o argumento copiados de **Options > Desktop AI Tool Connection**; os caminhos variam por instalação e não são gravados automaticamente pelo Engcode. Sua presença não substitui o Tapir no fluxo de lançamento estrutural desta ferramenta.
+O Public MCP incluído no Archicad 30 é uma conexão separada. Ele depende de uma assinatura Archicad Collaborate ou Max. Use o comando e o argumento copiados de **Options > Desktop AI Tool Connection**; os caminhos variam por instalação e não são gravados automaticamente pelo MCPcad. Sua presença não substitui o Tapir no fluxo de lançamento estrutural desta ferramenta.
 
 ## Tapir
 

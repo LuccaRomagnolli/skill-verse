@@ -1,11 +1,11 @@
 {
-  "name": "engcode-catalog",
+  "name": "mcpcad-catalog",
   "version": "0.1.0",
   "private": false,
-  "description": "Instalador modular de skills e MCPs de engenharia Engcode",
+  "description": "Instalador modular de skills e MCPs de engenharia MCPcad",
   "type": "module",
-  "bin": {"engcode": "engcode/cli.mjs"},
-  "files": ["engcode", "catalog", "mcps", "LICENSE-COMERCIAL.md"],
+  "bin": {"mcpcad": "mcpcad/cli.mjs"},
+  "files": ["mcpcad", "catalog", "mcps", "LICENSE-COMERCIAL.md"],
   "engines": {"node": ">=20"},
   "license": "SEE LICENSE IN LICENSE-COMERCIAL.md"
 }

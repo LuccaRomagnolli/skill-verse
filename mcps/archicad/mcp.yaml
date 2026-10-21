@@ -18,11 +18,11 @@ util_sem_software: false
 preparo:
   # regras de entrega em PT-BR que acompanham archicad-assistente
   - copiar_da_skill: catalog/engenharia-civil/archicad-assistente/assets/regras
-    destino: "{ENGCODE_HOME}/archicad-regras"
+    destino: "{MCPCAD_HOME}/archicad-regras"
 servidor:
   command: uvx
   args: ["--from", "archicad-mcp-server==0.8.0", "archicad-mcp", "--mode", "full",
-         "--rules-dir", "{ENGCODE_HOME}/archicad-regras"]
+         "--rules-dir", "{MCPCAD_HOME}/archicad-regras"]
   env: {}
 teste:
   tool_esperada: get_project_info

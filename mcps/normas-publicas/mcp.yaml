@@ -1,4 +1,4 @@
-# MCP próprio Engcode; instalado individualmente a partir de servidor/.
+# MCP próprio MCPcad; instalado individualmente a partir de servidor/.
 # Os documentos são baixados das fontes oficiais na máquina do usuário.
 nome: normas-publicas
 titulo: Normas e manuais públicos (NRs, DNIT, SINAPI)
@@ -6,7 +6,7 @@ descricao: >-
   Índice local consultado pelo agente com documentos técnicos públicos: Normas Regulamentadoras
   (segurança do trabalho e canteiro de obras) e seus manuais oficiais, normas e manuais do DNIT e
   cadernos técnicos do SINAPI. Baixa direto das fontes oficiais. Não inclui normas ABNT.
-licenca: "Código proprietário Engcode; documentos públicos (atos oficiais / reprodução livre com citação)"
+licenca: "Código proprietário MCPcad; documentos públicos (atos oficiais / reprodução livre com citação)"
 upstream: interno
 versao_fixada: 1.0.0
 requisitos:
@@ -15,20 +15,20 @@ requisitos:
   ferramentas: [uv]
 util_sem_software: true
 recomendado: true
-dados: "{ENGCODE_HOME}/normas-publicas"
+dados: "{MCPCAD_HOME}/normas-publicas"
 preparo:
   - comando: ["uv", "run", "-q", "--no-project", "--with", "pypdf>=4", "--with", "certifi", "python",
-              "{ENGCODE_MCP_DIR}/normas.py", "catalogo"]
-    env: {NORMAS_DIR: "{ENGCODE_HOME}/normas-publicas"}
+              "{MCPCAD_MCP_DIR}/normas.py", "catalogo"]
+    env: {NORMAS_DIR: "{MCPCAD_HOME}/normas-publicas"}
   - comando: ["uv", "run", "-q", "--no-project", "--with", "pypdf>=4", "--with", "certifi", "python",
-              "{ENGCODE_MCP_DIR}/normas.py", "baixar", "--padrao"]
-    env: {NORMAS_DIR: "{ENGCODE_HOME}/normas-publicas"}
+              "{MCPCAD_MCP_DIR}/normas.py", "baixar", "--padrao"]
+    env: {NORMAS_DIR: "{MCPCAD_HOME}/normas-publicas"}
 servidor:
   command: uv
   args: ["run", "-q", "--no-project", "--with", "mcp[cli]>=1.2,<2", "--with", "pypdf>=4", "--with", "certifi", "python",
-         "{ENGCODE_MCP_DIR}/server.py"]
+         "{MCPCAD_MCP_DIR}/server.py"]
   env:
-    NORMAS_DIR: "{ENGCODE_HOME}/normas-publicas"
+    NORMAS_DIR: "{MCPCAD_HOME}/normas-publicas"
 teste:
   tool_esperada: buscar_normas
   chamada_leitura: {name: status, arguments: {}}

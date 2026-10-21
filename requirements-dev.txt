@@ -1,3 +1,3 @@
-# Só para quem mantém o repositório (build/validação). O instalador Engcode usa Node.js sem dependências npm de execução.
+# Só para quem mantém o repositório (build/validação). O instalador MCPcad usa Node.js sem dependências npm de execução.
 pyyaml>=6.0
 pytest>=8.0

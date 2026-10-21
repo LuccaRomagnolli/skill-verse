@@ -1,11 +1,11 @@
-# Engcode — regras do repositório
+# MCPcad — regras do repositório
 
 Catálogo modular de skills e conexões MCP para engenharia. Cada ferramenta pode ser selecionada e instalada individualmente em Claude Code, Codex ou ambos. O site é uma vitrine estática, sem checkout ativo.
 
 ## Mapa
 - `catalog/<categoria>/<skill>/`: fonte das skills. `_comum/` contém ferramentas de uso geral.
 - `mcps/<nome>/mcp.yaml`: origem, versão, requisitos e passos de cada conexão. MCP interno tem código em `servidor/`.
-- `engcode/catalog.json`: manifesto dos itens distribuídos; `engcode/cli.mjs`: instalador via `npx`.
+- `mcpcad/catalog.json`: manifesto dos itens distribuídos; `mcpcad/cli.mjs`: instalador via `npx`.
 - `website/`: site estático; `website/public/catalog.json` é sincronizado a partir do manifesto.
 - `tools/validate.py`: valida skills, MCPs e manifesto. `tests/`: testes de scripts técnicos.
 
@@ -23,10 +23,10 @@ Catálogo modular de skills e conexões MCP para engenharia. Cada ferramenta pod
 pip install -r requirements-dev.txt
 python3 tools/validate.py --strict
 python3 -m pytest -q
-node engcode/sync-site.mjs --check
-node --check engcode/cli.mjs
+node mcpcad/sync-site.mjs --check
+node --check mcpcad/cli.mjs
 node website/build.mjs
-node engcode/cli.mjs --list
+node mcpcad/cli.mjs --list
 ```
 
 Teste instalação em HOME temporário e com projeto descartável antes de publicar um comando novo. O instalador preserva destinos existentes; não usar o HOME pessoal no teste.

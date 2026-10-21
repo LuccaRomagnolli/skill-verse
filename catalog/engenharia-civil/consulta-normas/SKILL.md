@@ -36,5 +36,5 @@ Código de obras, plano diretor, ITs do Corpo de Bombeiros e normas de concessio
 
 ## Limites e responsabilidade
 - O índice reproduz documentos públicos como publicados nos sites oficiais. A versão legal das NRs é a do Diário Oficial da União, e portarias recentes podem ainda não estar consolidadas no PDF.
-- Normas estaduais e municipais só estarão no índice se forem importadas de fonte oficial para aquela obra. Normas ABNT não são distribuídas pelo Engcode; uma cópia licenciada fornecida pelo usuário não vira conteúdo distribuível.
+- Normas estaduais e municipais só estarão no índice se forem importadas de fonte oficial para aquela obra. Normas ABNT não são distribuídas pelo MCPcad; uma cópia licenciada fornecida pelo usuário não vira conteúdo distribuível.
 - A interpretação e aplicação da norma ao caso concreto cabe ao profissional habilitado (engenheiro de segurança, responsável técnico da obra).
