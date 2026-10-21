@@ -1,0 +1,277 @@
+[
+  {
+    "id": "relatorio-tecnico",
+    "type": "skill",
+    "name": "Relatórios e laudos técnicos",
+    "version": "1.2.0",
+    "summary": "Redige relatórios técnicos, laudos de vistoria, pareceres e relatórios de inspeção predial na estrutura das normas, com fotos numeradas, e entrega em Word e PDF.",
+    "area": "Normas e documentação",
+    "path": "catalog/_comum/relatorio-tecnico",
+    "requires": [],
+    "example": "Monte um laudo de vistoria das fissuras com estas 6 fotos"
+  },
+  {
+    "id": "archicad-assistente",
+    "type": "skill",
+    "name": "Modelagem e auditoria Archicad",
+    "version": "1.2.0",
+    "summary": "Modela pilares, vigas e lajes no Archicad 29 ou 30 a partir da revisão estrutural e audita propriedades, IFC e issues sem aceitar verificações ignoradas.",
+    "area": "CAD e BIM",
+    "path": "catalog/engenharia-civil/archicad-assistente",
+    "requires": [
+      "archicad"
+    ],
+    "example": "Modele esta revisão estrutural no Archicad e confira as seções"
+  },
+  {
+    "id": "autocad-assistente",
+    "type": "skill",
+    "name": "Assistente AutoCAD",
+    "version": "1.4.1",
+    "summary": "Opera o AutoCAD pelo chat (layers, desenho e edição, cotas, blocos, detalhes de seção, pranchas A0–A4 com carimbo e escala, base de arquitetura limpa para CAD/BIM, PDF e AutoLISP com confirmação) e gera DXF quando não há AutoCAD.",
+    "area": "CAD e BIM",
+    "path": "catalog/engenharia-civil/autocad-assistente",
+    "requires": [
+      "autocad"
+    ],
+    "example": "Desenhe no AutoCAD o detalhe da seção da viga V1 que calculamos"
+  },
+  {
+    "id": "consulta-normas",
+    "type": "skill",
+    "name": "Consulta a normas e boas práticas",
+    "version": "1.2.0",
+    "summary": "Consulta NRs, normas e manuais do DNIT e cadernos técnicos do SINAPI num índice local, cita item e página, e transforma a exigência em checklist de projeto ou de obra.",
+    "area": "Normas e documentação",
+    "path": "catalog/engenharia-civil/consulta-normas",
+    "requires": [
+      "normas-publicas"
+    ],
+    "example": "O que a NR-18 exige para guarda-corpo na periferia da laje?"
+  },
+  {
+    "id": "contexto-do-projeto",
+    "type": "skill",
+    "name": "Contexto do projeto e normas locais",
+    "version": "1.3.0",
+    "summary": "Começa cada projeto pela ficha (município, UF, uso, ambiente) e pesquisa na internet a legislação local, as ITs dos Bombeiros, as normas das concessionárias e a edição vigente das NBR, registrando cada fonte oficial.",
+    "area": "Projeto e obra",
+    "path": "catalog/engenharia-civil/contexto-do-projeto",
+    "requires": [],
+    "example": "Vamos começar um projeto de sobrado em Goiânia: quais normas locais se aplicam?"
+  },
+  {
+    "id": "cotacao-materiais",
+    "type": "skill",
+    "name": "Cotação de materiais na web",
+    "version": "1.0.0",
+    "summary": "Pesquisa preços de fornecedores na web para cada material da planilha de quantitativos e gera planilha Excel com o melhor custo-benefício por item, empresa, produto, link, quantidade a comprar e total estimado.",
+    "area": "Orçamento e suprimentos",
+    "path": "catalog/engenharia-civil/cotacao-materiais",
+    "requires": [],
+    "example": "Pesquisa na web o melhor preço dos materiais desta planilha de quantitativos para entrega em Goiânia"
+  },
+  {
+    "id": "planta-arquitetonica",
+    "type": "skill",
+    "name": "Planta arquitetônica, cortes e BIM",
+    "version": "1.0.0",
+    "summary": "Gera cortes verticais DXF de uma planta conferida e prepara paredes, pisos e aberturas para Revit ou Archicad, com entrada DWG/DXF ou PDF/imagem calibrada.",
+    "area": "Projeto e obra",
+    "path": "catalog/engenharia-civil/planta-arquitetonica",
+    "requires": [
+      "autocad",
+      "revit",
+      "archicad"
+    ],
+    "example": "Faça os cortes A-A e B-B desta planta baixa no CAD"
+  },
+  {
+    "id": "quantitativos-sinapi",
+    "type": "skill",
+    "name": "Quantitativos e orçamento SINAPI",
+    "version": "1.2.0",
+    "summary": "Levanta concreto, fôrmas, aço e alvenaria por elemento e monta orçamento com composições SINAPI da planilha oficial da Caixa, com BDI e exportação para Excel.",
+    "area": "Projeto e obra",
+    "path": "catalog/engenharia-civil/quantitativos-sinapi",
+    "requires": [],
+    "example": "Levante o volume de concreto, fôrma e aço da estrutura que calculamos"
+  },
+  {
+    "id": "revit-assistente",
+    "type": "skill",
+    "name": "Assistente Revit",
+    "version": "1.2.0",
+    "summary": "Opera o Revit pelo chat (níveis, eixos, pilares, vigas, lajes, cotas, tags, ambientes), lança a estrutura a partir do cálculo com os tipos certos, extrai quantitativos de concreto, colore elementos para revisão, exporta IFC e roda C# da Revit API com confirmação.",
+    "area": "CAD e BIM",
+    "path": "catalog/engenharia-civil/revit-assistente",
+    "requires": [
+      "revit"
+    ],
+    "example": "Lança no Revit os pilares, vigas e lajes que calculamos, nos níveis Térreo e Pav 1"
+  },
+  {
+    "id": "solidworks-assistente",
+    "type": "skill",
+    "name": "Assistente SOLIDWORKS",
+    "version": "1.1.0",
+    "summary": "Modela no SOLIDWORKS pelo chat peças e montagens metálicas de obra (chapas de base, ligações, perfis, insertos, suportes, fôrmas), com peso de aço calculado e conferido, variações por configuração, interferência, STEP e macros para folha de desenho, PDF e DXF de corte.",
+    "area": "CAD e BIM",
+    "path": "catalog/engenharia-civil/solidworks-assistente",
+    "requires": [
+      "solidworks"
+    ],
+    "example": "Modela uma chapa de base 300x300x16 com 4 furos de 22 mm para chumbadores e me diz o peso"
+  },
+  {
+    "id": "archicad",
+    "type": "mcp",
+    "name": "Archicad 29–30",
+    "version": "0.8.0",
+    "summary": "Conecta ao Archicad 29 ou 30 aberto: auditoria de entrega (regras de escritório em YAML), consulta e edição de elementos, classificações, issues/BCF e prontidão para IFC.",
+    "area": "CAD e BIM",
+    "os": [
+      "macos",
+      "windows"
+    ],
+    "software": "Archicad 29 ou 30 aberto com um projeto. Tapir obrigatório para criar elementos, consultar pavimentos e conferir IFC/BCF.",
+    "tools": [
+      "uv"
+    ],
+    "upstream": "https://github.com/alesdev88/Archicad-MCP",
+    "license": "MIT",
+    "post": {
+      "todos": [
+        "Instale o add-on Tapir compatível (https://github.com/ENZYME-APD/tapir-archicad-automation/releases) para criar elementos, consultar pavimentos, trabalhar com issues/BCF e checar IFC. Tapir 1.7.1 foi verificado com Archicad 30 INT build 3001 no macOS.",
+        "Deixe o Archicad 29 ou 30 aberto com um projeto salvo antes de usar as skills de BIM."
+      ]
+    },
+    "warnings": [
+      "SALVE uma cópia antes de auditorias e alterações. Faça o primeiro teste em modelo pequeno e não sensível.",
+      "Um score 100 não basta: bloqueie a entrega se o modelo estiver vazio ou se qualquer regra vier com skipped=true.",
+      "Se houver mais de uma instância aberta, use a porta retornada por list_instances em cada chamada.",
+      "Após criar lajes, leia structureType, thickness e buildingMaterialId: o favorito controla a estrutura e pode ignorar a espessura solicitada quando não é Basic.",
+      "Mac Intel: a primeira execução compila dependências e pode demorar alguns minutos."
+    ]
+  },
+  {
+    "id": "autocad",
+    "type": "mcp",
+    "name": "AutoCAD LT (2024+)",
+    "version": "95476a33a1c246308326eb4709d6379ef2efdbc1",
+    "summary": "Controla o AutoCAD LT pelo chat: desenhar entidades, layers, blocos, cotas, P&ID. Sem AutoCAD (ou no macOS/Linux) roda em modo \"headless\" e gera arquivos DXF.",
+    "area": "CAD e BIM",
+    "os": [
+      "windows",
+      "macos",
+      "linux"
+    ],
+    "software": "AutoCAD LT 2024+ no Windows (opcional — sem ele, gera DXF headless)",
+    "tools": [
+      "uv"
+    ],
+    "upstream": "https://github.com/puran-water/autocad-mcp",
+    "license": "MIT",
+    "post": {
+      "windows": [
+        "Abra o AutoCAD LT e digite APPLOAD.",
+        "Carregue o arquivo {MCP_DIR}/autocad-mcp/lisp-code/mcp_dispatch.lsp (adicione ao Startup Suite para carregar sempre).",
+        "A mensagem '=== MCP Dispatch ... loaded ===' confirma que está pronto."
+      ],
+      "macos": [
+        "O AutoCAD para Mac aceita AutoLISP e scripts .scr, mas esta versão fixada do MCP usa apenas o backend ezdxf no macOS. Abra o DXF no AutoCAD para conferir medidas e gerar DWG/PDF."
+      ],
+      "linux": [
+        "Modo headless: gera arquivos .dxf."
+      ]
+    },
+    "warnings": [
+      "offset, fillet e chamfer só funcionam com o AutoCAD aberto (Windows)."
+    ]
+  },
+  {
+    "id": "normas-publicas",
+    "type": "mcp",
+    "name": "Normas e manuais públicos (NRs, DNIT, SINAPI)",
+    "version": "1.0.0",
+    "summary": "Índice local consultado pelo agente com documentos técnicos públicos: Normas Regulamentadoras (segurança do trabalho e canteiro de obras) e seus manuais oficiais, normas e manuais do DNIT e cadernos técnicos do SINAPI. Baixa direto das fontes oficiais. Não inclui normas ABNT.",
+    "area": "Normas e documentação",
+    "os": [
+      "windows",
+      "macos",
+      "linux"
+    ],
+    "software": "nenhum — precisa de internet na instalação (~25 MB no conjunto padrão)",
+    "tools": [
+      "uv"
+    ],
+    "upstream": "interno",
+    "license": "Código proprietário Skill-Verse; documentos públicos (atos oficiais / reprodução livre com citação)",
+    "post": {
+      "todos": [
+        "Já estão no índice as NRs da construção civil (NR-1, 6, 8, 10, 11, 12, 17, 18, 23, 24, 33, 35) e seus manuais oficiais. Normas do DNIT e cadernos do SINAPI são baixados quando o agente precisar.",
+        "As NRs mudam várias vezes por ano: peça 'atualize o catálogo de normas' de tempos em tempos.",
+        "Normas ABNT (NBR) não são incluídas por direitos autorais. Use a sua cópia licenciada."
+      ]
+    },
+    "warnings": [
+      "O texto das NRs no índice não substitui o publicado no Diário Oficial da União."
+    ]
+  },
+  {
+    "id": "revit",
+    "type": "mcp",
+    "name": "Autodesk Revit (2020–2026)",
+    "version": "v1.0.0",
+    "summary": "Conecta ao Revit aberto: lê a vista e os elementos, cria níveis, eixos, pilares, vigas, lajes e paredes, cotas, tags e ambientes, levanta quantitativos de materiais e executa código C# da Revit API (com confirmação).",
+    "area": "CAD e BIM",
+    "os": [
+      "windows"
+    ],
+    "software": "Autodesk Revit 2020 a 2026 (Windows), com o serviço MCP ligado na faixa 'Revit MCP Plugin'",
+    "tools": [
+      "node"
+    ],
+    "upstream": "https://github.com/mcp-servers-for-revit/mcp-servers-for-revit",
+    "license": "MIT",
+    "post": {
+      "windows": [
+        "Abra o Revit. Na mensagem de segurança do complemento 'mcp-servers-for-revit', clique em 'Sempre carregar'.",
+        "Na faixa Suplementos → painel 'Revit MCP Plugin', clique em 'Settings', marque todos os comandos e salve.",
+        "Com um projeto aberto, clique em 'Revit MCP Switch' para ligar o serviço (precisa estar ligado sempre que for usar o agente)."
+      ]
+    },
+    "warnings": [
+      "O serviço do Revit escuta em localhost:8080. Se outro programa usar essa porta, a conexão falha.",
+      "Revit 2027 ou mais novo ainda não tem add-in publicado nesta versão fixada.",
+      "A primeira execução baixa o pacote npm (precisa de internet)."
+    ]
+  },
+  {
+    "id": "solidworks",
+    "type": "mcp",
+    "name": "SOLIDWORKS (2022+)",
+    "version": "60c11fe45b6cfc60c4e2da8ad41fc725a48bf8ea",
+    "summary": "Controla o SOLIDWORKS aberto: esboços, extrusões, cortes, furos, padrões, montagens com posicionamentos, configurações, equações, propriedades de massa, interferência, capturas de tela e exportação STEP/IGES/STL.",
+    "area": "CAD e BIM",
+    "os": [
+      "windows"
+    ],
+    "software": "SOLIDWORKS 2022 ou mais novo, ativado, aberto no Windows",
+    "tools": [
+      "uv"
+    ],
+    "upstream": "https://github.com/HarrierPigeon/Solidworks-MCP-Server",
+    "license": "MIT",
+    "post": {
+      "windows": [
+        "Abra o SOLIDWORKS antes de pedir qualquer modelagem; o agente se conecta à sessão aberta.",
+        "Arquivos salvos só com o nome (sem pasta) vão para {MCP_DIR}/solidworks-mcp/workspace. Prefira informar a pasta do projeto."
+      ]
+    },
+    "warnings": [
+      "Não há desenho 2D (folha de detalhamento) nem exportação DXF pela conexão: a skill gera macro VBA para isso.",
+      "O Hole Wizard pode abrir uma janela de confirmação em algumas versões do SOLIDWORKS."
+    ]
+  }
+]

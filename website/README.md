@@ -1,10 +1,18 @@
-# SkillVerse — loja e pagamentos SyncPay
+# Engcode — catálogo modular de engenharia
+
+A interface usa `server/store.html`, `public/styles.css`, `public/app.js` e `public/catalog.json`. O usuário escolhe skills e MCPs individuais, abre a lista de instalação e copia um comando `npx` para Claude Code, Codex ou ambos. Não há packs, preços ou checkout no fluxo atual.
+
+O pacote executável está em `../engcode/cli.mjs`, distribuído pela branch pública `engcode-catalog` do repositório. O comando mostra requisitos de software e registra somente as ferramentas escolhidas. O arquivo `public/catalog.json` deve acompanhar `../engcode/catalog.json`. A hospedagem Engcode permanece privada durante a validação, e o pagamento continua desativado.
+
+O conteúdo de engenharia e as integrações CAD/BIM ainda exigem conferência em software real e revisão profissional. Os endpoints de pagamento são código legado e não estão ligados à nova interface.
+
+## Infraestrutura de pagamentos legada
 
 A loja usa Vinext em Cloudflare Workers, com D1 para pedidos e R2 privado para o arquivo do pack. A vitrine está em `server/store.html` e `public/`; os endpoints estão em `app/api/`. O preço é definido no servidor em `lib/payments.ts` (R$ 39,90). A configuração do navegador é apenas apresentação e não determina a cobrança.
 
 ## Estado atual
 
-O pagamento inicia desativado. O pack de Engenharia Civil 1.6.0 ainda é candidato, conforme o README principal do repositório: não disponibilize o ZIP até sua liberação técnica. A hospedagem do site está privada; visitantes e webhooks externos da SyncPay não podem alcançá-la nesse estado. Os testes automatizados usam respostas simuladas, sem efetuar cobranças reais.
+O pagamento está desativado nesta fase da Engcode. O catálogo de Engenharia Civil segue em validação técnica: não disponibilize o ZIP até sua liberação. A hospedagem do site está privada; visitantes e webhooks externos da SyncPay não podem alcançá-la nesse estado. Os testes automatizados usam respostas simuladas, sem efetuar cobranças reais.
 
 A SyncPay exige IP de origem autorizado. Confirme com a SyncPay e a hospedagem uma solução de saída compatível; este projeto não presume que o Worker tenha um IP fixo. A chave pública do cartão exige que a origem da loja esteja autorizada no painel SyncPay. O checkout mantém os dados do cartão no navegador apenas durante a tokenização direta na SyncPay: o servidor recebe somente o token. A página própria continua sujeita às obrigações de segurança aplicáveis a cartão; não pressupõe certificação PCI.
 
