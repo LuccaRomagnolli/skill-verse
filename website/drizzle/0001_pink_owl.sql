@@ -1,1 +1,0 @@
-ALTER TABLE `orders` ADD `method` text DEFAULT 'pix' NOT NULL;

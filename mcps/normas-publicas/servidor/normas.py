@@ -5,7 +5,7 @@ Só baixa documentos publicados gratuitamente pelos órgãos oficiais, respeitan
 e um intervalo entre requisições. Normas ABNT (NBR) NÃO são coletadas: são protegidas por
 direito autoral e vendidas pela ABNT.
 
-Dados em $NORMAS_DIR (padrão ~/SkillVerse/normas-publicas): normas.db (SQLite + FTS5) e pdf/.
+Dados em $NORMAS_DIR (padrão ~/.engcode/normas-publicas): normas.db (SQLite + FTS5) e pdf/.
 
   python3 normas.py catalogo [--fonte nr|dnit|sinapi]     atualiza a lista de documentos (metadados)
   python3 normas.py baixar --padrao                        NRs da construção civil
@@ -41,7 +41,7 @@ import urllib.request
 import urllib.robotparser
 from pathlib import Path
 
-UA = "SkillVerse-normas/1.0 (coleta de documentos publicos; uso pessoal do usuario)"
+UA = "Engcode-normas/1.0 (coleta de documentos publicos; uso pessoal do usuario)"
 INTERVALO = 0.8  # s entre requisições ao mesmo host
 
 NR_INDICE = ("https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-"

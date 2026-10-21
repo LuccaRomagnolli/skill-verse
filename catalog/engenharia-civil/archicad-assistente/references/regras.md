@@ -1,6 +1,6 @@
 # Regras de auditoria (formato do MCP do ArchiCAD)
 
-Arquivos `.yaml` em `~/SkillVerse/archicad-regras/` (o instalador copia `assets/regras/entrega-br.yaml` para lá). Cada arquivo é uma **lista** de regras. O servidor lê a pasta ao iniciar: depois de editar, reinicie o Claude Code/Codex.
+Arquivos `.yaml` em `~/.engcode/archicad-regras/` (o instalador da skill copia `assets/regras/entrega-br.yaml` para lá). Cada arquivo é uma **lista** de regras. O servidor lê a pasta ao iniciar: depois de editar, reinicie o Claude Code/Codex.
 
 Campos comuns: `id` (único), `type`, `severity` (`error` reprova a entrega; `warning` só pontua), `tags` (usadas como `ruleset` na auditoria), `applies_to` (`element_type`: Wall, Slab, Column, Beam, Door, Window, Zone… e opcional `where`: lista de comparações `{property, operator, value}`).
 

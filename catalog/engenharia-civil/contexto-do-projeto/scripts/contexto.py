@@ -116,7 +116,7 @@ def checklist_faltante(ficha: dict) -> list[dict]:
 def render(f: dict) -> str:
     caa = f.get("caa") or {}
     linhas = [f"# Contexto do projeto — {f.get('projeto') or 'sem nome'}", "",
-              f"Atualizado em {f.get('atualizado_em', '')}. Ficha usada pelas skills do pack: mantenha-a atualizada.", "",
+              f"Atualizado em {f.get('atualizado_em', '')}. Ficha usada pelas skills instaladas: mantenha-a atualizada.", "",
               "| Parâmetro | Valor |", "|---|---|",
               f"| Município / UF | {f['municipio']} / {f['uf']} |",
               f"| Uso | {f.get('uso') or '—'} |",

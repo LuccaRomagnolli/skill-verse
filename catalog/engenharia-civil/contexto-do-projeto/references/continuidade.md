@@ -1,6 +1,6 @@
 # Continuidade do projeto entre sessões
 
-`projeto-contexto.json` é a fonte compartilhada pelas skills do pack; `projeto-contexto.md` é a leitura humana. Execute `scripts/contexto.py` a partir da pasta da skill e passe `--pasta <pasta-da-obra>` em todos os comandos. A pasta da obra contém também cálculos, desenhos e documentos produzidos pelo cliente. Não coloque nela cópias de normas licenciadas por padrão.
+`projeto-contexto.json` é a fonte compartilhada pelas skills instaladas no projeto; `projeto-contexto.md` é a leitura humana. Execute `scripts/contexto.py` a partir da pasta da skill e passe `--pasta <pasta-da-obra>` em todos os comandos. A pasta da obra contém também cálculos, desenhos e documentos produzidos pelo cliente. Não coloque nela cópias de normas licenciadas por padrão.
 
 ## Ao iniciar ou retomar
 

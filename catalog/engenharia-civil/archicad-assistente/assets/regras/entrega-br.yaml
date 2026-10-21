@@ -1,5 +1,5 @@
-# Regras de entrega Skill-Verse (modelo base para escritórios brasileiros).
-# Carregadas pelo MCP do ArchiCAD a partir de ~/SkillVerse/archicad-regras/ (--rules-dir).
+# Regras de entrega Engcode (modelo base para escritórios brasileiros).
+# Carregadas pelo MCP do ArchiCAD a partir de ~/.engcode/archicad-regras/ (--rules-dir).
 # Adapte nomes de sistema de classificação, layers e propriedades ao template do escritório.
 # Tags: entrega (prancha/aprovação), ifc (exportação/compatibilização), padrao (padrão interno).
 

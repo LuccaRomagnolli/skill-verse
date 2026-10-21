@@ -3,9 +3,5 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  X-XSS-Protection: 0
   Strict-Transport-Security: max-age=31536000
-
-# Keep Vinext's cache policy for fingerprinted bundles.
-/_next/static/*
-  Cache-Control: public, max-age=31536000, immutable
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'

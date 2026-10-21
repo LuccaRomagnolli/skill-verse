@@ -12,7 +12,7 @@ Ferramentas do MCP `autocad`: `system`, `drawing`, `layer`, `entity`, `annotatio
 1. `system` → `status`. Veja o `backend`:
    - `file_ipc`: AutoCAD/LT 2024+ aberto no Windows. Tudo disponível.
    - `ezdxf`: modo sem AutoCAD (macOS/Linux ou AutoCAD fechado). O desenho fica em memória, só lê **DXF** (não DWG) e grava com `drawing` → `save_as_dxf` `{path}`. `offset`, `fillet`, `chamfer`, `plot_pdf` e `execute_lisp` não funcionam.
-   - Erro de conexão no Windows: peça para abrir o AutoCAD e carregar o `mcp_dispatch.lsp` (APPLOAD; caminho no manual do pack). Depois `system` → `init`.
+   - Erro de conexão no Windows: peça para abrir o AutoCAD e carregar o `mcp_dispatch.lsp` (APPLOAD; caminho exibido após instalar o MCP `autocad`). Depois `system` → `init`.
 2. Desenho existente: `drawing` → `info` e `get_variables` `{names:["INSUNITS","LTSCALE","DIMSCALE"]}`. Confirme a **unidade** medindo algo conhecido (porta ≈ 0,80 m). Desenho novo: padrão **cm** e layers de `references/padrao-layers.md`, a menos que o escritório tenha padrão próprio (pergunte uma vez).
 3. Trabalhe numa **cópia** quando for limpar ou alterar muito um arquivo recebido.
 4. Combine um plano de operações: arquivo-alvo, unidades, layers, objetos afetados, quantidade esperada, saída e como desfazer. Execute em lotes pequenos; após cada lote confira `drawing` → `info`, `entity` → `count` e captura visual (`view` → `get_screenshot` quando disponível). Divergência de contagem, escala ou layer suspende a sequência.

@@ -17,12 +17,12 @@ deteccao:
 util_sem_software: false
 preparo:
   # regras de entrega em PT-BR que acompanham archicad-assistente
-  - copiar_do_pack: plugin/skills/archicad-assistente/assets/regras
-    destino: "{SKILLVERSE_HOME}/archicad-regras"
+  - copiar_da_skill: catalog/engenharia-civil/archicad-assistente/assets/regras
+    destino: "{ENGCODE_HOME}/archicad-regras"
 servidor:
   command: uvx
   args: ["--from", "archicad-mcp-server==0.8.0", "archicad-mcp", "--mode", "full",
-         "--rules-dir", "{SKILLVERSE_HOME}/archicad-regras"]
+         "--rules-dir", "{ENGCODE_HOME}/archicad-regras"]
   env: {}
 teste:
   tool_esperada: get_project_info

@@ -1,6 +1,6 @@
 # Engcode
 
-Catálogo modular de **skills** e conexões **MCP** para engenharia. O usuário escolhe ferramentas individualmente no site, copia um comando e instala no Claude Code, Codex ou ambos. Não há pack no fluxo de instalação do usuário.
+Catálogo modular de **skills** e conexões **MCP** para engenharia. O usuário escolhe ferramentas individualmente no site, copia um comando e instala no Claude Code, Codex ou ambos. Cada item é instalado individualmente.
 
 ## Instalação individual
 
@@ -18,7 +18,7 @@ Use `--list` para listar IDs, `--target claude|codex|both` e `--scope user|proje
 - `mcps/<nome>/mcp.yaml`: fonte, versão fixada, requisitos e etapas de cada MCP.
 - `engcode/catalog.json`: manifesto distribuído ao instalador e ao site.
 - `engcode/cli.mjs`: instalador modular sem dependências npm de execução.
-- `website/`: catálogo público em desenvolvimento, com busca, páginas individuais e lista de instalação.
+- `website/`: catálogo estático, com busca, páginas individuais e lista de instalação.
 
 A fonte atual tem 10 skills e 5 MCPs. Ao alterar uma skill ou MCP, atualize `engcode/catalog.json` e execute `node engcode/sync-site.mjs` para sincronizar a vitrine. Confirme a operação em software real para qualquer promessa de automação CAD/BIM. Textos integrais de normas ABNT não estão incluídos.
 
@@ -32,7 +32,7 @@ node engcode/cli.mjs --skills contexto-do-projeto --target codex --scope project
 cd website && npm run build
 ```
 
-A antiga estrutura `packs/` e `installer/instalar-pack/` está preservada como legado de desenvolvimento. Ela não faz parte da instalação modular do usuário. Recursos antigos de checkout continuam desativados no site enquanto o modelo comercial é definido.
+O site não inclui checkout. Publicações permanecem privadas durante a validação. Para adicionar uma ferramenta, registre-a no manifesto, sincronize o site e valide o build e a instalação.
 
 ## Licença
 

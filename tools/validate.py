@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint do catálogo de skills, dos MCPs e dos packs.
+"""Lint das skills, MCPs e do catálogo modular Engcode.
 
 Uso: python3 tools/validate.py [--strict]
 Sai com código 1 se houver erro (ou aviso, com --strict).
@@ -7,6 +7,7 @@ Sai com código 1 se houver erro (ou aviso, com --strict).
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -16,8 +17,8 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "catalog"
 MCPS = ROOT / "mcps"
-PACKS = ROOT / "packs"
-INSTALLER = ROOT / "installer"
+MANIFEST = ROOT / "engcode" / "catalog.json"
+SITE_MANIFEST = ROOT / "website" / "public" / "catalog.json"
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
@@ -148,8 +149,8 @@ def check_catalog(rep: Report, known_mcps: set[str]) -> dict[str, Path]:
 
 
 MCP_REQUIRED = ("nome", "titulo", "licenca", "upstream", "versao_fixada", "requisitos", "servidor", "teste")
-FERRAMENTAS = {"uv", "node"}  # as que o instalador sabe procurar (install.py FERRAMENTAS)
-PREPARO = ("copiar_do_pack", "baixar_zip", "extrair_zip", "comando")
+FERRAMENTAS = {"uv", "node"}
+PREPARO = ("copiar_da_skill", "baixar_zip", "extrair_zip", "comando")
 
 
 def check_mcps(rep: Report) -> set[str]:
@@ -177,9 +178,8 @@ def check_mcps(rep: Report) -> set[str]:
                     compile(py.read_text(encoding="utf-8"), str(py), "exec")
                 except SyntaxError as e:
                     rep.err(py, f"não compila: {e}")
-            usa_pack = "{PACK_DIR}" in str(data.get("servidor")) + str(data.get("preparo"))
-            if not usa_pack:
-                rep.err(f, "MCP interno deve referenciar o código via {PACK_DIR}/mcps/<nome>/")
+            if "{ENGCODE_MCP_DIR}" not in str(data.get("servidor")):
+                rep.err(f, "MCP interno deve referenciar o código via {ENGCODE_MCP_DIR}")
         if str(data.get("licenca", "")).upper() in ("", "DESCONHECIDA", "?"):
             rep.err(f, "licença do upstream não verificada — não pode ser vendido")
         for t in (data.get("requisitos") or {}).get("ferramentas") or []:
@@ -189,7 +189,7 @@ def check_mcps(rep: Report) -> set[str]:
             tipo = [k for k in PREPARO if k in step]
             if len(tipo) != 1:
                 rep.err(f, f"passo de preparo inválido {step!r} (use um de {', '.join(PREPARO)})")
-            elif tipo[0] in ("baixar_zip", "extrair_zip", "copiar_do_pack") and "destino" not in step:
+            elif tipo[0] in ("baixar_zip", "extrair_zip", "copiar_da_skill") and "destino" not in step:
                 rep.err(f, f"passo '{tipo[0]}' sem 'destino'")
             elif tipo[0] == "extrair_zip" and "{VERSAO}" in str(step) and not step.get("versoes"):
                 rep.err(f, "extrair_zip por versão precisa da lista 'versoes' suportadas")
@@ -197,40 +197,40 @@ def check_mcps(rep: Report) -> set[str]:
     return found
 
 
-PACK_REQUIRED = ("id", "nome", "version", "publico", "descricao", "skills")
-
-
-def check_packs(rep: Report, skills: dict[str, Path], known_mcps: set[str]) -> None:
-    for d in sorted(p for p in PACKS.iterdir() if p.is_dir()):
-        f = d / "pack.yaml"
-        if not f.is_file():
-            rep.err(d, "falta pack.yaml")
-            continue
-        data = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
-        for k in PACK_REQUIRED:
-            if k not in data:
-                rep.err(f, f"falta '{k}'")
-        if data.get("id") != d.name:
-            rep.err(f, f"'id' deve ser '{d.name}'")
-        if not SEMVER_RE.match(str(data.get("version", ""))):
-            rep.err(f, "'version' deve ser semver")
-        for s in data.get("skills") or []:
-            if s not in skills:
-                rep.err(f, f"skill '{s}' não existe em catalog/")
-        for m in data.get("mcps") or []:
-            if m.get("nome") not in known_mcps:
-                rep.err(f, f"MCP '{m.get('nome')}' não existe em mcps/")
-        # MCPs exigidos pelas skills precisam estar no pack
-        pack_mcps = {m.get("nome") for m in data.get("mcps") or []}
-        for s in data.get("skills") or []:
-            sy = skills.get(s, Path()) / "skill.yaml"
-            if sy.is_file():
-                need = set((yaml.safe_load(sy.read_text(encoding="utf-8")) or {}).get("mcps") or [])
-                for m in need - pack_mcps:
-                    rep.err(f, f"skill '{s}' precisa do MCP '{m}', que não está no pack")
-        for req in ("manual.template.md", "CHANGELOG.md"):
-            if not (d / req).is_file():
-                rep.err(d, f"falta {req}")
+def check_manifest(rep: Report, skills: dict[str, Path], known_mcps: set[str]) -> None:
+    try:
+        items = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        site_items = json.loads(SITE_MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        rep.err(MANIFEST, f"catálogo JSON inválido: {exc}")
+        return
+    if items != site_items:
+        rep.err(SITE_MANIFEST, "catálogo do site diverge de engcode/catalog.json")
+    ids: set[str] = set()
+    for item in items:
+        id_ = item.get("id")
+        typ = item.get("type")
+        if id_ in ids:
+            rep.err(MANIFEST, f"ID duplicado: {id_}")
+        ids.add(id_)
+        if typ == "skill":
+            if not any(path.name == id_ for path in skills.values()):
+                rep.err(MANIFEST, f"skill ausente: {id_}")
+            if not (ROOT / str(item.get("path", "")) / "SKILL.md").is_file():
+                rep.err(MANIFEST, f"caminho de skill inválido: {id_}")
+            for mcp in item.get("requires", []):
+                if mcp not in known_mcps:
+                    rep.err(MANIFEST, f"{id_} requer MCP ausente: {mcp}")
+        elif typ == "mcp":
+            if id_ not in known_mcps:
+                rep.err(MANIFEST, f"MCP ausente: {id_}")
+        else:
+            rep.err(MANIFEST, f"tipo inválido para {id_}: {typ}")
+    for path in skills.values():
+        if path.name not in ids:
+            rep.err(MANIFEST, f"skill não publicada: {path.name}")
+    for id_ in known_mcps - ids:
+        rep.err(MANIFEST, f"MCP não publicado: {id_}")
 
 
 def main() -> int:
@@ -241,8 +241,7 @@ def main() -> int:
     rep = Report()
     known_mcps = check_mcps(rep)
     skills = check_catalog(rep, known_mcps)
-    check_packs(rep, skills, known_mcps)
-    check_skill_md(INSTALLER / "instalar-pack", rep, require_limits=False)
+    check_manifest(rep, skills, known_mcps)
 
     for line in rep.errors + rep.warnings:
         print(line)

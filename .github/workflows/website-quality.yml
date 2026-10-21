@@ -1,34 +1,27 @@
-name: Website quality
+name: Engcode quality
 
 on:
   pull_request:
-    paths: ['website/**', '.github/workflows/website-quality.yml']
+    paths: ['website/**', 'engcode/**', 'catalog/**', 'mcps/**', 'tools/validate.py', '.github/workflows/website-quality.yml']
   push:
-    branches: [main]
-    paths: ['website/**', '.github/workflows/website-quality.yml']
+    branches: [main, engcode-catalog]
+    paths: ['website/**', 'engcode/**', 'catalog/**', 'mcps/**', 'tools/validate.py', '.github/workflows/website-quality.yml']
 
 jobs:
   quality:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: website
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: website/package-lock.json
-      - run: npm run install:ci
-      - run: npm audit --omit=dev --audit-level=moderate
-      - run: node tests/run-payments-tests.mjs
-      - run: npx tsc --noEmit
-      - run: npm run build
-      - run: npm exec --yes --package=@lhci/cli@0.15.1 -- lhci autorun
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - uses: actions/setup-python@v5
         with:
-          name: lighthouse-reports
-          path: website/.lighthouseci/reports
-          if-no-files-found: ignore
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: python3 tools/validate.py --strict
+      - run: python3 -m pytest -q
+      - run: node engcode/sync-site.mjs --check
+      - run: node --check engcode/cli.mjs
+      - run: node website/build.mjs
+      - run: node engcode/cli.mjs --list
