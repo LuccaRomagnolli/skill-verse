@@ -1,5 +1,15 @@
 # Changelog — Pack Engenharia Civil
 
+## 1.7.0 — 2026-10-18 (candidato)
+
+- Nova skill `cotacao-materiais` 1.0.0: importa a planilha de quantitativos, orienta a pesquisa de preços de fornecedores na web e gera XLSX com o melhor custo-benefício por item (empresa, produto, embalagem, quantidade a comprar, frete, total estimado e link), comparativo de ofertas, resumo por fornecedor e pedidos de cotação para itens sem preço público.
+- Pack passa a 10 skills.
+
+### Validação pendente
+
+- Ensaiar a pesquisa com uma planilha real em pelo menos duas cidades e conferir preços, fretes e links na data da pesquisa.
+- Abrir a planilha gerada no Excel e no LibreOffice e conferir fórmulas, formatos de moeda e links.
+
 ## 1.6.0 — 2026-10-18 (candidato)
 
 - Pack reduzido a 9 skills e 5 MCPs opcionais. Permanecem contexto de projeto, planta arquitetônica, quantitativos SINAPI, AutoCAD, Revit, SOLIDWORKS, Archicad, consulta a normas públicas e relatório técnico.

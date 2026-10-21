@@ -1,15 +1,16 @@
 id: engenharia-civil
 nome: Pack Engenharia Civil
-version: 1.6.0
+version: 1.7.0
 publico: Engenheiros civis, profissionais de projeto e estudantes de Engenharia Civil
 descricao: >-
   Organização persistente de projetos, planta arquitetônica com cortes CAD e planos BIM,
-  quantitativos e orçamento SINAPI, relatórios técnicos, consulta a fontes públicas e
+  quantitativos e orçamento SINAPI, cotação de materiais na web, relatórios técnicos, consulta a fontes públicas e
   assistência a AutoCAD, Revit, SOLIDWORKS e Archicad com conexões opcionais.
 skills:
   - engenharia-civil/contexto-do-projeto
   - engenharia-civil/planta-arquitetonica
   - engenharia-civil/quantitativos-sinapi
+  - engenharia-civil/cotacao-materiais
   - engenharia-civil/autocad-assistente
   - engenharia-civil/revit-assistente
   - engenharia-civil/solidworks-assistente
@@ -64,6 +65,12 @@ fluxos:
     passos:
       - "Baixe a planilha SINAPI do seu estado no site da Caixa."
       - "Peça: \"Levante os quantitativos da estrutura e orce com o SINAPI de <mês>, BDI 25%\" (quantitativos-sinapi)."
+  - titulo: Cotação de materiais com fornecedores da região
+    passos:
+      - "Tenha a planilha de quantitativos (XLSX/CSV) e o CEP da obra; diga: \"Pesquise na web o melhor preço dos materiais desta planilha para entrega em <cidade>/<UF>\" (cotacao-materiais)."
+      - "Confirme a lista importada, a especificação de cada material e como serviços (alvenaria, fôrma) viram insumos de compra."
+      - "Revise a planilha gerada: melhor custo-benefício por item, comparativo de ofertas, fornecedores e itens sob consulta."
+      - "Envie os pedidos de cotação gerados para concreteira, olaria e demais fornecedores locais e peça para atualizar a planilha com as respostas."
   - titulo: Modelo BIM pronto para entrega
     passos:
       - "Abra o projeto no Archicad 29 ou 30, salve uma cópia e confirme a porta/Tapir com list_instances."

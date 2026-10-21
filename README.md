@@ -6,7 +6,7 @@ Banco de skills para agentes de IA (Claude Code e Codex), organizado por categor
 
 | Pack | Versão | Skills | Conexões |
 |---|---|---|---|
-| Engenharia Civil | 1.6.0 (candidato) | 9 skills: ficha persistente, planta arquitetônica/cortes/BIM, quantitativos SINAPI, normas públicas, relatório técnico, AutoCAD, Revit, SOLIDWORKS e Archicad | 5 MCPs opcionais: normas-publicas, AutoCAD, Revit, SOLIDWORKS e Archicad |
+| Engenharia Civil | 1.7.0 (candidato) | 10 skills: ficha persistente, planta arquitetônica/cortes/BIM, quantitativos SINAPI, cotação de materiais na web, normas públicas, relatório técnico, AutoCAD, Revit, SOLIDWORKS e Archicad | 5 MCPs opcionais: normas-publicas, AutoCAD, Revit, SOLIDWORKS e Archicad |
 | Professores | — | (próximo) | — |
 
 ## Estrutura
@@ -26,7 +26,7 @@ tests/                         pytest (cálculos, instalador, build) + evals/gat
 pip install -r requirements-dev.txt
 python3 tools/validate.py                  # lint (frontmatter, "Use quando", limites, scripts, packs, MCPs)
 python3 -m pytest -q                       # testes
-python3 tools/build.py engenharia-civil    # → dist/skillverse-engenharia-civil-v1.6.0.zip
+python3 tools/build.py engenharia-civil    # → dist/skillverse-engenharia-civil-v1.7.0.zip
 ```
 Regras de autoria em [CLAUDE.md](CLAUDE.md).
 
@@ -36,7 +36,7 @@ Regras de autoria em [CLAUDE.md](CLAUDE.md).
 - **MCPs**: baixados do upstream na versão fixada (nunca embutidos), só para os softwares compatíveis escolhidos pelo usuário. `verificar` distingue servidor iniciado de leitura do aplicativo; AutoCAD headless é identificado como geração DXF, não como AutoCAD operável.
 - `desinstalar` remove componentes registrados do pack; preserva manuais, regras personalizadas, documentos locais e arquivos do usuário. Cada skill copiada leva um marcador `.skillverse.json`.
 
-O ZIP 1.6.0 é **candidato**, não liberação técnica para clientes. O [manual completo](packs/engenharia-civil/MANUAL-COMPLETO.md) acompanha o pacote e orienta instalação, uso das 9 skills e o fluxo de planta baixa, cortes CAD e BIM arquitetônico. O fluxo aceita medidas conferidas de DWG/DXF ou pontos traçados de PDF/imagem calibrada, gera cortes DXF e planos de modelagem no Revit/Archicad; ainda precisa de ensaio com projeto real e não interpreta automaticamente desenhos arbitrários. Quantitativos, fontes públicas e relatórios exigem conferência profissional. Veja as pendências no [changelog](packs/engenharia-civil/CHANGELOG.md).
+O ZIP 1.7.0 é **candidato**, não liberação técnica para clientes. O [manual completo](packs/engenharia-civil/MANUAL-COMPLETO.md) acompanha o pacote e orienta instalação, uso das 10 skills e o fluxo de planta baixa, cortes CAD e BIM arquitetônico. O fluxo aceita medidas conferidas de DWG/DXF ou pontos traçados de PDF/imagem calibrada, gera cortes DXF e planos de modelagem no Revit/Archicad; ainda precisa de ensaio com projeto real e não interpreta automaticamente desenhos arbitrários. Quantitativos, cotações de preço, fontes públicas e relatórios exigem conferência profissional. Veja as pendências no [changelog](packs/engenharia-civil/CHANGELOG.md).
 
 ## Novo pack
 1. Escreva as skills em `catalog/<categoria>/` seguindo o CLAUDE.md (reaproveite `_comum/`).

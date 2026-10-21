@@ -1,0 +1,10 @@
+titulo: Cotação de materiais na web
+categoria: engenharia-civil
+version: 1.0.0
+resumo: Pesquisa preços de fornecedores na web para cada material da planilha de quantitativos e gera planilha Excel com o melhor custo-benefício por item, empresa, produto, link, quantidade a comprar e total estimado.
+mcps: []
+exemplos:
+  - "Pesquisa na web o melhor preço dos materiais desta planilha de quantitativos para entrega em Goiânia"
+  - "Faz uma cotação de cimento, aço e bloco com pelo menos 3 fornecedores e me dá o total"
+  - "Monta a planilha de compra com o fornecedor de melhor custo-benefício para cada item"
+  - "Gera os pedidos de cotação para a concreteira e a olaria"

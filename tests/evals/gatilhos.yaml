@@ -5,6 +5,15 @@ quantitativos-sinapi:
     - "Qual o código SINAPI de alvenaria de bloco cerâmico 14 cm?"
   nao_deve:
     - "Qual o preço do cimento hoje na minha cidade?"
+cotacao-materiais:
+  deve:
+    - "Qual o preço do cimento hoje na minha cidade?"
+    - "Pesquisa na web o melhor preço dos materiais dessa planilha de quantitativos"
+    - "Faz uma cotação com 3 fornecedores pra essa lista de materiais"
+    - "Onde compro aço CA-50 mais barato aqui em Goiânia?"
+  nao_deve:
+    - "Orça a estrutura com o SINAPI de agosto, BDI 22%"
+    - "Quantos m³ de concreto tem essa estrutura?"
 autocad-assistente:
   deve:
     - "Desenha no AutoCAD a seção da viga V2"

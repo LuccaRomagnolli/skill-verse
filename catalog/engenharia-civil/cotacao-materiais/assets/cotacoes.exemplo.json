@@ -1,0 +1,78 @@
+{
+  "obra": "Residência exemplo",
+  "local": {"municipio": "Município exemplo", "uf": "GO", "cep": "74000-000"},
+  "data_pesquisa": "2026-10-18",
+  "planilha_origem": "quantitativos.csv",
+  "itens": [
+    {
+      "item": "1",
+      "descricao": "Cimento Portland CP II-F-32",
+      "especificacao": "saco de 50 kg, NBR 16697:2018",
+      "unidade": "kg",
+      "quantidade": 1500,
+      "perda_pct": 5,
+      "origem": "quantitativos.csv, linha 2",
+      "referencia": {"preco_unitario": 0.78, "fonte": "SINAPI insumo (exemplo) GO 09/2026"},
+      "ofertas": [
+        {"fornecedor": "Fornecedor A (exemplo)", "produto": "Cimento CP II-F-32 saco 50 kg", "url": "https://example.com/a/cimento",
+         "preco": 39.90, "unidade_venda": "saco", "conteudo": 50, "frete": 0, "prazo_dias": 2, "cidade": "Município exemplo/GO",
+         "acesso": "2026-10-18", "atende": "sim", "confirmado": true, "obs": "preço à vista no Pix"},
+        {"fornecedor": "Fornecedor B (exemplo)", "produto": "Cimento CP II-F-32 50 kg", "url": "https://example.com/b/cimento",
+         "preco": 37.50, "unidade_venda": "saco", "conteudo": 50, "frete": 80, "prazo_dias": 5, "cidade": "Município exemplo/GO",
+         "acesso": "2026-10-18", "atende": "sim", "confirmado": true},
+        {"fornecedor": "Fornecedor C (exemplo)", "produto": "Cimento CP II-F-32 saco 50 kg", "url": "https://example.com/c/cimento",
+         "preco": 41.00, "unidade_venda": "saco", "conteudo": 50, "prazo_dias": 1, "cidade": "Município vizinho/GO",
+         "acesso": "2026-10-18", "atende": "sim", "confirmado": true, "obs": "frete calculado só no carrinho"}
+      ]
+    },
+    {
+      "item": "2",
+      "descricao": "Aço CA-50 φ10 mm",
+      "especificacao": "barra reta de 12 m, NBR 7480:2022",
+      "unidade": "kg",
+      "quantidade": 110.31,
+      "perda_pct": 0,
+      "origem": "quantitativos.csv, linha 4 (já inclui 10% de perda)",
+      "ofertas": [
+        {"fornecedor": "Fornecedor A (exemplo)", "produto": "Vergalhão CA-50 10 mm barra 12 m", "url": "https://example.com/a/aco10",
+         "preco": 54.90, "unidade_venda": "barra 12 m", "conteudo": 7.404, "frete": 0, "prazo_dias": 2,
+         "cidade": "Município exemplo/GO", "acesso": "2026-10-18", "atende": "sim", "confirmado": true,
+         "obs": "conteúdo = massa-barra --bitola 10 --comprimento 12"},
+        {"fornecedor": "Central de corte e dobra D (exemplo)", "produto": "Aço CA-50 10 mm cortado e dobrado (por kg)",
+         "url": "https://example.com/d/aco", "preco": 8.40, "unidade_venda": "kg", "conteudo": 1, "fracionavel": true,
+         "pedido_minimo": 300, "frete": 0, "prazo_dias": 7, "cidade": "Município exemplo/GO", "acesso": "2026-10-18",
+         "atende": "sim", "confirmado": true, "obs": "exige pedido mínimo de 300 kg"}
+      ]
+    },
+    {
+      "item": "3",
+      "descricao": "Bloco cerâmico de vedação 14 x 19 x 29 cm",
+      "especificacao": "furos na horizontal, NBR 15270-1:2017",
+      "unidade": "un",
+      "perda_pct": 5,
+      "derivado_de": {"servico": "Alvenaria de vedação", "quantidade_servico": 31.77, "coeficiente": 13.5,
+                      "fonte": "coeficiente da composição analítica escolhida (exemplo; confirme na base do mês)"},
+      "origem": "quantitativos.csv, linha 5",
+      "ofertas": [
+        {"fornecedor": "Fornecedor B (exemplo)", "produto": "Bloco cerâmico 14x19x29 (milheiro)", "url": "https://example.com/b/bloco",
+         "preco": 1150.00, "unidade_venda": "milheiro", "conteudo": 1000, "frete": 150, "prazo_dias": 4,
+         "cidade": "Município exemplo/GO", "acesso": "2026-10-18", "atende": "sim", "confirmado": true},
+        {"fornecedor": "Olaria E (exemplo)", "situacao": "sob-consulta", "contato": "(62) 0000-0000 · comercial@example.com",
+         "cidade": "Município vizinho/GO", "obs": "vende só por carga fechada; pedir preço do milheiro posto obra"}
+      ]
+    },
+    {
+      "item": "4",
+      "descricao": "Concreto usinado fck 25 MPa, slump 10 ± 2 cm",
+      "especificacao": "bombeável, brita 1",
+      "unidade": "m³",
+      "quantidade": 5.089,
+      "perda_pct": 5,
+      "origem": "quantitativos.csv, linha 1",
+      "ofertas": [
+        {"fornecedor": "Concreteira F (exemplo)", "situacao": "sob-consulta", "contato": "https://example.com/f/orcamento",
+         "cidade": "Município exemplo/GO", "obs": "confirmar volume mínimo, taxa de bomba e horário"}
+      ]
+    }
+  ]
+}

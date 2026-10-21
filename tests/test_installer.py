@@ -50,14 +50,14 @@ def test_estrutura_do_zip(pacote):
     assert "planta-arquitetonica" in names
     assert (pacote / "plugin/skills/planta-arquitetonica/scripts/planta.py").is_file()
     assert (pacote / "mcps/normas-publicas/server.py").is_file()   # código do MCP próprio vai no zip
-    assert len(pack["skills"]) == 9 and len(pack["mcps"]) == 5
+    assert len(pack["skills"]) == 10 and len(pack["mcps"]) == 5
     assert not list(pacote.rglob("*.db")) and not list(pacote.rglob("pdf/*.pdf"))  # documentos não vão
     mk = json.loads((pacote / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
     assert mk["plugins"][0]["name"] == json.loads((pacote / "plugin/.claude-plugin/plugin.json").read_text())["name"]
     assert not list(pacote.rglob("skill.yaml")), "metadados internos não devem ir no zip"
     assert "{{" not in (pacote / "INSTALAR.md").read_text(encoding="utf-8")
     completo = (pacote / "MANUAL-COMPLETO.md").read_text(encoding="utf-8")
-    assert "Versão 1.6.0" in completo and "{{" not in completo
+    assert "Versão 1.7.0" in completo and "{{" not in completo
     assert "Fluxo 1 — planta baixa" in completo
 
 

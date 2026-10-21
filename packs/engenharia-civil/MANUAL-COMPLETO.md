@@ -14,10 +14,11 @@ Este guia acompanha o ZIP. O instalador gera também um `MANUAL.md` com as skill
 | Trabalhar no BIM | `revit-assistente` ou `archicad-assistente` | modelo salvo, IDs/GUIDs e IFC conferidos |
 | Modelar componentes | `solidworks-assistente` | peça, massa e exportações conferidas |
 | Levantar quantidades e orçamento | `quantitativos-sinapi` | quantidades e planilha com mês/UF informados |
+| Cotar materiais com fornecedores na web | `cotacao-materiais` | planilha de compra com empresa, link, data e total estimado |
 | Consultar fontes públicas | `consulta-normas` | documento oficial, item, edição e data de acesso |
 | Redigir laudo ou relatório | `relatorio-tecnico` | texto e evidências revisados pelo responsável |
 
-As nove skills são instruções e ferramentas de apoio. Nenhuma conclusão de projeto decorre apenas de um arquivo gerado ou de um MCP conectado.
+As dez skills são instruções e ferramentas de apoio. Nenhuma conclusão de projeto decorre apenas de um arquivo gerado ou de um MCP conectado.
 
 ## 2. Instalação
 
@@ -59,6 +60,7 @@ Normas ABNT completas e licenciadas não acompanham o pack. Confirme sua ediçã
 - **Revit e Archicad:** o pack ajuda a ler, modelar e auditar elementos com as conexões compatíveis. Dados de geometria, materiais e tipos devem vir de fonte conferida pelo profissional; a criação BIM não valida um projeto de engenharia.
 - **SOLIDWORKS:** forneça dimensões e material de uma peça ou montagem; confira massa, desenho e STEP/DXF no aplicativo.
 - **SINAPI:** forneça a planilha oficial de mês e UF, quantitativos com origem e o BDI escolhido. Confira unidades, critérios de medição e exclusões.
+- **Cotação de materiais:** forneça a planilha de quantitativos e o CEP da obra. Confira a especificação de cada material, os links e a data da pesquisa. Confirme preço, frete e prazo com o fornecedor antes de comprar; materiais a granel saem como pedidos de cotação.
 - **Normas públicas e laudos:** registre fonte, item, data e evidências. Revise o documento com o responsável técnico antes de usar externamente.
 
 ## 6. Conexões opcionais
